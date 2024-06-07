@@ -280,7 +280,13 @@ public class Tests
 	[TestMethod]
 	public void TestToString()
 	{
-		var a = 1.1.ToSignificantNumber();
+		var a = 1.ToSignificantNumber();
+		Assert.AreEqual("1", a.ToString());
+
+		a = -1.ToSignificantNumber();
+		Assert.AreEqual("-1", a.ToString());
+
+		a = 1.1.ToSignificantNumber();
 		Assert.AreEqual("1.1", a.ToString());
 
 		a = 1.01.ToSignificantNumber();
@@ -307,6 +313,12 @@ public class Tests
 
 		a = 2000.ToSignificantNumber();
 		Assert.AreEqual("2000", a.ToString());
+
+		a = 0.001.ToSignificantNumber();
+		Assert.AreEqual("0.001", a.ToString());
+
+		a = -0.001.ToSignificantNumber();
+		Assert.AreEqual("-0.001", a.ToString());
 	}
 
 	[TestMethod]
