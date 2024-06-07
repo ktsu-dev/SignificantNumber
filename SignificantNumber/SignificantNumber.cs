@@ -15,7 +15,7 @@ public readonly struct SignificantNumber
 {
 	internal const int MaxDecimalPlaces = 15;
 	internal const int MinDecimalPlaces = 1;
-	private const string FormatSpecifier = "e";
+	private const string FormatSpecifier = "e15";
 
 	internal int SignificantDigits { get; }
 	internal int Exponent { get; }
@@ -25,6 +25,7 @@ public readonly struct SignificantNumber
 	public static SignificantNumber One => new(0, 1);
 	public static SignificantNumber NegativeOne => new(0, -1);
 
+	private static CultureInfo InvariantCulture { get; } = CultureInfo.InvariantCulture;
 	private SignificantNumber(int exponent, BigInteger significand, bool sanitize = true)
 	{
 		if (sanitize)
@@ -78,6 +79,8 @@ public readonly struct SignificantNumber
 	internal static SignificantNumber CreateFromFloatingPoint<TFloat>(TFloat input)
 		where TFloat : IFloatingPoint<TFloat>
 	{
+		ArgumentNullException.ThrowIfNull(input);
+
 		bool isOne = input == TFloat.One;
 		bool isNegativeOne = input == TFloat.NegativeOne;
 		bool isZero = TFloat.IsZero(input);
@@ -97,11 +100,11 @@ public readonly struct SignificantNumber
 			return NegativeOne;
 		}
 
-		string str = input.ToString($"{FormatSpecifier}{MaxDecimalPlaces}", CultureInfo.InvariantCulture);
+		string str = input.ToString(FormatSpecifier, InvariantCulture);
 		int indexOfE = str.IndexOf('e');
 		var significandStr = str.AsSpan(0, indexOfE);
 		var exponentStr = str.AsSpan(indexOfE + 1, str.Length - indexOfE - 1);
-		int exponentValue = int.Parse(exponentStr, CultureInfo.InvariantCulture);
+		int exponentValue = int.Parse(exponentStr, InvariantCulture);
 
 		while (significandStr.Length > 2 && significandStr[^1] == '0')
 		{
@@ -119,13 +122,15 @@ public readonly struct SignificantNumber
 		Debug.Assert(fractionalLength != 0 || integerComponent.Length == 1);
 
 		string significandStrWithoutDecimal = $"{integerComponent}{fractionalComponent}";
-		var significandValue = BigInteger.Parse(significandStrWithoutDecimal, CultureInfo.InvariantCulture);
+		var significandValue = BigInteger.Parse(significandStrWithoutDecimal, InvariantCulture);
 		return new(exponentValue, significandValue);
 	}
 
 	internal static SignificantNumber CreateFromInteger<TInteger>(TInteger input)
 		where TInteger : IBinaryInteger<TInteger>
 	{
+		ArgumentNullException.ThrowIfNull(input);
+
 		bool isOne = input == TInteger.One;
 		bool isNegativeOne = TInteger.IsNegative(input) && input == -TInteger.One;
 		bool isZero = TInteger.IsZero(input);
@@ -153,7 +158,7 @@ public readonly struct SignificantNumber
 			++exponentValue;
 		}
 
-		var significandValue = BigInteger.Parse(integerComponent, CultureInfo.InvariantCulture);
+		var significandValue = BigInteger.Parse(integerComponent, InvariantCulture);
 
 		return new(exponentValue, significandValue);
 	}
@@ -317,7 +322,7 @@ public readonly struct SignificantNumber
 		}
 
 
-		string significandStr = BigInteger.Abs(Significand).ToString(CultureInfo.InvariantCulture);
+		string significandStr = BigInteger.Abs(Significand).ToString(InvariantCulture);
 		if (Exponent == 0)
 		{
 			return significandStr;
