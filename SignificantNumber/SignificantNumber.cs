@@ -102,6 +102,7 @@ public readonly struct SignificantNumber
 
 		string str = input.ToString(FormatSpecifier, InvariantCulture);
 		int indexOfE = str.IndexOf('e');
+		Debug.Assert(indexOfE > -1);
 
 		var significandStr = str.AsSpan(0, indexOfE);
 		var exponentStr = str.AsSpan(indexOfE + 1, str.Length - indexOfE - 1);
