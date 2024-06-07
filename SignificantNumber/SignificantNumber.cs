@@ -23,6 +23,7 @@ public readonly struct SignificantNumber
 
 	public static SignificantNumber Zero => new(0, 0);
 	public static SignificantNumber One => new(0, 1);
+	public static SignificantNumber NegativeOne => new(0, -1);
 
 	private SignificantNumber(int exponent, BigInteger significand, bool sanitize = true)
 	{
@@ -70,7 +71,8 @@ public readonly struct SignificantNumber
 	internal static SignificantNumber CreateFromFloatingPoint<TFloat>(TFloat input)
 		where TFloat : IFloatingPoint<TFloat>
 	{
-		bool isOne = TFloat.Abs(input) == TFloat.One;
+		bool isOne = input == TFloat.One;
+		bool isNegativeOne = input == TFloat.NegativeOne;
 		bool isZero = TFloat.IsZero(input);
 
 		if (isZero)
@@ -81,6 +83,11 @@ public readonly struct SignificantNumber
 		if (isOne)
 		{
 			return One;
+		}
+
+		if (isNegativeOne)
+		{
+			return NegativeOne;
 		}
 
 		string str = input.ToString($"{FormatSpecifier}{MaxDecimalPlaces}", CultureInfo.InvariantCulture);
@@ -112,7 +119,8 @@ public readonly struct SignificantNumber
 	internal static SignificantNumber CreateFromInteger<TInteger>(TInteger input)
 		where TInteger : IBinaryInteger<TInteger>
 	{
-		bool isOne = TInteger.Abs(input) == TInteger.One;
+		bool isOne = input == TInteger.One;
+		bool isNegativeOne = TInteger.IsNegative(input) && input == -TInteger.One;
 		bool isZero = TInteger.IsZero(input);
 
 		if (isZero)
@@ -123,6 +131,11 @@ public readonly struct SignificantNumber
 		if (isOne)
 		{
 			return One;
+		}
+
+		if (isNegativeOne)
+		{
+			return NegativeOne;
 		}
 
 		int exponentValue = 0;
@@ -281,7 +294,23 @@ public readonly struct SignificantNumber
 
 	public override string ToString()
 	{
-		string significandStr = Significand.ToString(CultureInfo.InvariantCulture);
+		if (this == Zero)
+		{
+			return "0";
+		}
+
+		if (this == One)
+		{
+			return "1";
+		}
+
+		if (this == NegativeOne)
+		{
+			return "-1";
+		}
+
+
+		string significandStr = BigInteger.Abs(Significand).ToString(CultureInfo.InvariantCulture);
 		if (Exponent == 0)
 		{
 			return significandStr;
@@ -294,9 +323,17 @@ public readonly struct SignificantNumber
 
 		int absExponent = -Exponent;
 		string sign = Significand < 0 ? "-" : string.Empty;
-		return absExponent >= significandStr.Length
-			? $"{sign}0.{new string('0', absExponent - significandStr.Length)}{BigInteger.Abs(Significand)}"
-			: $"{significandStr[..^absExponent]}.{significandStr[^absExponent..]}";
+
+		string integralComponent = absExponent >= significandStr.Length
+			? "0"
+			: significandStr[..^absExponent];
+
+		string fractionalComponent = absExponent >= significandStr.Length
+			? $"{new string('0', absExponent - significandStr.Length)}{BigInteger.Abs(Significand)}"
+			: significandStr[^absExponent..];
+
+		string output = $"{sign}{integralComponent}.{fractionalComponent}";
+		return output;
 	}
 
 	public string ToString(string format) => format.Equals("G", StringComparison.OrdinalIgnoreCase) ? ToString() : throw new FormatException();
