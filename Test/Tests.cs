@@ -63,6 +63,30 @@ public class Tests
 	}
 
 	[TestMethod]
+	public void TestNegativeOne()
+	{
+		const int testValue = -1;
+		IsValid(SignificantNumber.NegativeOne);
+		IsValid(sbyte.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(short.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(int.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(long.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(float.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(double.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(decimal.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(BigInteger.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(Half.CreateTruncating(testValue).ToSignificantNumber());
+
+		static void IsValid(SignificantNumber a)
+		{
+			Assert.AreEqual(SignificantNumber.NegativeOne, a);
+			Assert.AreEqual(-BigInteger.Pow(10, SignificantNumber.MaxDecimalPlaces), a.Significand);
+			Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
+			Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
+		}
+	}
+
+	[TestMethod]
 	public void TestCreation()
 	{
 		var a = 1.1.ToSignificantNumber();
@@ -280,7 +304,10 @@ public class Tests
 	[TestMethod]
 	public void TestToString()
 	{
-		var a = 1.ToSignificantNumber();
+		var a = 0.ToSignificantNumber();
+		Assert.AreEqual("0", a.ToString());
+
+		a = 1.ToSignificantNumber();
 		Assert.AreEqual("1", a.ToString());
 
 		a = -1.ToSignificantNumber();

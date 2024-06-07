@@ -51,6 +51,13 @@ public readonly struct SignificantNumber
 				Significand = BigInteger.Pow(10, MaxDecimalPlaces);
 				return;
 			}
+			else if (significand == -1 && exponent == 0)
+			{
+				SignificantDigits = MaxDecimalPlaces + 1;
+				Exponent = -MaxDecimalPlaces;
+				Significand = -BigInteger.Pow(10, MaxDecimalPlaces);
+				return;
+			}
 		}
 
 		//count digits
