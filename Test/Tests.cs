@@ -87,6 +87,8 @@ public class Tests
 	[TestMethod]
 	public void TestCreation()
 	{
+		Assert.ThrowsException<NotSupportedException>(() => Half.CreateChecked(1).ToSignificantNumber());
+
 		var a = 1.1.ToSignificantNumber();
 		Assert.AreEqual(11, a.Significand);
 		Assert.AreEqual(-1, a.Exponent);
