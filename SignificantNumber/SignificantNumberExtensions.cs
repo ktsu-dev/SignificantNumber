@@ -1,34 +1,97 @@
-﻿namespace ktsu.io.SignificantNumber;
+namespace ktsu.io.SignificantNumber;
 
 using System.Numerics;
 
 public static class SignificantNumberExtensions
 {
-	public static SignificantNumber ToSignificantNumber(this Half input) =>
-		SignificantNumber.CreateFromFloatingPoint(input);
-	public static SignificantNumber ToSignificantNumber(this float input) =>
-		SignificantNumber.CreateFromFloatingPoint(input);
-	public static SignificantNumber ToSignificantNumber(this double input) =>
-		SignificantNumber.CreateFromFloatingPoint(input);
-	public static SignificantNumber ToSignificantNumber(this decimal input) =>
-		SignificantNumber.CreateFromFloatingPoint(input);
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1199:Nested code blocks should not be used", Justification = "<Pending>")]
+	public static SignificantNumber ToSignificantNumber<TInput>(this INumber<TInput> input)
+		where TInput : INumber<TInput>
+	{
+		{
+			if (input is sbyte value)
+			{
+				return SignificantNumber.CreateFromInteger(value);
+			}
+		}
 
-	public static SignificantNumber ToSignificantNumber(this sbyte input) =>
-		SignificantNumber.CreateFromInteger(input);
-	public static SignificantNumber ToSignificantNumber(this byte input) =>
-		SignificantNumber.CreateFromInteger(input);
-	public static SignificantNumber ToSignificantNumber(this short input) =>
-		SignificantNumber.CreateFromInteger(input);
-	public static SignificantNumber ToSignificantNumber(this ushort input) =>
-		SignificantNumber.CreateFromInteger(input);
-	public static SignificantNumber ToSignificantNumber(this int input) =>
-		SignificantNumber.CreateFromInteger(input);
-	public static SignificantNumber ToSignificantNumber(this uint input) =>
-		SignificantNumber.CreateFromInteger(input);
-	public static SignificantNumber ToSignificantNumber(this long input) =>
-		SignificantNumber.CreateFromInteger(input);
-	public static SignificantNumber ToSignificantNumber(this ulong input) =>
-		SignificantNumber.CreateFromInteger(input);
-	public static SignificantNumber ToSignificantNumber(this BigInteger input) =>
-		SignificantNumber.CreateFromInteger(input);
+		{
+			if (input is byte value)
+			{
+				return SignificantNumber.CreateFromInteger(value);
+			}
+		}
+
+		{
+			if (input is short value)
+			{
+				return SignificantNumber.CreateFromInteger(value);
+			}
+		}
+
+		{
+			if (input is ushort value)
+			{
+				return SignificantNumber.CreateFromInteger(value);
+			}
+		}
+
+		{
+			if (input is int value)
+			{
+				return SignificantNumber.CreateFromInteger(value);
+			}
+		}
+
+		{
+			if (input is uint value)
+			{
+				return SignificantNumber.CreateFromInteger(value);
+			}
+		}
+
+		{
+			if (input is long value)
+			{
+				return SignificantNumber.CreateFromInteger(value);
+			}
+		}
+
+		{
+			if (input is ulong value)
+			{
+				return SignificantNumber.CreateFromInteger(value);
+			}
+		}
+
+		{
+			if (input is BigInteger value)
+			{
+				return SignificantNumber.CreateFromInteger(value);
+			}
+		}
+
+		{
+			if (input is float value)
+			{
+				return SignificantNumber.CreateFromFloatingPoint(value);
+			}
+		}
+
+		{
+			if (input is double value)
+			{
+				return SignificantNumber.CreateFromFloatingPoint(value);
+			}
+		}
+
+		{
+			if (input is decimal value)
+			{
+				return SignificantNumber.CreateFromFloatingPoint(value);
+			}
+		}
+
+		throw new NotSupportedException();
+	}
 }
