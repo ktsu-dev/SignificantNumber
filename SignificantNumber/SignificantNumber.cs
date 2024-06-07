@@ -102,6 +102,7 @@ public readonly struct SignificantNumber
 
 		string str = input.ToString(FormatSpecifier, InvariantCulture);
 		int indexOfE = str.IndexOf('e');
+
 		var significandStr = str.AsSpan(0, indexOfE);
 		var exponentStr = str.AsSpan(indexOfE + 1, str.Length - indexOfE - 1);
 		int exponentValue = int.Parse(exponentStr, InvariantCulture);
@@ -321,20 +322,20 @@ public readonly struct SignificantNumber
 			return "-1";
 		}
 
-
+		string sign = Significand < 0 ? "-" : string.Empty;
 		string significandStr = BigInteger.Abs(Significand).ToString(InvariantCulture);
+
 		if (Exponent == 0)
 		{
-			return significandStr;
+			return $"{sign}{significandStr}";
 		}
 
 		if (Exponent > 0)
 		{
-			return $"{significandStr}{new string('0', Exponent)}";
+			return $"{sign}{significandStr}{new string('0', Exponent)}";
 		}
 
 		int absExponent = -Exponent;
-		string sign = Significand < 0 ? "-" : string.Empty;
 
 		string integralComponent = absExponent >= significandStr.Length
 			? "0"
