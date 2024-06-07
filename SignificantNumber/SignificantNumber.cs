@@ -1,5 +1,6 @@
 namespace ktsu.io.SignificantNumber;
 
+using System.Diagnostics;
 using System.Globalization;
 using System.Numerics;
 
@@ -94,24 +95,14 @@ public readonly struct SignificantNumber
 		}
 
 		string[] components = significandStr.ToString().Split('.');
-		if (components.Length < 2)
-		{
-			throw new FormatException();
-		}
+		Debug.Assert(components.Length == 2);
 
 		var integerComponent = components[0].AsSpan();
 		var fractionalComponent = components[1].AsSpan();
 		int fractionalLength = fractionalComponent.Length;
 		exponentValue -= fractionalLength;
 
-		if (fractionalLength == 0)
-		{
-			while (integerComponent.Length > 2 && integerComponent[^1] == '0')
-			{
-				integerComponent = integerComponent[..^1];
-				++exponentValue;
-			}
-		}
+		Debug.Assert(fractionalLength != 0 || integerComponent.Length == 1);
 
 		string significandStrWithoutDecimal = $"{integerComponent}{fractionalComponent}";
 		var significandValue = BigInteger.Parse(significandStrWithoutDecimal, CultureInfo.InvariantCulture);
