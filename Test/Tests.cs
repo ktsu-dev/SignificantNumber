@@ -9,57 +9,57 @@ public class Tests
 	[TestMethod]
 	public void TestZero()
 	{
-		var a = 0.ToSignificantNumber();
-		Assert.AreEqual(SignificantNumber.Zero, a);
-		Assert.AreEqual(0, a.Significand);
-		Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
-		Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
+		const int testValue = 0;
+		IsValid(SignificantNumber.Zero);
+		IsValid(byte.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(sbyte.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(short.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(ushort.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(int.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(uint.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(long.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(ulong.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(float.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(double.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(decimal.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(BigInteger.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(Half.CreateTruncating(testValue).ToSignificantNumber());
 
-		a = 0.0.ToSignificantNumber();
-		Assert.AreEqual(SignificantNumber.Zero, a);
-		Assert.AreEqual(0, a.Significand);
-		Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
-		Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
-
-		a = 0.0f.ToSignificantNumber();
-		Assert.AreEqual(SignificantNumber.Zero, a);
-		Assert.AreEqual(0, a.Significand);
-		Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
-		Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
-
-		a = 0.0m.ToSignificantNumber();
-		Assert.AreEqual(SignificantNumber.Zero, a);
-		Assert.AreEqual(0, a.Significand);
-		Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
-		Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
+		static void IsValid(SignificantNumber a)
+		{
+			Assert.AreEqual(SignificantNumber.Zero, a);
+			Assert.AreEqual(0, a.Significand);
+			Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
+			Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
+		}
 	}
 
 	[TestMethod]
 	public void TestOne()
 	{
-		var a = 1.ToSignificantNumber();
-		Assert.AreEqual(SignificantNumber.One, a);
-		Assert.AreEqual(BigInteger.Pow(10, SignificantNumber.MaxDecimalPlaces), a.Significand);
-		Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
-		Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
+		const int testValue = 1;
+		IsValid(SignificantNumber.One);
+		IsValid(byte.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(sbyte.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(short.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(ushort.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(int.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(uint.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(long.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(ulong.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(float.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(double.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(decimal.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(BigInteger.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(Half.CreateTruncating(testValue).ToSignificantNumber());
 
-		a = 1.0.ToSignificantNumber();
-		Assert.AreEqual(SignificantNumber.One, a);
-		Assert.AreEqual(BigInteger.Pow(10, SignificantNumber.MaxDecimalPlaces), a.Significand);
-		Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
-		Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
-
-		a = 1.0f.ToSignificantNumber();
-		Assert.AreEqual(SignificantNumber.One, a);
-		Assert.AreEqual(BigInteger.Pow(10, SignificantNumber.MaxDecimalPlaces), a.Significand);
-		Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
-		Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
-
-		a = 1.0m.ToSignificantNumber();
-		Assert.AreEqual(SignificantNumber.One, a);
-		Assert.AreEqual(BigInteger.Pow(10, SignificantNumber.MaxDecimalPlaces), a.Significand);
-		Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
-		Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
+		static void IsValid(SignificantNumber a)
+		{
+			Assert.AreEqual(SignificantNumber.One, a);
+			Assert.AreEqual(BigInteger.Pow(10, SignificantNumber.MaxDecimalPlaces), a.Significand);
+			Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
+			Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
+		}
 	}
 
 	[TestMethod]
@@ -204,6 +204,9 @@ public class Tests
 		a = 100.1.ToSignificantNumber();
 		b = 100.0.ToSignificantNumber();
 		Assert.AreEqual(a, b);
+
+		a = 1.ToSignificantNumber();
+		Assert.IsFalse(a.Equals(1));
 	}
 
 	[TestMethod]
@@ -298,6 +301,12 @@ public class Tests
 		Assert.ThrowsException<FormatException>(() => a.ToString("D"));
 		Assert.ThrowsException<FormatException>(() => a.ToString("R"));
 		Assert.ThrowsException<FormatException>(() => a.ToString("X"));
+
+		a = 2.ToSignificantNumber();
+		Assert.AreEqual("2", a.ToString());
+
+		a = 2000.ToSignificantNumber();
+		Assert.AreEqual("2000", a.ToString());
 	}
 
 	[TestMethod]
@@ -318,6 +327,9 @@ public class Tests
 		a = 1.1.ToSignificantNumber();
 		b = +a;
 		Assert.AreEqual(a, b);
+
+		a = -0.ToSignificantNumber();
+		Assert.AreEqual(SignificantNumber.Zero, a);
 	}
 
 	[TestMethod]
