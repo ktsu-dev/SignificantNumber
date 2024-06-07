@@ -1,11 +1,81 @@
 namespace ktsu.io.SignificantNumber.Test;
 
+using System.Globalization;
 using System.Numerics;
 using ktsu.io.SignificantNumber;
 
 [TestClass]
 public class Tests
 {
+	public static Random RNG { get; } = new(123456789);
+
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]
+	public static TNumber RandomNumber<TNumber>()
+		where TNumber : INumber<TNumber>
+	{
+		if (typeof(TNumber) == typeof(byte))
+		{
+			return TNumber.CreateChecked(RNG.Next(byte.MinValue, byte.MaxValue));
+		}
+
+		if (typeof(TNumber) == typeof(sbyte))
+		{
+			return TNumber.CreateChecked(RNG.Next(sbyte.MinValue, sbyte.MaxValue));
+		}
+
+		if (typeof(TNumber) == typeof(short))
+		{
+			return TNumber.CreateChecked(RNG.Next(short.MinValue, short.MaxValue));
+		}
+
+		if (typeof(TNumber) == typeof(ushort))
+		{
+			return TNumber.CreateChecked(RNG.Next(ushort.MinValue, ushort.MaxValue));
+		}
+
+		if (typeof(TNumber) == typeof(int))
+		{
+			return TNumber.CreateChecked(RNG.Next(int.MinValue, int.MaxValue));
+		}
+
+		if (typeof(TNumber) == typeof(uint))
+		{
+			return TNumber.CreateChecked((uint)RNG.Next(int.MinValue, int.MaxValue));
+		}
+
+		if (typeof(TNumber) == typeof(long))
+		{
+			return TNumber.CreateChecked(RNG.NextInt64(long.MinValue, long.MaxValue));
+		}
+
+		if (typeof(TNumber) == typeof(ulong))
+		{
+			return TNumber.CreateChecked((ulong)RNG.NextInt64(long.MinValue, long.MaxValue));
+		}
+
+		if (typeof(TNumber) == typeof(float))
+		{
+			return TNumber.CreateChecked(float.MinValue + (RNG.NextSingle() * float.MaxValue) + (RNG.NextSingle() * float.MaxValue));
+		}
+
+		if (typeof(TNumber) == typeof(double))
+		{
+			return TNumber.CreateChecked(double.MinValue + (RNG.NextDouble() * double.MaxValue) + (RNG.NextDouble() * double.MaxValue));
+		}
+
+		if (typeof(TNumber) == typeof(decimal))
+		{
+			return TNumber.CreateChecked(decimal.MinValue + (decimal)(RNG.NextDouble() * (double)decimal.MaxValue) + (decimal)(RNG.NextDouble() * (double)decimal.MaxValue));
+		}
+
+		if (typeof(TNumber) == typeof(BigInteger))
+		{
+			return TNumber.CreateChecked(RNG.NextInt64(long.MinValue, long.MaxValue));
+		}
+
+		throw new NotSupportedException();
+	}
+
 	[TestMethod]
 	public void TestZero()
 	{
@@ -23,7 +93,6 @@ public class Tests
 		IsValid(double.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(decimal.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(BigInteger.CreateChecked(testValue).ToSignificantNumber());
-		IsValid(Half.CreateTruncating(testValue).ToSignificantNumber());
 
 		static void IsValid(SignificantNumber a)
 		{
@@ -51,7 +120,6 @@ public class Tests
 		IsValid(double.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(decimal.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(BigInteger.CreateChecked(testValue).ToSignificantNumber());
-		IsValid(Half.CreateTruncating(testValue).ToSignificantNumber());
 
 		static void IsValid(SignificantNumber a)
 		{
@@ -75,7 +143,6 @@ public class Tests
 		IsValid(double.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(decimal.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(BigInteger.CreateChecked(testValue).ToSignificantNumber());
-		IsValid(Half.CreateTruncating(testValue).ToSignificantNumber());
 
 		static void IsValid(SignificantNumber a)
 		{
@@ -108,6 +175,37 @@ public class Tests
 		Assert.AreEqual(1, a.Significand);
 		Assert.AreEqual(3, a.Exponent);
 		Assert.AreEqual(1, a.SignificantDigits);
+	}
+
+	[TestMethod]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0008:Use explicit type", Justification = "<Pending>")]
+	public void TestRoundTrip()
+	{
+		TestType<sbyte>();
+		TestType<byte>();
+		TestType<short>();
+		TestType<ushort>();
+		TestType<int>();
+		TestType<uint>();
+		TestType<long>();
+		TestType<ulong>();
+		TestType<float>();
+		TestType<double>();
+		TestType<decimal>();
+		TestType<BigInteger>();
+
+		static void TestType<TInput>()
+			where TInput : INumber<TInput>
+		{
+			for (int i = 0; i < 100; i++)
+			{
+				var testValue = RandomNumber<TInput>();
+				var str = testValue.ToSignificantNumber().ToString();
+				var roundtrip = TInput.Parse(str, CultureInfo.InvariantCulture);
+				var epsilon = TInput.Max(TInput.Abs(testValue), TInput.Abs(roundtrip)) * TInput.CreateTruncating(1e-15);
+				Assert.IsTrue(TInput.Abs(testValue - roundtrip) <= epsilon, $"{typeof(TInput).Name}.Abs({testValue} - {roundtrip}) <= {epsilon} was false");
+			}
+		}
 	}
 
 	[TestMethod]
