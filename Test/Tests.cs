@@ -24,6 +24,7 @@ public class Tests
 		IsValid(double.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(decimal.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(BigInteger.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(Half.CreateChecked(testValue).ToSignificantNumber());
 
 		static void IsValid(SignificantNumber a)
 		{
@@ -51,6 +52,7 @@ public class Tests
 		IsValid(double.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(decimal.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(BigInteger.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(Half.CreateChecked(testValue).ToSignificantNumber());
 
 		static void IsValid(SignificantNumber a)
 		{
@@ -74,6 +76,7 @@ public class Tests
 		IsValid(double.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(decimal.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(BigInteger.CreateChecked(testValue).ToSignificantNumber());
+		IsValid(Half.CreateChecked(testValue).ToSignificantNumber());
 
 		static void IsValid(SignificantNumber a)
 		{
@@ -87,8 +90,6 @@ public class Tests
 	[TestMethod]
 	public void TestCreation()
 	{
-		Assert.ThrowsException<NotSupportedException>(() => Half.CreateChecked(1).ToSignificantNumber());
-
 		var a = 1.1.ToSignificantNumber();
 		Assert.AreEqual(11, a.Significand);
 		Assert.AreEqual(-1, a.Exponent);
@@ -130,6 +131,7 @@ public class Tests
 		TestType<double>();
 		TestType<decimal>();
 		TestType<BigInteger>();
+		TestType<Half>();
 
 		static void TestType<TInput>()
 			where TInput : INumber<TInput>
@@ -342,7 +344,7 @@ public class Tests
 	}
 
 	[TestMethod]
-	public void TestUnequality()
+	public void TestInequality()
 	{
 		var a = 1.1.ToSignificantNumber();
 		var b = 1.1.ToSignificantNumber();

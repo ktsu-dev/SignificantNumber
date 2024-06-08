@@ -1,3 +1,5 @@
+// Ignore Spelling: RNG
+
 namespace ktsu.io.SignificantNumber.Test;
 using System.Numerics;
 
@@ -34,134 +36,46 @@ internal static class Helpers
 	public static TNumber GetMaxValue<TNumber>()
 		where TNumber : INumber<TNumber>
 	{
-		if (typeof(TNumber) == typeof(byte))
+		var type = typeof(TNumber);
+		return type switch
 		{
-			return TNumber.CreateChecked(byte.MaxValue);
-		}
-
-		if (typeof(TNumber) == typeof(sbyte))
-		{
-			return TNumber.CreateChecked(sbyte.MaxValue);
-		}
-
-		if (typeof(TNumber) == typeof(short))
-		{
-			return TNumber.CreateChecked(short.MaxValue);
-		}
-
-		if (typeof(TNumber) == typeof(ushort))
-		{
-			return TNumber.CreateChecked(ushort.MaxValue);
-		}
-
-		if (typeof(TNumber) == typeof(int))
-		{
-			return TNumber.CreateChecked(int.MaxValue);
-		}
-
-		if (typeof(TNumber) == typeof(uint))
-		{
-			return TNumber.CreateChecked(uint.MaxValue);
-		}
-
-		if (typeof(TNumber) == typeof(long))
-		{
-			return TNumber.CreateChecked(long.MaxValue);
-		}
-
-		if (typeof(TNumber) == typeof(ulong))
-		{
-			return TNumber.CreateChecked(long.MaxValue); // special case because random returns a signed int64
-		}
-
-		if (typeof(TNumber) == typeof(float))
-		{
-			return TNumber.CreateChecked(float.MaxValue);
-		}
-
-		if (typeof(TNumber) == typeof(double))
-		{
-			return TNumber.CreateChecked(double.MaxValue);
-		}
-
-		if (typeof(TNumber) == typeof(decimal))
-		{
-			return TNumber.CreateChecked(79228162514264300000000000000m); // special case because we have 15 digits of precision
-		}
-
-		if (typeof(TNumber) == typeof(BigInteger))
-		{
-			return TNumber.CreateChecked(long.MaxValue);
-		}
-
-		throw new NotSupportedException();
+			_ when type == typeof(byte) => TNumber.CreateChecked(byte.MaxValue),
+			_ when type == typeof(sbyte) => TNumber.CreateChecked(sbyte.MaxValue),
+			_ when type == typeof(short) => TNumber.CreateChecked(short.MaxValue),
+			_ when type == typeof(ushort) => TNumber.CreateChecked(ushort.MaxValue),
+			_ when type == typeof(int) => TNumber.CreateChecked(int.MaxValue),
+			_ when type == typeof(uint) => TNumber.CreateChecked(uint.MaxValue),
+			_ when type == typeof(long) => TNumber.CreateChecked(long.MaxValue),
+			_ when type == typeof(ulong) => TNumber.CreateChecked(long.MaxValue), // special case because random returns a signed int64
+			_ when type == typeof(float) => TNumber.CreateChecked(float.MaxValue),
+			_ when type == typeof(double) => TNumber.CreateChecked(double.MaxValue),
+			_ when type == typeof(decimal) => TNumber.CreateChecked(79228162514264300000000000000m), // special case because we have 15 digits of precision
+			_ when type == typeof(BigInteger) => TNumber.CreateChecked(long.MaxValue),
+			_ => throw new NotSupportedException(),
+		};
 	}
 
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]
 	public static TNumber GetMinValue<TNumber>()
 		where TNumber : INumber<TNumber>
 	{
-		if (typeof(TNumber) == typeof(byte))
+		var type = typeof(TNumber);
+		return type switch
 		{
-			return TNumber.CreateChecked(byte.MinValue);
-		}
-
-		if (typeof(TNumber) == typeof(sbyte))
-		{
-			return TNumber.CreateChecked(sbyte.MinValue + 1); // you cant use Abs on a signed number that is the minimum value
-		}
-
-		if (typeof(TNumber) == typeof(short))
-		{
-			return TNumber.CreateChecked(short.MinValue + 1); // you cant use Abs on a signed number that is the minimum value
-		}
-
-		if (typeof(TNumber) == typeof(ushort))
-		{
-			return TNumber.CreateChecked(ushort.MinValue);
-		}
-
-		if (typeof(TNumber) == typeof(int))
-		{
-			return TNumber.CreateChecked(int.MinValue + 1); // you cant use Abs on a signed number that is the minimum value
-		}
-
-		if (typeof(TNumber) == typeof(uint))
-		{
-			return TNumber.CreateChecked(uint.MinValue);
-		}
-
-		if (typeof(TNumber) == typeof(long))
-		{
-			return TNumber.CreateChecked(long.MinValue + 1); // you cant use Abs on a signed number that is the minimum value
-		}
-
-		if (typeof(TNumber) == typeof(ulong))
-		{
-			return TNumber.CreateChecked(ulong.MinValue);
-		}
-
-		if (typeof(TNumber) == typeof(float))
-		{
-			return TNumber.CreateChecked(float.MinValue);
-		}
-
-		if (typeof(TNumber) == typeof(double))
-		{
-			return TNumber.CreateChecked(double.MinValue);
-		}
-
-		if (typeof(TNumber) == typeof(decimal))
-		{
-			return TNumber.CreateChecked(-79228162514264300000000000000m); // special case because we have 15 digits of precision
-		}
-
-		if (typeof(TNumber) == typeof(BigInteger))
-		{
-			return TNumber.CreateChecked(long.MinValue);
-		}
-
-		throw new NotSupportedException();
+			_ when type == typeof(byte) => TNumber.CreateChecked(byte.MinValue),
+			_ when type == typeof(sbyte) => TNumber.CreateChecked(sbyte.MinValue + 1), // you cant use Abs on a signed number that is the minimum value
+			_ when type == typeof(short) => TNumber.CreateChecked(short.MinValue + 1), // you cant use Abs on a signed number that is the minimum value
+			_ when type == typeof(ushort) => TNumber.CreateChecked(ushort.MinValue),
+			_ when type == typeof(int) => TNumber.CreateChecked(int.MinValue + 1), // you cant use Abs on a signed number that is the minimum value
+			_ when type == typeof(uint) => TNumber.CreateChecked(uint.MinValue),
+			_ when type == typeof(long) => TNumber.CreateChecked(long.MinValue + 1), // you cant use Abs on a signed number that is the minimum value
+			_ when type == typeof(ulong) => TNumber.CreateChecked(ulong.MinValue),
+			_ when type == typeof(float) => TNumber.CreateChecked(float.MinValue),
+			_ when type == typeof(double) => TNumber.CreateChecked(double.MinValue),
+			_ when type == typeof(decimal) => TNumber.CreateChecked(-79228162514264300000000000000m), // special case because we have 15 digits of precision
+			_ when type == typeof(BigInteger) => TNumber.CreateChecked(long.MinValue),
+			_ => throw new NotSupportedException(),
+		};
 	}
 
 	public static long GetMinValueAsLong<TNumber>()

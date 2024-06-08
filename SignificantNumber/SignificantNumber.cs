@@ -1,17 +1,13 @@
 namespace ktsu.io.SignificantNumber;
 
+using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 
 public readonly struct SignificantNumber
-	: IAdditionOperators<SignificantNumber, SignificantNumber, SignificantNumber>
-	, ISubtractionOperators<SignificantNumber, SignificantNumber, SignificantNumber>
-	, IMultiplyOperators<SignificantNumber, SignificantNumber, SignificantNumber>
-	, IDivisionOperators<SignificantNumber, SignificantNumber, SignificantNumber>
-	, IUnaryPlusOperators<SignificantNumber, SignificantNumber>
-	, IUnaryNegationOperators<SignificantNumber, SignificantNumber>
-	, IEqualityOperators<SignificantNumber, SignificantNumber, bool>
+	: INumber<SignificantNumber>
 {
 	internal const int MaxDecimalPlaces = 15;
 	internal const int MinDecimalPlaces = 1;
@@ -80,55 +76,41 @@ public readonly struct SignificantNumber
 
 	private static CultureInfo InvariantCulture { get; } = CultureInfo.InvariantCulture;
 
+	public static int Radix => 2;
+
+	public static SignificantNumber AdditiveIdentity => Zero;
+
+	public static SignificantNumber MultiplicativeIdentity => One;
+
+	static SignificantNumber INumberBase<SignificantNumber>.One => One;
+
+	static int INumberBase<SignificantNumber>.Radix => Radix;
+
+	static SignificantNumber INumberBase<SignificantNumber>.Zero => Zero;
+
+	static SignificantNumber IAdditiveIdentity<SignificantNumber, SignificantNumber>.AdditiveIdentity => AdditiveIdentity;
+
+	static SignificantNumber IMultiplicativeIdentity<SignificantNumber, SignificantNumber>.MultiplicativeIdentity => MultiplicativeIdentity;
+
 	public override bool Equals(object? obj) => obj is SignificantNumber number && this == number;
+	public bool Equals(SignificantNumber other) => this == other;
 
 	public override int GetHashCode() => HashCode.Combine(Exponent, Significand);
 
-	public override string ToString()
+	public override string ToString() => ToString(this, null, null);
+
+	public string ToString(string format) => ToString(this, format, null);
+	public static string ToString(SignificantNumber number, string? format, IFormatProvider? formatProvider)
 	{
-		if (this == Zero)
-		{
-			return "0";
-		}
-
-		if (this == One)
-		{
-			return "1";
-		}
-
-		if (this == NegativeOne)
-		{
-			return "-1";
-		}
-
-		string sign = Significand < 0 ? "-" : string.Empty;
-		string significandStr = BigInteger.Abs(Significand).ToString(InvariantCulture);
-
-		if (Exponent == 0)
-		{
-			return $"{sign}{significandStr}";
-		}
-
-		if (Exponent > 0)
-		{
-			return $"{sign}{significandStr}{new string('0', Exponent)}";
-		}
-
-		int absExponent = -Exponent;
-
-		string integralComponent = absExponent >= significandStr.Length
-			? "0"
-			: significandStr[..^absExponent];
-
-		string fractionalComponent = absExponent >= significandStr.Length
-			? $"{new string('0', absExponent - significandStr.Length)}{BigInteger.Abs(Significand)}"
-			: significandStr[^absExponent..];
-
-		string output = $"{sign}{integralComponent}.{fractionalComponent}";
-		return output;
+		int bufferSize = int.Abs(number.Exponent) + number.SignificantDigits + 2; // +2 is for negative symbol and decimal symbol
+		Span<char> buffer = stackalloc char[bufferSize];
+		Debug.Assert(buffer.Length >= bufferSize);
+		return number.TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider)
+			? buffer[..charsWritten].ToString()
+			: string.Empty;
 	}
 
-	public SignificantNumber Abs() => Significand < 0 ? -this : this;
+	public SignificantNumber Abs() => Abs(this);
 
 	public SignificantNumber Round(int decimalDigits)
 	{
@@ -145,16 +127,16 @@ public readonly struct SignificantNumber
 		return this;
 	}
 
-	public string ToString(string format) => format.Equals("G", StringComparison.OrdinalIgnoreCase) ? ToString() : throw new FormatException();
-
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "<Pending>")]
+	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "<Pending>")]
 	internal static SignificantNumber CreateFromFloatingPoint<TFloat>(TFloat input)
-		where TFloat : IFloatingPoint<TFloat>
+		where TFloat : INumber<TFloat>
 	{
 		ArgumentNullException.ThrowIfNull(input);
 
+		Debug.Assert(Array.Exists(typeof(TFloat).GetInterfaces(), i => i.Name.StartsWith("IFloatingPoint", StringComparison.Ordinal)));
+
 		bool isOne = input == TFloat.One;
-		bool isNegativeOne = input == TFloat.NegativeOne;
+		bool isNegativeOne = input == -TFloat.One;
 		bool isZero = TFloat.IsZero(input);
 
 		if (isZero)
@@ -201,9 +183,11 @@ public readonly struct SignificantNumber
 	}
 
 	internal static SignificantNumber CreateFromInteger<TInteger>(TInteger input)
-		where TInteger : IBinaryInteger<TInteger>
+		where TInteger : INumber<TInteger>
 	{
 		ArgumentNullException.ThrowIfNull(input);
+
+		Debug.Assert(Array.Exists(typeof(TInteger).GetInterfaces(), i => i.Name.StartsWith("IBinaryInteger", StringComparison.Ordinal)));
 
 		bool isOne = input == TInteger.One;
 		bool isNegativeOne = TInteger.IsNegative(input) && input == -TInteger.One;
@@ -225,7 +209,7 @@ public readonly struct SignificantNumber
 		}
 
 		int exponentValue = 0;
-		var integerComponent = input.ToString().AsSpan();
+		var integerComponent = input.ToString().AsSpan(); //TODO: replace all uses of ToString with TryFormat with stack allocated spans
 		while (integerComponent.Length > 1 && integerComponent[^1] == '0')
 		{
 			integerComponent = integerComponent[..^1];
@@ -296,6 +280,176 @@ public readonly struct SignificantNumber
 		return new SignificantNumber(newExponent, newSignificand, sanitize: false);
 	}
 
+	[SuppressMessage("Major Code Smell", "S3358:Ternary operators should not be nested", Justification = "<Pending>")]
+	public int CompareTo(object? obj) =>
+		obj switch
+		{
+			null => 1,
+			SignificantNumber number => CompareTo(number),
+			_ => throw new ArgumentException(null, nameof(obj)),
+		};
+
+	[SuppressMessage("Major Code Smell", "S3358:Ternary operators should not be nested", Justification = "<Pending>")]
+	public int CompareTo(SignificantNumber other) =>
+		this < other
+		? -1
+		: this > other
+		? 1
+		: 0;
+
+	public static SignificantNumber Abs(SignificantNumber value) => value.Significand < 0 ? -value : value;
+	public static bool IsCanonical(SignificantNumber _) => true;
+	public static bool IsComplexNumber(SignificantNumber value) => !IsRealNumber(value);
+	public static bool IsEvenInteger(SignificantNumber value) => IsInteger(value) && value.Significand.IsEven;
+	public static bool IsFinite(SignificantNumber _) => true;
+	public static bool IsImaginaryNumber(SignificantNumber value) => !IsRealNumber(value);
+	public static bool IsInfinity(SignificantNumber value) => !IsFinite(value);
+	public static bool IsInteger(SignificantNumber value) => value.Exponent >= 0;
+	public static bool IsNaN(SignificantNumber _) => false;
+	public static bool IsNegative(SignificantNumber value) => !IsPositive(value);
+	public static bool IsNegativeInfinity(SignificantNumber value) => IsNegative(value);
+	public static bool IsNormal(SignificantNumber _) => true;
+	public static bool IsOddInteger(SignificantNumber value) => IsInteger(value) && !value.Significand.IsEven;
+	public static bool IsPositive(SignificantNumber value) => value.Significand >= 0;
+	public static bool IsPositiveInfinity(SignificantNumber value) => IsInfinity(value) && IsPositive(value);
+	public static bool IsRealNumber(SignificantNumber _) => true;
+	public static bool IsSubnormal(SignificantNumber value) => !IsNormal(value);
+	public static bool IsZero(SignificantNumber value) => value.Significand == 0;
+	public static SignificantNumber MaxMagnitude(SignificantNumber x, SignificantNumber y) => x.Abs() > y.Abs() ? x : y;
+	public static SignificantNumber MaxMagnitudeNumber(SignificantNumber x, SignificantNumber y) => MaxMagnitude(x, y);
+	public static SignificantNumber MinMagnitude(SignificantNumber x, SignificantNumber y) => x.Abs() < y.Abs() ? x : y;
+	public static SignificantNumber MinMagnitudeNumber(SignificantNumber x, SignificantNumber y) => MinMagnitude(x, y);
+	public static SignificantNumber Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) => throw new NotImplementedException();
+	public static SignificantNumber Parse(string s, NumberStyles style, IFormatProvider? provider) => throw new NotImplementedException();
+	public static SignificantNumber Parse(string s, IFormatProvider? provider) => throw new NotImplementedException();
+	public static SignificantNumber Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => throw new NotImplementedException();
+	public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotImplementedException();
+	public static bool TryParse([NotNullWhen(true)] string? s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotImplementedException();
+	public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotImplementedException();
+	public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotImplementedException();
+	public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+	{
+		int requiredLength = SignificantDigits + Exponent + 2;
+
+		if (destination.Length < requiredLength)
+		{
+			charsWritten = 0;
+			return false;
+		}
+
+		if (!format.IsEmpty && !format.Equals("G", StringComparison.OrdinalIgnoreCase))
+		{
+			throw new FormatException();
+		}
+
+		destination.Clear();
+
+		string output;
+
+		provider ??= InvariantCulture;
+		var numberFormat = NumberFormatInfo.GetInstance(provider);
+
+		if (this == Zero)
+		{
+			output = "0";
+		}
+		else if (this == One)
+		{
+			output = "1";
+		}
+		else if (this == NegativeOne)
+		{
+			output = $"{numberFormat.NegativeSign}1";
+		}
+		else
+		{
+
+			string sign = Significand < 0 ? numberFormat.NegativeSign : string.Empty;
+			string significandStr = BigInteger.Abs(Significand).ToString(InvariantCulture);
+
+			if (Exponent == 0)
+			{
+				output = $"{sign}{significandStr}";
+			}
+			else if (Exponent > 0)
+			{
+				//string exponentSymbol = format == "G" ? "E" : "e";
+				//int overflowChars = int.Abs(Exponent) + significandStr.Length - MaxDecimalPlaces;
+				//output = overflowChars > 0
+				//	? $"{sign}{significandStr[..1]}{numberFormat.NumberDecimalSeparator}{significandStr[1..MaxDecimalPlaces]}{exponentSymbol}{Exponent + int.CopySign(overflowChars, Exponent):D3}"
+				//	: $"{sign}{significandStr}{new string('0', Exponent)}";
+				Span<char> trainlingZeroes = stackalloc char[Exponent];
+				trainlingZeroes.Fill('0');
+				output = $"{sign}{significandStr}{trainlingZeroes}";
+			}
+			else
+			{
+
+				int absExponent = -Exponent;
+
+				string integralComponent = absExponent >= significandStr.Length
+					? "0"
+					: significandStr[..^absExponent];
+
+				Span<char> fractionalZeroes = stackalloc char[absExponent - significandStr.Length];
+				fractionalZeroes.Fill('0');
+
+				string fractionalComponent = absExponent >= significandStr.Length
+					? $"{fractionalZeroes}{BigInteger.Abs(Significand)}"
+					: significandStr[^absExponent..];
+
+				output = $"{sign}{integralComponent}{numberFormat.NumberDecimalSeparator}{fractionalComponent}";
+			}
+		}
+
+		bool success = output.TryCopyTo(destination);
+		Debug.Assert(success, $"Destination buffer is too small:{Environment.NewLine}{destination.Length} when needed {output.Length}{Environment.NewLine}{SignificantDigits}:{Significand}e{Exponent}");
+
+		charsWritten = output.Length;
+		return true;
+	}
+	int IComparable.CompareTo(object? obj) => CompareTo(obj);
+	int IComparable<SignificantNumber>.CompareTo(SignificantNumber other) => CompareTo(other);
+	static SignificantNumber INumberBase<SignificantNumber>.Abs(SignificantNumber value) => Abs(value);
+	static bool INumberBase<SignificantNumber>.IsCanonical(SignificantNumber value) => IsCanonical(value);
+	static bool INumberBase<SignificantNumber>.IsComplexNumber(SignificantNumber value) => IsComplexNumber(value);
+	static bool INumberBase<SignificantNumber>.IsEvenInteger(SignificantNumber value) => IsEvenInteger(value);
+	static bool INumberBase<SignificantNumber>.IsFinite(SignificantNumber value) => IsFinite(value);
+	static bool INumberBase<SignificantNumber>.IsImaginaryNumber(SignificantNumber value) => IsImaginaryNumber(value);
+	static bool INumberBase<SignificantNumber>.IsInfinity(SignificantNumber value) => IsInfinity(value);
+	static bool INumberBase<SignificantNumber>.IsInteger(SignificantNumber value) => IsInteger(value);
+	static bool INumberBase<SignificantNumber>.IsNaN(SignificantNumber value) => IsNaN(value);
+	static bool INumberBase<SignificantNumber>.IsNegative(SignificantNumber value) => IsNegative(value);
+	static bool INumberBase<SignificantNumber>.IsNegativeInfinity(SignificantNumber value) => IsNegativeInfinity(value);
+	static bool INumberBase<SignificantNumber>.IsNormal(SignificantNumber value) => IsNormal(value);
+	static bool INumberBase<SignificantNumber>.IsOddInteger(SignificantNumber value) => IsOddInteger(value);
+	static bool INumberBase<SignificantNumber>.IsPositive(SignificantNumber value) => IsPositive(value);
+	static bool INumberBase<SignificantNumber>.IsPositiveInfinity(SignificantNumber value) => IsPositiveInfinity(value);
+	static bool INumberBase<SignificantNumber>.IsRealNumber(SignificantNumber value) => IsRealNumber(value);
+	static bool INumberBase<SignificantNumber>.IsSubnormal(SignificantNumber value) => IsSubnormal(value);
+	static bool INumberBase<SignificantNumber>.IsZero(SignificantNumber value) => IsZero(value);
+	static SignificantNumber INumberBase<SignificantNumber>.MaxMagnitude(SignificantNumber x, SignificantNumber y) => MaxMagnitude(x, y);
+	static SignificantNumber INumberBase<SignificantNumber>.MaxMagnitudeNumber(SignificantNumber x, SignificantNumber y) => MaxMagnitudeNumber(x, y);
+	static SignificantNumber INumberBase<SignificantNumber>.MinMagnitude(SignificantNumber x, SignificantNumber y) => MinMagnitude(x, y);
+	static SignificantNumber INumberBase<SignificantNumber>.MinMagnitudeNumber(SignificantNumber x, SignificantNumber y) => MinMagnitudeNumber(x, y);
+	static SignificantNumber INumberBase<SignificantNumber>.Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) => Parse(s, style, provider);
+	static SignificantNumber INumberBase<SignificantNumber>.Parse(string s, NumberStyles style, IFormatProvider? provider) => Parse(s, style, provider);
+	static bool INumberBase<SignificantNumber>.TryConvertFromChecked<TOther>(TOther value, out SignificantNumber result) => throw new NotImplementedException();
+	static bool INumberBase<SignificantNumber>.TryConvertFromSaturating<TOther>(TOther value, out SignificantNumber result) => throw new NotImplementedException();
+	static bool INumberBase<SignificantNumber>.TryConvertFromTruncating<TOther>(TOther value, out SignificantNumber result) => throw new NotImplementedException();
+	static bool INumberBase<SignificantNumber>.TryConvertToChecked<TOther>(SignificantNumber value, out TOther result) => throw new NotImplementedException();
+	static bool INumberBase<SignificantNumber>.TryConvertToSaturating<TOther>(SignificantNumber value, out TOther result) => throw new NotImplementedException();
+	static bool INumberBase<SignificantNumber>.TryConvertToTruncating<TOther>(SignificantNumber value, out TOther result) => throw new NotImplementedException();
+	static bool INumberBase<SignificantNumber>.TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, out SignificantNumber result) => TryParse(s, style, provider, out result);
+	static bool INumberBase<SignificantNumber>.TryParse(string? s, NumberStyles style, IFormatProvider? provider, out SignificantNumber result) => TryParse(s, style, provider, out result);
+	bool IEquatable<SignificantNumber>.Equals(SignificantNumber other) => Equals(other);
+	bool ISpanFormattable.TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider) => TryFormat(destination, out charsWritten, format, provider);
+	string IFormattable.ToString(string? format, IFormatProvider? formatProvider) => ToString(this, format, formatProvider);
+	static SignificantNumber ISpanParsable<SignificantNumber>.Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s, provider);
+	static bool ISpanParsable<SignificantNumber>.TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out SignificantNumber result) => TryParse(s.ToString(), provider, out result);
+	static SignificantNumber IParsable<SignificantNumber>.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
+	static bool IParsable<SignificantNumber>.TryParse(string? s, IFormatProvider? provider, out SignificantNumber result) => TryParse(s, provider, out result);
+
 	public static SignificantNumber operator -(SignificantNumber value)
 	{
 		return value == Zero
@@ -357,4 +511,27 @@ public readonly struct SignificantNumber
 		return leftSignificant.Exponent == rightSignificant.Exponent
 			&& leftSignificant.Significand == rightSignificant.Significand;
 	}
+
+	public static bool operator >(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	public static bool operator >=(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	public static bool operator <(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	public static bool operator <=(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	public static SignificantNumber operator %(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	public static SignificantNumber operator --(SignificantNumber value) => throw new NotImplementedException();
+	public static SignificantNumber operator ++(SignificantNumber value) => throw new NotImplementedException();
+	static bool IComparisonOperators<SignificantNumber, SignificantNumber, bool>.operator >(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	static bool IComparisonOperators<SignificantNumber, SignificantNumber, bool>.operator >=(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	static bool IComparisonOperators<SignificantNumber, SignificantNumber, bool>.operator <(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	static bool IComparisonOperators<SignificantNumber, SignificantNumber, bool>.operator <=(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	static SignificantNumber IModulusOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator %(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	static SignificantNumber IAdditionOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator +(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	static SignificantNumber IDecrementOperators<SignificantNumber>.operator --(SignificantNumber value) => throw new NotImplementedException();
+	static SignificantNumber IDivisionOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator /(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	static bool IEqualityOperators<SignificantNumber, SignificantNumber, bool>.operator ==(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	static bool IEqualityOperators<SignificantNumber, SignificantNumber, bool>.operator !=(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	static SignificantNumber IIncrementOperators<SignificantNumber>.operator ++(SignificantNumber value) => throw new NotImplementedException();
+	static SignificantNumber IMultiplyOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator *(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	static SignificantNumber ISubtractionOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator -(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	static SignificantNumber IUnaryNegationOperators<SignificantNumber, SignificantNumber>.operator -(SignificantNumber value) => throw new NotImplementedException();
+	static SignificantNumber IUnaryPlusOperators<SignificantNumber, SignificantNumber>.operator +(SignificantNumber value) => throw new NotImplementedException();
 }
