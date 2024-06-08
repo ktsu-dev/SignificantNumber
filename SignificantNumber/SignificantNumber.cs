@@ -17,15 +17,6 @@ public readonly struct SignificantNumber
 	internal const int MinDecimalPlaces = 1;
 	private const string FormatSpecifier = "e15";
 
-	internal int SignificantDigits { get; }
-	internal int Exponent { get; }
-	internal BigInteger Significand { get; }
-
-	public static SignificantNumber Zero => new(0, 0);
-	public static SignificantNumber One => new(0, 1);
-	public static SignificantNumber NegativeOne => new(0, -1);
-
-	private static CultureInfo InvariantCulture { get; } = CultureInfo.InvariantCulture;
 	private SignificantNumber(int exponent, BigInteger significand, bool sanitize = true)
 	{
 		if (sanitize)
@@ -74,6 +65,87 @@ public readonly struct SignificantNumber
 		Exponent = exponent;
 		Significand = significand;
 	}
+
+	public static SignificantNumber NegativeOne => new(0, -1);
+
+	public static SignificantNumber One => new(0, 1);
+
+	public static SignificantNumber Zero => new(0, 0);
+
+	internal int Exponent { get; }
+
+	internal BigInteger Significand { get; }
+
+	internal int SignificantDigits { get; }
+
+	private static CultureInfo InvariantCulture { get; } = CultureInfo.InvariantCulture;
+
+	public override bool Equals(object? obj) => obj is SignificantNumber number && this == number;
+
+	public override int GetHashCode() => HashCode.Combine(Exponent, Significand);
+
+	public override string ToString()
+	{
+		if (this == Zero)
+		{
+			return "0";
+		}
+
+		if (this == One)
+		{
+			return "1";
+		}
+
+		if (this == NegativeOne)
+		{
+			return "-1";
+		}
+
+		string sign = Significand < 0 ? "-" : string.Empty;
+		string significandStr = BigInteger.Abs(Significand).ToString(InvariantCulture);
+
+		if (Exponent == 0)
+		{
+			return $"{sign}{significandStr}";
+		}
+
+		if (Exponent > 0)
+		{
+			return $"{sign}{significandStr}{new string('0', Exponent)}";
+		}
+
+		int absExponent = -Exponent;
+
+		string integralComponent = absExponent >= significandStr.Length
+			? "0"
+			: significandStr[..^absExponent];
+
+		string fractionalComponent = absExponent >= significandStr.Length
+			? $"{new string('0', absExponent - significandStr.Length)}{BigInteger.Abs(Significand)}"
+			: significandStr[^absExponent..];
+
+		string output = $"{sign}{integralComponent}.{fractionalComponent}";
+		return output;
+	}
+
+	public SignificantNumber Abs() => Significand < 0 ? -this : this;
+
+	public SignificantNumber Round(int decimalDigits)
+	{
+		int currentDecimalDigits = CountDecimalDigits();
+		int decimalDifference = int.Abs(decimalDigits - currentDecimalDigits);
+		if (decimalDifference > 0)
+		{
+			var roundingFactor = BigInteger.CopySign(CreateRepeatingDigits(5, decimalDifference), Significand);
+			var newSignificand = (Significand + roundingFactor) / BigInteger.Pow(10, decimalDifference);
+			int newExponent = Exponent - int.CopySign(decimalDifference, Exponent);
+			return new SignificantNumber(newExponent, newSignificand);
+		}
+
+		return this;
+	}
+
+	public string ToString(string format) => format.Equals("G", StringComparison.OrdinalIgnoreCase) ? ToString() : throw new FormatException();
 
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "<Pending>")]
 	internal static SignificantNumber CreateFromFloatingPoint<TFloat>(TFloat input)
@@ -165,65 +237,6 @@ public readonly struct SignificantNumber
 		return new(exponentValue, significandValue);
 	}
 
-	private SignificantNumber WithCommonExponent(SignificantNumber other)
-	{
-		int absExponent = int.Abs(Exponent);
-		int absOtherExponent = int.Abs(other.Exponent);
-		int highestExponent = absExponent > absOtherExponent ? absExponent : absOtherExponent;
-		int exponentDifference = highestExponent - absExponent;
-		var newSignificand = Significand * BigInteger.Pow(10, exponentDifference);
-		int newExponent = Exponent == 0
-			? -highestExponent
-			: int.CopySign(highestExponent, Exponent);
-		return new SignificantNumber(newExponent, newSignificand, sanitize: false);
-	}
-
-	private SignificantNumber ReduceSignificance(int significantDigits)
-	{
-		int significantDifference = significantDigits < SignificantDigits
-			? SignificantDigits - significantDigits
-			: 0;
-		int newExponent = Exponent - int.CopySign(significantDifference, Exponent);
-		var roundingFactor = BigInteger.CopySign(CreateRepeatingDigits(5, significantDifference), Significand);
-		var newSignificand = (Significand + roundingFactor) / BigInteger.Pow(10, significantDifference);
-		return new(newExponent, newSignificand);
-	}
-
-	private int CountDecimalDigits() =>
-		Exponent > 0
-		? 0
-		: int.Abs(Exponent);
-
-	private static int LowestDecimalDigits(SignificantNumber left, SignificantNumber right)
-	{
-		int leftDecimalDigits = left.CountDecimalDigits();
-		int rightDecimalDigits = right.CountDecimalDigits();
-		return leftDecimalDigits < rightDecimalDigits
-		? leftDecimalDigits
-		: rightDecimalDigits;
-	}
-
-	private static int LowestSignificantDigits(SignificantNumber left, SignificantNumber right) =>
-		left.SignificantDigits < right.SignificantDigits
-		? left.SignificantDigits
-		: right.SignificantDigits;
-
-	public SignificantNumber Abs() => Significand < 0 ? -this : this;
-	public SignificantNumber Round(int decimalDigits)
-	{
-		int currentDecimalDigits = CountDecimalDigits();
-		int decimalDifference = int.Abs(decimalDigits - currentDecimalDigits);
-		if (decimalDifference > 0)
-		{
-			var roundingFactor = BigInteger.CopySign(CreateRepeatingDigits(5, decimalDifference), Significand);
-			var newSignificand = (Significand + roundingFactor) / BigInteger.Pow(10, decimalDifference);
-			int newExponent = Exponent - int.CopySign(decimalDifference, Exponent);
-			return new SignificantNumber(newExponent, newSignificand);
-		}
-
-		return this;
-	}
-
 	private static BigInteger CreateRepeatingDigits(int digit, int numberOfRepeats)
 	{
 		if (numberOfRepeats <= 0)
@@ -239,6 +252,68 @@ public readonly struct SignificantNumber
 
 		return repeatingDigit;
 	}
+
+	private static int LowestDecimalDigits(SignificantNumber left, SignificantNumber right)
+	{
+		int leftDecimalDigits = left.CountDecimalDigits();
+		int rightDecimalDigits = right.CountDecimalDigits();
+		return leftDecimalDigits < rightDecimalDigits
+		? leftDecimalDigits
+		: rightDecimalDigits;
+	}
+
+	private static int LowestSignificantDigits(SignificantNumber left, SignificantNumber right) =>
+		left.SignificantDigits < right.SignificantDigits
+		? left.SignificantDigits
+		: right.SignificantDigits;
+
+	private int CountDecimalDigits() =>
+		Exponent > 0
+		? 0
+		: int.Abs(Exponent);
+
+	private SignificantNumber ReduceSignificance(int significantDigits)
+	{
+		int significantDifference = significantDigits < SignificantDigits
+			? SignificantDigits - significantDigits
+			: 0;
+		int newExponent = Exponent - int.CopySign(significantDifference, Exponent);
+		var roundingFactor = BigInteger.CopySign(CreateRepeatingDigits(5, significantDifference), Significand);
+		var newSignificand = (Significand + roundingFactor) / BigInteger.Pow(10, significantDifference);
+		return new(newExponent, newSignificand);
+	}
+
+	private SignificantNumber WithCommonExponent(SignificantNumber other)
+	{
+		int absExponent = int.Abs(Exponent);
+		int absOtherExponent = int.Abs(other.Exponent);
+		int highestExponent = absExponent > absOtherExponent ? absExponent : absOtherExponent;
+		int exponentDifference = highestExponent - absExponent;
+		var newSignificand = Significand * BigInteger.Pow(10, exponentDifference);
+		int newExponent = Exponent == 0
+			? -highestExponent
+			: int.CopySign(highestExponent, Exponent);
+		return new SignificantNumber(newExponent, newSignificand, sanitize: false);
+	}
+
+	public static SignificantNumber operator -(SignificantNumber value)
+	{
+		return value == Zero
+			? value
+			: new(value.Exponent, -value.Significand);
+	}
+
+	public static SignificantNumber operator -(SignificantNumber left, SignificantNumber right)
+	{
+		var leftCommon = left.WithCommonExponent(right);
+		var rightCommon = right.WithCommonExponent(left);
+		int decimalDigits = LowestDecimalDigits(left, right);
+		var newSignificand = leftCommon.Significand - rightCommon.Significand;
+		int newExponent = leftCommon.Exponent;
+		return new SignificantNumber(newExponent, newSignificand).Round(decimalDigits);
+	}
+
+	public static bool operator !=(SignificantNumber left, SignificantNumber right) => !(left == right);
 
 	public static SignificantNumber operator *(SignificantNumber left, SignificantNumber right)
 	{
@@ -260,6 +335,8 @@ public readonly struct SignificantNumber
 		return new SignificantNumber(newExponent, newSignificand).ReduceSignificance(significantDigits);
 	}
 
+	public static SignificantNumber operator +(SignificantNumber value) => value;
+
 	public static SignificantNumber operator +(SignificantNumber left, SignificantNumber right)
 	{
 		var leftCommon = left.WithCommonExponent(right);
@@ -268,25 +345,6 @@ public readonly struct SignificantNumber
 		var newSignificand = leftCommon.Significand + rightCommon.Significand;
 		int newExponent = leftCommon.Exponent;
 		return new SignificantNumber(newExponent, newSignificand).Round(decimalDigits);
-	}
-
-	public static SignificantNumber operator -(SignificantNumber left, SignificantNumber right)
-	{
-		var leftCommon = left.WithCommonExponent(right);
-		var rightCommon = right.WithCommonExponent(left);
-		int decimalDigits = LowestDecimalDigits(left, right);
-		var newSignificand = leftCommon.Significand - rightCommon.Significand;
-		int newExponent = leftCommon.Exponent;
-		return new SignificantNumber(newExponent, newSignificand).Round(decimalDigits);
-	}
-
-	public static SignificantNumber operator +(SignificantNumber value) => value;
-
-	public static SignificantNumber operator -(SignificantNumber value)
-	{
-		return value == Zero
-			? value
-			: new(value.Exponent, -value.Significand);
 	}
 
 	public static bool operator ==(SignificantNumber left, SignificantNumber right)
@@ -299,56 +357,4 @@ public readonly struct SignificantNumber
 		return leftSignificant.Exponent == rightSignificant.Exponent
 			&& leftSignificant.Significand == rightSignificant.Significand;
 	}
-
-	public static bool operator !=(SignificantNumber left, SignificantNumber right) => !(left == right);
-
-	public override bool Equals(object? obj) => obj is SignificantNumber number && this == number;
-
-	public override int GetHashCode() => HashCode.Combine(Exponent, Significand);
-
-	public override string ToString()
-	{
-		if (this == Zero)
-		{
-			return "0";
-		}
-
-		if (this == One)
-		{
-			return "1";
-		}
-
-		if (this == NegativeOne)
-		{
-			return "-1";
-		}
-
-		string sign = Significand < 0 ? "-" : string.Empty;
-		string significandStr = BigInteger.Abs(Significand).ToString(InvariantCulture);
-
-		if (Exponent == 0)
-		{
-			return $"{sign}{significandStr}";
-		}
-
-		if (Exponent > 0)
-		{
-			return $"{sign}{significandStr}{new string('0', Exponent)}";
-		}
-
-		int absExponent = -Exponent;
-
-		string integralComponent = absExponent >= significandStr.Length
-			? "0"
-			: significandStr[..^absExponent];
-
-		string fractionalComponent = absExponent >= significandStr.Length
-			? $"{new string('0', absExponent - significandStr.Length)}{BigInteger.Abs(Significand)}"
-			: significandStr[^absExponent..];
-
-		string output = $"{sign}{integralComponent}.{fractionalComponent}";
-		return output;
-	}
-
-	public string ToString(string format) => format.Equals("G", StringComparison.OrdinalIgnoreCase) ? ToString() : throw new FormatException();
 }
