@@ -209,7 +209,13 @@ public readonly struct SignificantNumber
 		}
 
 		int exponentValue = 0;
-		var integerComponent = input.ToString().AsSpan(); //TODO: replace all uses of ToString with TryFormat with stack allocated spans
+
+		const int sizeOfSignificand = 17;
+		const int sizeOfExponent = 5;
+
+		Span<char> inputSpan = stackalloc char[sizeOfSignificand + sizeOfExponent];
+		_ = input.TryFormat(inputSpan, out int charsWritten, "", CultureInfo.InvariantCulture);
+		ReadOnlySpan<char> integerComponent = inputSpan;
 		while (integerComponent.Length > 1 && integerComponent[^1] == '0')
 		{
 			integerComponent = integerComponent[..^1];
