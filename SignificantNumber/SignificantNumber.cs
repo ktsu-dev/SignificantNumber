@@ -9,9 +9,6 @@ using System.Globalization;
 using System.Numerics;
 
 [DebuggerDisplay("{Significand}e{Exponent}")]
-[SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
-[SuppressMessage("Major Code Smell", "S3358:Ternary operators should not be nested", Justification = "<Pending>")]
-[SuppressMessage("Minor Code Smell", "S4136:Method overloads should be grouped together", Justification = "<Pending>")]
 public readonly struct SignificantNumber
 	: INumber<SignificantNumber>
 {
@@ -123,20 +120,11 @@ public readonly struct SignificantNumber
 	{
 		var sigMin = min.ToSignificantNumber();
 		var sigMax = max.ToSignificantNumber();
-		var a = this < sigMin
-			? sigMin
-			: this > sigMax
-			? sigMax
-			: this;
+		var clampedToMax = this > sigMax ? sigMax : this;
+		return this < sigMin ? sigMin : clampedToMax;
 
-		var b = this < sigMin ? sigMin : (this > sigMax ? sigMax : this);
-
-		Debug.Assert(a == b, "ya fucked up");
-
-		return a;
 	}
 
-	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "<Pending>")]
 	internal static SignificantNumber CreateFromFloatingPoint<TFloat>(TFloat input)
 		where TFloat : INumber<TFloat>
 	{
@@ -313,29 +301,28 @@ public readonly struct SignificantNumber
 			_ => throw new ArgumentException(null, nameof(obj)),
 		};
 
-	public int CompareTo(SignificantNumber other) =>
-		this < other
-		? -1
-		: this > other
-		? 1
-		: 0;
+	public int CompareTo(SignificantNumber other)
+	{
+		int greaterOrEqual = this > other ? 1 : 0;
+		return this < other ? -1 : greaterOrEqual;
+	}
 
 	public static SignificantNumber Abs(SignificantNumber value) => value.Significand < 0 ? -value : value;
-	public static bool IsCanonical(SignificantNumber value) => true;
+	public static bool IsCanonical(SignificantNumber _) => true;
 	public static bool IsComplexNumber(SignificantNumber value) => !IsRealNumber(value);
 	public static bool IsEvenInteger(SignificantNumber value) => IsInteger(value) && value.Significand.IsEven;
-	public static bool IsFinite(SignificantNumber value) => true;
+	public static bool IsFinite(SignificantNumber _) => true;
 	public static bool IsImaginaryNumber(SignificantNumber value) => !IsRealNumber(value);
 	public static bool IsInfinity(SignificantNumber value) => !IsFinite(value);
 	public static bool IsInteger(SignificantNumber value) => value.Exponent >= 0;
-	public static bool IsNaN(SignificantNumber value) => false;
+	public static bool IsNaN(SignificantNumber _) => false;
 	public static bool IsNegative(SignificantNumber value) => !IsPositive(value);
 	public static bool IsNegativeInfinity(SignificantNumber value) => IsNegative(value);
-	public static bool IsNormal(SignificantNumber value) => true;
+	public static bool IsNormal(SignificantNumber _) => true;
 	public static bool IsOddInteger(SignificantNumber value) => IsInteger(value) && !value.Significand.IsEven;
 	public static bool IsPositive(SignificantNumber value) => value.Significand >= 0;
 	public static bool IsPositiveInfinity(SignificantNumber value) => IsInfinity(value) && IsPositive(value);
-	public static bool IsRealNumber(SignificantNumber value) => true;
+	public static bool IsRealNumber(SignificantNumber _) => true;
 	public static bool IsSubnormal(SignificantNumber value) => !IsNormal(value);
 	public static bool IsZero(SignificantNumber value) => value.Significand == 0;
 	public static SignificantNumber MaxMagnitude(SignificantNumber x, SignificantNumber y) => x.Abs() > y.Abs() ? x : y;
