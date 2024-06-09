@@ -482,6 +482,27 @@ public readonly struct SignificantNumber
 	private static void AssertExponentsMatch(SignificantNumber left, SignificantNumber right) =>
 		Debug.Assert(left.Exponent == right.Exponent, $"{nameof(AssertExponentsMatch)}: {left.Exponent} == {right.Exponent}");
 
+	public static SignificantNumber Negate(SignificantNumber value) => -value;
+	public static SignificantNumber Subtract(SignificantNumber left, SignificantNumber right) => left - right;
+	public static SignificantNumber Add(SignificantNumber left, SignificantNumber right) => left + right;
+	public static SignificantNumber Multiply(SignificantNumber left, SignificantNumber right) => left * right;
+	public static SignificantNumber Divide(SignificantNumber left, SignificantNumber right) => left / right;
+	public static SignificantNumber Increment(SignificantNumber value) => throw new NotSupportedException();
+	public static SignificantNumber Decrement(SignificantNumber value) => throw new NotSupportedException();
+	public static SignificantNumber UnaryPlus(SignificantNumber value) => +value;
+	public static SignificantNumber UnaryNegation(SignificantNumber value) => -value;
+	public static SignificantNumber Mod(SignificantNumber left, SignificantNumber right) => throw new NotSupportedException();
+	public static bool GreaterThan(SignificantNumber left, SignificantNumber right) => left > right;
+	public static bool GreaterThanOrEqual(SignificantNumber left, SignificantNumber right) => left >= right;
+	public static bool LessThan(SignificantNumber left, SignificantNumber right) => left < right;
+	public static bool LessThanOrEqual(SignificantNumber left, SignificantNumber right) => left <= right;
+	public static bool Equal(SignificantNumber left, SignificantNumber right) => left == right;
+	public static bool NotEqual(SignificantNumber left, SignificantNumber right) => left != right;
+	public static SignificantNumber Max(SignificantNumber x, SignificantNumber y) => x > y ? x : y;
+	public static SignificantNumber Min(SignificantNumber x, SignificantNumber y) => x < y ? x : y;
+	public static SignificantNumber Clamp(SignificantNumber value, SignificantNumber min, SignificantNumber max) => value.Clamp(min, max);
+	public static SignificantNumber Round(SignificantNumber value, int decimalDigits) => value.Round(decimalDigits);
+
 	public static SignificantNumber operator -(SignificantNumber value)
 	{
 		return value == Zero
