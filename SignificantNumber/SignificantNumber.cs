@@ -234,10 +234,12 @@ public readonly struct SignificantNumber
 			return 0;
 		}
 
+		const int ten = 10;
+
 		BigInteger repeatingDigit = digit;
 		for (int i = 1; i < numberOfRepeats; i++)
 		{
-			repeatingDigit = (repeatingDigit * 10) + digit;
+			repeatingDigit = (repeatingDigit * ten) + digit;
 		}
 
 		return repeatingDigit;
