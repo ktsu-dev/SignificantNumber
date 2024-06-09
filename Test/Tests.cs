@@ -101,6 +101,10 @@ public class Tests
 		Assert.AreEqual(3, a.Exponent);
 		Assert.AreEqual(1, a.SignificantDigits);
 
+		a = 1000.ToSignificantNumber();
+		Assert.AreEqual(1, a.Significand);
+		Assert.AreEqual(3, a.Exponent);
+		Assert.AreEqual(1, a.SignificantDigits);
 	}
 
 	[TestMethod]
@@ -314,6 +318,7 @@ public class Tests
 		Assert.IsTrue(a <= b);
 		Assert.IsFalse(a > b);
 		Assert.IsTrue(a >= b);
+		Assert.IsTrue(a.Equals(b));
 
 		a = 1.1.ToSignificantNumber();
 		b = 1.01.ToSignificantNumber();
@@ -323,6 +328,7 @@ public class Tests
 		Assert.IsFalse(a <= b);
 		Assert.IsTrue(a > b);
 		Assert.IsTrue(a >= b);
+		Assert.IsFalse(a.Equals(b));
 
 		a = 1.1.ToSignificantNumber();
 		b = 1.11.ToSignificantNumber();
@@ -332,6 +338,7 @@ public class Tests
 		Assert.IsTrue(a <= b);
 		Assert.IsFalse(a > b);
 		Assert.IsTrue(a >= b);
+		Assert.IsTrue(a.Equals(b));
 
 		a = 10.1.ToSignificantNumber();
 		b = 1.01.ToSignificantNumber();
@@ -341,6 +348,7 @@ public class Tests
 		Assert.IsTrue(a >= b);
 		Assert.IsFalse(a < b);
 		Assert.IsFalse(a <= b);
+		Assert.IsFalse(a.Equals(b));
 
 		a = 100.1.ToSignificantNumber();
 		b = 100.ToSignificantNumber();
@@ -350,6 +358,7 @@ public class Tests
 		Assert.IsTrue(a <= b);
 		Assert.IsFalse(a > b);
 		Assert.IsTrue(a >= b);
+		Assert.IsTrue(a.Equals(b));
 
 		a = 100.1.ToSignificantNumber();
 		b = 100.0.ToSignificantNumber();
@@ -359,6 +368,7 @@ public class Tests
 		Assert.IsTrue(a <= b);
 		Assert.IsFalse(a > b);
 		Assert.IsTrue(a >= b);
+		Assert.IsTrue(a.Equals(b));
 	}
 
 	[TestMethod]
@@ -428,6 +438,8 @@ public class Tests
 
 		a = 2.ToSignificantNumber();
 		Assert.AreEqual("2", a.ToString());
+		Assert.AreEqual("2", a.ToString("g", CultureInfo.InvariantCulture));
+		Assert.AreEqual("2", a.ToString("g", CultureInfo.CurrentCulture));
 
 		a = 2000.ToSignificantNumber();
 		Assert.AreEqual("2000", a.ToString());
@@ -570,6 +582,12 @@ public class Tests
 	public void TestRadix() => Assert.AreEqual(2, SignificantNumber.Radix);
 
 	[TestMethod]
-
 	public void TestMaxDecimalPlaces() => Assert.AreEqual(15, SignificantNumber.MaxDecimalPlaces);
+
+	[TestMethod]
+	public void TestIdentity()
+	{
+		Assert.AreEqual(SignificantNumber.Zero, SignificantNumber.AdditiveIdentity);
+		Assert.AreEqual(SignificantNumber.One, SignificantNumber.MultiplicativeIdentity);
+	}
 }
