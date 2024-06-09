@@ -287,7 +287,10 @@ public readonly struct SignificantNumber
 		return new(newExponent, newSignificand);
 	}
 
-	private static int MakeCommonized(ref SignificantNumber left, ref SignificantNumber right)
+	private static void MakeCommonized(ref SignificantNumber left, ref SignificantNumber right) =>
+		_ = MakeCommonizedAndGetExponent(ref left, ref right);
+
+	private static int MakeCommonizedAndGetExponent(ref SignificantNumber left, ref SignificantNumber right)
 	{
 		int smallestExponent = left.Exponent < right.Exponent ? left.Exponent : right.Exponent;
 		int exponentDifferenceLeft = Math.Abs(left.Exponent - smallestExponent);
@@ -487,7 +490,7 @@ public readonly struct SignificantNumber
 	public static SignificantNumber operator -(SignificantNumber left, SignificantNumber right)
 	{
 		int decimalDigits = LowestDecimalDigits(left, right);
-		int commonExponent = MakeCommonized(ref left, ref right);
+		int commonExponent = MakeCommonizedAndGetExponent(ref left, ref right);
 		AssertExponentsMatch(left, left);
 
 		var newSignificand = left.Significand - right.Significand;
@@ -499,7 +502,7 @@ public readonly struct SignificantNumber
 	public static SignificantNumber operator *(SignificantNumber left, SignificantNumber right)
 	{
 		int significantDigits = LowestSignificantDigits(left, right);
-		int commonExponent = MakeCommonized(ref left, ref right);
+		int commonExponent = MakeCommonizedAndGetExponent(ref left, ref right);
 		AssertExponentsMatch(left, right);
 
 		var newSignificand = left.Significand * right.Significand / BigInteger.Pow(10, int.Abs(commonExponent));
@@ -509,7 +512,7 @@ public readonly struct SignificantNumber
 	public static SignificantNumber operator /(SignificantNumber left, SignificantNumber right)
 	{
 		int significantDigits = LowestSignificantDigits(left, right);
-		int commonExponent = MakeCommonized(ref left, ref right);
+		int commonExponent = MakeCommonizedAndGetExponent(ref left, ref right);
 		AssertExponentsMatch(left, right);
 
 		var newSignificand = left.Significand * BigInteger.Pow(10, int.Abs(commonExponent)) / right.Significand;
@@ -521,7 +524,7 @@ public readonly struct SignificantNumber
 	public static SignificantNumber operator +(SignificantNumber left, SignificantNumber right)
 	{
 		int decimalDigits = LowestDecimalDigits(left, right);
-		int commonExponent = MakeCommonized(ref left, ref right);
+		int commonExponent = MakeCommonizedAndGetExponent(ref left, ref right);
 		AssertExponentsMatch(left, right);
 
 		var newSignificand = left.Significand + right.Significand;
