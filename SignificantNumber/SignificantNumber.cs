@@ -21,12 +21,14 @@ public readonly struct SignificantNumber
 
 	private SignificantNumber(int exponent, BigInteger significand, bool sanitize = true)
 	{
+		const int ten = 10;
+
 		if (sanitize)
 		{
 			// remove trailing zeros
-			while (significand != 0 && significand % 10 == 0)
+			while (significand != 0 && significand % ten == 0)
 			{
-				significand /= 10;
+				significand /= ten;
 				exponent++;
 			}
 		}
@@ -37,7 +39,7 @@ public readonly struct SignificantNumber
 		while (number != 0)
 		{
 			significantDigits++;
-			number /= 10;
+			number /= ten;
 		}
 
 		SignificantDigits = significantDigits;
