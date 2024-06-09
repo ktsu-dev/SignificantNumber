@@ -98,6 +98,8 @@ public readonly struct SignificantNumber
 			: string.Empty;
 	}
 
+	public string ToString(string? format, IFormatProvider? formatProvider) => ToString(this, format, formatProvider);
+
 	public SignificantNumber Abs() => Abs(this);
 
 	public SignificantNumber Round(int decimalDigits)
@@ -424,7 +426,6 @@ public readonly struct SignificantNumber
 		return true;
 	}
 
-	public string ToString(string? format, IFormatProvider? formatProvider) => ToString(this, format, formatProvider);
 	int IComparable.CompareTo(object? obj) => CompareTo(obj);
 	int IComparable<SignificantNumber>.CompareTo(SignificantNumber other) => CompareTo(other);
 	static SignificantNumber INumberBase<SignificantNumber>.Abs(SignificantNumber value) => Abs(value);
