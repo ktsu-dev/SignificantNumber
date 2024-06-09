@@ -604,7 +604,7 @@ public readonly struct SignificantNumber
 	static SignificantNumber IDivisionOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator /(SignificantNumber left, SignificantNumber right) => left / right;
 	static bool IEqualityOperators<SignificantNumber, SignificantNumber, bool>.operator ==(SignificantNumber left, SignificantNumber right) => left == right;
 	static bool IEqualityOperators<SignificantNumber, SignificantNumber, bool>.operator !=(SignificantNumber left, SignificantNumber right) => left != right;
-	static SignificantNumber IIncrementOperators<SignificantNumber>.operator ++(SignificantNumber value) => throw new NotImplementedException();
+	static SignificantNumber IIncrementOperators<SignificantNumber>.operator ++(SignificantNumber value) => throw new NotSupportedException();
 	static SignificantNumber IMultiplyOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator *(SignificantNumber left, SignificantNumber right) => left * right;
 	static SignificantNumber ISubtractionOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator -(SignificantNumber left, SignificantNumber right) => left - right;
 	static SignificantNumber IUnaryNegationOperators<SignificantNumber, SignificantNumber>.operator -(SignificantNumber value) => -value;
