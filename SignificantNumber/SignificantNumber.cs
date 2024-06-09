@@ -489,8 +489,7 @@ public readonly struct SignificantNumber
 	public static SignificantNumber Divide(SignificantNumber left, SignificantNumber right) => left / right;
 	public static SignificantNumber Increment(SignificantNumber value) => throw new NotSupportedException();
 	public static SignificantNumber Decrement(SignificantNumber value) => throw new NotSupportedException();
-	public static SignificantNumber UnaryPlus(SignificantNumber value) => +value;
-	public static SignificantNumber UnaryNegation(SignificantNumber value) => -value;
+	public static SignificantNumber Plus(SignificantNumber value) => +value;
 	public static SignificantNumber Mod(SignificantNumber left, SignificantNumber right) => throw new NotSupportedException();
 	public static bool GreaterThan(SignificantNumber left, SignificantNumber right) => left > right;
 	public static bool GreaterThanOrEqual(SignificantNumber left, SignificantNumber right) => left >= right;
