@@ -132,7 +132,7 @@ public readonly struct SignificantNumber
 	{
 		ArgumentNullException.ThrowIfNull(input);
 
-		Debug.Assert(Array.Exists(typeof(TFloat).GetInterfaces(), i => i.Name.StartsWith("IFloatingPoint", StringComparison.Ordinal)), $"{typeof(TFloat).Name} does not implement IFloatingPoint");
+		AssertDoesImplementGenericInterface(typeof(TFloat), typeof(IFloatingPoint<>));
 
 		bool isOne = input == TFloat.One;
 		bool isNegativeOne = input == -TFloat.One;
@@ -186,8 +186,7 @@ public readonly struct SignificantNumber
 		where TInteger : INumber<TInteger>
 	{
 		ArgumentNullException.ThrowIfNull(input);
-
-		Debug.Assert(Array.Exists(typeof(TInteger).GetInterfaces(), i => i.Name.StartsWith("IBinaryInteger", StringComparison.Ordinal)), $"{typeof(TInteger).Name} does not implement IBinaryInteger");
+		AssertDoesImplementGenericInterface(typeof(TInteger), typeof(IBinaryInteger<>));
 
 		bool isOne = input == TInteger.One;
 		bool isNegativeOne = TInteger.IsNegative(input) && input == -TInteger.One;
@@ -631,4 +630,30 @@ public readonly struct SignificantNumber
 	static SignificantNumber ISubtractionOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator -(SignificantNumber left, SignificantNumber right) => left - right;
 	static SignificantNumber IUnaryNegationOperators<SignificantNumber, SignificantNumber>.operator -(SignificantNumber value) => -value;
 	static SignificantNumber IUnaryPlusOperators<SignificantNumber, SignificantNumber>.operator +(SignificantNumber value) => +value;
+
+	internal static void AssertDoesImplementGenericInterface(Type type, Type genericInterface) =>
+		Debug.Assert(DoesImplementGenericInterface(type, genericInterface), $"{type.Name} does not implement {genericInterface.Name}");
+
+	internal static bool DoesImplementGenericInterface(Type type, Type genericInterface)
+	{
+		EnsureTypeIsInterface(genericInterface);
+		EnsureTypeIsGeneric(genericInterface);
+		return Array.Exists(type.GetInterfaces(), x => x.IsGenericType && x.GetGenericTypeDefinition() == genericInterface);
+	}
+
+	internal static void EnsureTypeIsInterface(Type type)
+	{
+		if (!type.IsInterface)
+		{
+			throw new ArgumentException($"{type.Name} is expected to be an interface", nameof(type));
+		}
+	}
+
+	internal static void EnsureTypeIsGeneric(Type type)
+	{
+		if (!type.IsGenericType)
+		{
+			throw new ArgumentException($"{type.Name} is expected to be an generic type", nameof(type));
+		}
+	}
 }
