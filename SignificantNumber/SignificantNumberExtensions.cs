@@ -5,7 +5,6 @@ using System.Numerics;
 
 public static class SignificantNumberExtensions
 {
-	[SuppressMessage("Minor Code Smell", "S1199:Nested code blocks should not be used", Justification = "<Pending>")]
 	public static SignificantNumber ToSignificantNumber<TInput>(this INumber<TInput> input)
 		where TInput : INumber<TInput>
 	{
