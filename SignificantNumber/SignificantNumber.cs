@@ -61,7 +61,8 @@ public readonly struct SignificantNumber
 
 	private static CultureInfo InvariantCulture { get; } = CultureInfo.InvariantCulture;
 
-	public static int Radix => 2;
+	private const int BinaryRadix = 2;
+	public static int Radix => BinaryRadix;
 
 	public static SignificantNumber AdditiveIdentity => Zero;
 
