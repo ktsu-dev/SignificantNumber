@@ -1,3 +1,4 @@
+[assembly: CLSCompliant(true)]
 namespace ktsu.io.SignificantNumber;
 
 using System;
