@@ -5,7 +5,7 @@ using System.Numerics;
 
 internal static class Helpers
 {
-	public static Random RNG { get; set; } = new(int.CreateTruncating(DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds));
+	public static Random RNG { get; set; } = new((int)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds);
 
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]
 	public static TNumber RandomNumber<TNumber>()
@@ -51,6 +51,7 @@ internal static class Helpers
 			_ when type == typeof(double) => TNumber.CreateChecked(double.MaxValue),
 			_ when type == typeof(decimal) => TNumber.CreateChecked(79228162514264300000000000000m), // special case because we have 15 digits of precision
 			_ when type == typeof(BigInteger) => TNumber.CreateChecked(long.MaxValue),
+			_ when type == typeof(Half) => TNumber.CreateChecked(Half.MaxValue),
 			_ => throw new NotSupportedException(),
 		};
 	}
@@ -74,6 +75,7 @@ internal static class Helpers
 			_ when type == typeof(double) => TNumber.CreateChecked(double.MinValue),
 			_ when type == typeof(decimal) => TNumber.CreateChecked(-79228162514264300000000000000m), // special case because we have 15 digits of precision
 			_ when type == typeof(BigInteger) => TNumber.CreateChecked(long.MinValue),
+			_ when type == typeof(Half) => TNumber.CreateChecked(Half.MinValue),
 			_ => throw new NotSupportedException(),
 		};
 	}

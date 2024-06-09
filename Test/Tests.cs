@@ -10,7 +10,9 @@ public class Tests
 	[TestMethod]
 	public void TestZero()
 	{
-		const int testValue = 0;
+		static void IsValid(SignificantNumber a) => Assert.AreEqual(SignificantNumber.Zero, a);
+
+		double testValue = 0;
 		IsValid(SignificantNumber.Zero);
 		IsValid(byte.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(sbyte.CreateChecked(testValue).ToSignificantNumber());
@@ -26,18 +28,15 @@ public class Tests
 		IsValid(BigInteger.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(Half.CreateChecked(testValue).ToSignificantNumber());
 
-		static void IsValid(SignificantNumber a)
-		{
-			Assert.AreEqual(SignificantNumber.Zero, a);
-			Assert.AreEqual(0, a.Significand);
-			Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
-			Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
-		}
+		double testValue2 = 0.1;
+		Assert.AreNotEqual(SignificantNumber.Zero, testValue2.ToSignificantNumber());
 	}
 
 	[TestMethod]
 	public void TestOne()
 	{
+		static void IsValid(SignificantNumber a) => Assert.AreEqual(SignificantNumber.One, a);
+
 		const int testValue = 1;
 		IsValid(SignificantNumber.One);
 		IsValid(byte.CreateChecked(testValue).ToSignificantNumber());
@@ -54,18 +53,15 @@ public class Tests
 		IsValid(BigInteger.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(Half.CreateChecked(testValue).ToSignificantNumber());
 
-		static void IsValid(SignificantNumber a)
-		{
-			Assert.AreEqual(SignificantNumber.One, a);
-			Assert.AreEqual(BigInteger.Pow(10, SignificantNumber.MaxDecimalPlaces), a.Significand);
-			Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
-			Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
-		}
+		double testValue2 = 1.1;
+		Assert.AreNotEqual(SignificantNumber.One, testValue2.ToSignificantNumber());
 	}
 
 	[TestMethod]
 	public void TestNegativeOne()
 	{
+		static void IsValid(SignificantNumber a) => Assert.AreEqual(SignificantNumber.NegativeOne, a);
+
 		const int testValue = -1;
 		IsValid(SignificantNumber.NegativeOne);
 		IsValid(sbyte.CreateChecked(testValue).ToSignificantNumber());
@@ -78,13 +74,8 @@ public class Tests
 		IsValid(BigInteger.CreateChecked(testValue).ToSignificantNumber());
 		IsValid(Half.CreateChecked(testValue).ToSignificantNumber());
 
-		static void IsValid(SignificantNumber a)
-		{
-			Assert.AreEqual(SignificantNumber.NegativeOne, a);
-			Assert.AreEqual(-BigInteger.Pow(10, SignificantNumber.MaxDecimalPlaces), a.Significand);
-			Assert.AreEqual(-SignificantNumber.MaxDecimalPlaces, a.Exponent);
-			Assert.AreEqual(SignificantNumber.MaxDecimalPlaces + 1, a.SignificantDigits);
-		}
+		double testValue2 = -1.1;
+		Assert.AreNotEqual(SignificantNumber.NegativeOne, testValue2.ToSignificantNumber());
 	}
 
 	[TestMethod]
@@ -114,7 +105,7 @@ public class Tests
 
 	[TestMethod]
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0008:Use explicit type", Justification = "<Pending>")]
-	public void TestRoundTrip()
+	public void TestRoundTripWithRandomValues()
 	{
 		const int numIterations = 10000;
 		const int maxFailuresToReport = 10;
@@ -313,90 +304,79 @@ public class Tests
 	}
 
 	[TestMethod]
-	public void TestEquality()
+	public void TestComparison()
 	{
 		var a = 1.1.ToSignificantNumber();
 		var b = 1.1.ToSignificantNumber();
-		Assert.AreEqual(a, b);
+		Assert.IsTrue(a == b);
+		Assert.IsFalse(a != b);
+		Assert.IsFalse(a < b);
+		Assert.IsTrue(a <= b);
+		Assert.IsFalse(a > b);
+		Assert.IsTrue(a >= b);
 
 		a = 1.1.ToSignificantNumber();
 		b = 1.01.ToSignificantNumber();
-		Assert.AreNotEqual(a, b);
+		Assert.IsFalse(a == b);
+		Assert.IsTrue(a != b);
+		Assert.IsFalse(a < b);
+		Assert.IsFalse(a <= b);
+		Assert.IsTrue(a > b);
+		Assert.IsTrue(a >= b);
 
 		a = 1.1.ToSignificantNumber();
 		b = 1.11.ToSignificantNumber();
-		Assert.AreEqual(a, b);
+		Assert.IsTrue(a == b);
+		Assert.IsFalse(a != b);
+		Assert.IsFalse(a < b);
+		Assert.IsTrue(a <= b);
+		Assert.IsFalse(a > b);
+		Assert.IsTrue(a >= b);
 
 		a = 10.1.ToSignificantNumber();
 		b = 1.01.ToSignificantNumber();
-		Assert.AreNotEqual(a, b);
+		Assert.IsFalse(a == b);
+		Assert.IsTrue(a != b);
+		Assert.IsTrue(a > b);
+		Assert.IsTrue(a >= b);
+		Assert.IsFalse(a < b);
+		Assert.IsFalse(a <= b);
 
 		a = 100.1.ToSignificantNumber();
 		b = 100.ToSignificantNumber();
-		Assert.AreEqual(a, b);
+		Assert.IsTrue(a == b);
+		Assert.IsFalse(a != b);
+		Assert.IsFalse(a < b);
+		Assert.IsTrue(a <= b);
+		Assert.IsFalse(a > b);
+		Assert.IsTrue(a >= b);
 
 		a = 100.1.ToSignificantNumber();
 		b = 100.0.ToSignificantNumber();
-		Assert.AreEqual(a, b);
-
-		a = 1.ToSignificantNumber();
-		Assert.IsFalse(a.Equals(1));
+		Assert.IsTrue(a == b);
+		Assert.IsFalse(a != b);
+		Assert.IsFalse(a < b);
+		Assert.IsTrue(a <= b);
+		Assert.IsFalse(a > b);
+		Assert.IsTrue(a >= b);
 	}
 
 	[TestMethod]
-	public void TestInequality()
+	public void TestComparisonWithRandomValues()
 	{
-		var a = 1.1.ToSignificantNumber();
-		var b = 1.1.ToSignificantNumber();
-		Assert.IsFalse(a != b);
+		var rng = new Random((int)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds);
 
-		a = 1.1.ToSignificantNumber();
-		b = 1.01.ToSignificantNumber();
-		Assert.IsTrue(a != b);
+		const double reallyLow = -10.0;
+		const double reallyHigh = 10.0;
 
-		a = 1.1.ToSignificantNumber();
-		b = 1.11.ToSignificantNumber();
-		Assert.IsFalse(a != b);
-
-		a = 10.1.ToSignificantNumber();
-		b = 1.01.ToSignificantNumber();
-		Assert.IsTrue(a != b);
-
-		a = 100.1.ToSignificantNumber();
-		b = 100.ToSignificantNumber();
-		Assert.IsFalse(a != b);
-
-		a = 100.1.ToSignificantNumber();
-		b = 100.0.ToSignificantNumber();
-		Assert.IsFalse(a != b);
-	}
-
-	[TestMethod]
-	public void TestEquals()
-	{
-		var a = 1.1.ToSignificantNumber();
-		var b = 1.1.ToSignificantNumber();
-		Assert.IsTrue(a.Equals(b));
-
-		a = 1.1.ToSignificantNumber();
-		b = 1.01.ToSignificantNumber();
-		Assert.IsFalse(a.Equals(b));
-
-		a = 1.1.ToSignificantNumber();
-		b = 1.11.ToSignificantNumber();
-		Assert.IsTrue(a.Equals(b));
-
-		a = 10.1.ToSignificantNumber();
-		b = 1.01.ToSignificantNumber();
-		Assert.IsFalse(a.Equals(b));
-
-		a = 100.1.ToSignificantNumber();
-		b = 100.ToSignificantNumber();
-		Assert.IsTrue(a.Equals(b));
-
-		a = 100.1.ToSignificantNumber();
-		b = 100.0.ToSignificantNumber();
-		Assert.IsTrue(a.Equals(b));
+		for (int i = 0; i < 1000; ++i)
+		{
+			double a = (rng.NextDouble() * 2.0) - 1.0;
+			Assert.IsTrue(a.ToSignificantNumber() > reallyLow.ToSignificantNumber(), $"{a} > {reallyLow} should be true but was false");
+			Assert.IsTrue(a.ToSignificantNumber() < reallyHigh.ToSignificantNumber(), $"{a} < {reallyHigh} should be true but was false");
+			Assert.IsFalse(a.ToSignificantNumber() < reallyLow.ToSignificantNumber(), $"{a} < {reallyLow} should be false but was true");
+			Assert.IsFalse(a.ToSignificantNumber() > reallyHigh.ToSignificantNumber(), $"{a} > {reallyHigh} should be false but was true");
+		}
 	}
 
 	[TestMethod]
@@ -412,6 +392,7 @@ public class Tests
 	}
 
 	[TestMethod]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "<Pending>")]
 	public void TestToString()
 	{
 		var a = 0.ToSignificantNumber();
@@ -535,4 +516,60 @@ public class Tests
 		Assert.AreEqual(-1, c.Exponent);
 		Assert.AreEqual(2, c.SignificantDigits);
 	}
+
+	[TestMethod]
+	public void TestCompareTo()
+	{
+		var a = 1.1.ToSignificantNumber();
+		var b = 1.1.ToSignificantNumber();
+		Assert.AreEqual(0, a.CompareTo(b));
+
+		a = 1.1.ToSignificantNumber();
+		b = 1.01.ToSignificantNumber();
+		Assert.AreEqual(1, a.CompareTo(b));
+
+		a = 1.1.ToSignificantNumber();
+		b = 1.11.ToSignificantNumber();
+		Assert.AreEqual(0, a.CompareTo(b));
+
+		a = 10.1.ToSignificantNumber();
+		b = 1.01.ToSignificantNumber();
+		Assert.AreEqual(1, a.CompareTo(b));
+
+		a = 100.1.ToSignificantNumber();
+		b = 100.ToSignificantNumber();
+		Assert.AreEqual(0, a.CompareTo(b));
+
+		a = 100.1.ToSignificantNumber();
+		b = 100.0.ToSignificantNumber();
+		Assert.AreEqual(0, a.CompareTo(b));
+	}
+
+	[TestMethod]
+	public void TestClamp()
+	{
+		var rng = new Random((int)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds);
+
+		for (int i = 0; i < 1000; ++i)
+		{
+			double a = rng.NextDouble();
+			double b = rng.NextDouble();
+			double c = rng.NextDouble();
+			if (b > c)
+			{
+				(c, b) = (b, c);
+			}
+
+			var d = Math.Clamp(a, b, c).ToSignificantNumber();
+			var e = a.ToSignificantNumber().Clamp(b, c);
+			Assert.AreEqual(d, e, $"iteration {i}: {a}, {b}, {c}, {d}, {e}");
+		}
+	}
+
+	[TestMethod]
+	public void TestRadix() => Assert.AreEqual(2, SignificantNumber.Radix);
+
+	[TestMethod]
+
+	public void TestMaxDecimalPlaces() => Assert.AreEqual(15, SignificantNumber.MaxDecimalPlaces);
 }

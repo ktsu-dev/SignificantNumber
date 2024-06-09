@@ -6,6 +6,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 
+[DebuggerDisplay("{Significand}e{Exponent}")]
+[SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+[SuppressMessage("Major Code Smell", "S3358:Ternary operators should not be nested", Justification = "<Pending>")]
+[SuppressMessage("Minor Code Smell", "S4136:Method overloads should be grouped together", Justification = "<Pending>")]
 public readonly struct SignificantNumber
 	: INumber<SignificantNumber>
 {
@@ -22,29 +26,6 @@ public readonly struct SignificantNumber
 			{
 				significand /= 10;
 				exponent++;
-			}
-
-			// special case zero and 1 with max precision
-			if (significand == 0)
-			{
-				SignificantDigits = MaxDecimalPlaces + 1;
-				Exponent = -MaxDecimalPlaces;
-				Significand = 0;
-				return;
-			}
-			else if (significand == 1 && exponent == 0)
-			{
-				SignificantDigits = MaxDecimalPlaces + 1;
-				Exponent = -MaxDecimalPlaces;
-				Significand = BigInteger.Pow(10, MaxDecimalPlaces);
-				return;
-			}
-			else if (significand == -1 && exponent == 0)
-			{
-				SignificantDigits = MaxDecimalPlaces + 1;
-				Exponent = -MaxDecimalPlaces;
-				Significand = -BigInteger.Pow(10, MaxDecimalPlaces);
-				return;
 			}
 		}
 
@@ -93,6 +74,7 @@ public readonly struct SignificantNumber
 	static SignificantNumber IMultiplicativeIdentity<SignificantNumber, SignificantNumber>.MultiplicativeIdentity => MultiplicativeIdentity;
 
 	public override bool Equals(object? obj) => obj is SignificantNumber number && this == number;
+
 	public bool Equals(SignificantNumber other) => this == other;
 
 	public override int GetHashCode() => HashCode.Combine(Exponent, Significand);
@@ -102,9 +84,13 @@ public readonly struct SignificantNumber
 	public string ToString(string format) => ToString(this, format, null);
 	public static string ToString(SignificantNumber number, string? format, IFormatProvider? formatProvider)
 	{
-		int bufferSize = int.Abs(number.Exponent) + number.SignificantDigits + 2; // +2 is for negative symbol and decimal symbol
-		Span<char> buffer = stackalloc char[bufferSize];
-		Debug.Assert(buffer.Length >= bufferSize);
+		int desiredAlloc = int.Abs(number.Exponent) + number.SignificantDigits + 2; // +2 is for negative symbol and decimal symbol
+		int stackAlloc = Math.Min(desiredAlloc, 128);
+		Span<char> buffer = stackAlloc == desiredAlloc
+			? stackalloc char[stackAlloc]
+			: new char[desiredAlloc];
+
+
 		return number.TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider)
 			? buffer[..charsWritten].ToString()
 			: string.Empty;
@@ -127,13 +113,31 @@ public readonly struct SignificantNumber
 		return this;
 	}
 
+	public SignificantNumber Clamp<TNumber>(TNumber min, TNumber max)
+		where TNumber : INumber<TNumber>
+	{
+		var sigMin = min.ToSignificantNumber();
+		var sigMax = max.ToSignificantNumber();
+		var a = this < sigMin
+			? sigMin
+			: this > sigMax
+			? sigMax
+			: this;
+
+		var b = this < sigMin ? sigMin : (this > sigMax ? sigMax : this);
+
+		Debug.Assert(a == b, "ya fucked up");
+
+		return a;
+	}
+
 	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "<Pending>")]
 	internal static SignificantNumber CreateFromFloatingPoint<TFloat>(TFloat input)
 		where TFloat : INumber<TFloat>
 	{
 		ArgumentNullException.ThrowIfNull(input);
 
-		Debug.Assert(Array.Exists(typeof(TFloat).GetInterfaces(), i => i.Name.StartsWith("IFloatingPoint", StringComparison.Ordinal)));
+		Debug.Assert(Array.Exists(typeof(TFloat).GetInterfaces(), i => i.Name.StartsWith("IFloatingPoint", StringComparison.Ordinal)), $"{typeof(TFloat).Name} does not implement IFloatingPoint");
 
 		bool isOne = input == TFloat.One;
 		bool isNegativeOne = input == -TFloat.One;
@@ -156,7 +160,7 @@ public readonly struct SignificantNumber
 
 		string str = input.ToString(FormatSpecifier, InvariantCulture);
 		int indexOfE = str.IndexOf('e');
-		Debug.Assert(indexOfE > -1);
+		Debug.Assert(indexOfE > -1, $"Exponent delimiter not found in: {str}");
 
 		var significandStr = str.AsSpan(0, indexOfE);
 		var exponentStr = str.AsSpan(indexOfE + 1, str.Length - indexOfE - 1);
@@ -168,14 +172,15 @@ public readonly struct SignificantNumber
 		}
 
 		string[] components = significandStr.ToString().Split('.');
-		Debug.Assert(components.Length == 2);
+		Debug.Assert(components.Length == 2, $"Missing decimal separator in: {significandStr}");
 
 		var integerComponent = components[0].AsSpan();
 		var fractionalComponent = components[1].AsSpan();
 		int fractionalLength = fractionalComponent.Length;
 		exponentValue -= fractionalLength;
 
-		Debug.Assert(fractionalLength != 0 || integerComponent.Length == 1);
+
+		Debug.Assert(fractionalLength != 0 || integerComponent.TrimStart("-").Length == 1, $"Unexpected format: {integerComponent}.{fractionalComponent}");
 
 		string significandStrWithoutDecimal = $"{integerComponent}{fractionalComponent}";
 		var significandValue = BigInteger.Parse(significandStrWithoutDecimal, InvariantCulture);
@@ -187,7 +192,7 @@ public readonly struct SignificantNumber
 	{
 		ArgumentNullException.ThrowIfNull(input);
 
-		Debug.Assert(Array.Exists(typeof(TInteger).GetInterfaces(), i => i.Name.StartsWith("IBinaryInteger", StringComparison.Ordinal)));
+		Debug.Assert(Array.Exists(typeof(TInteger).GetInterfaces(), i => i.Name.StartsWith("IBinaryInteger", StringComparison.Ordinal)), $"{typeof(TInteger).Name} does not implement IBinaryInteger");
 
 		bool isOne = input == TInteger.One;
 		bool isNegativeOne = TInteger.IsNegative(input) && input == -TInteger.One;
@@ -237,19 +242,33 @@ public readonly struct SignificantNumber
 		return repeatingDigit;
 	}
 
+	private bool HasInfinitePrecision => Exponent == 0 && (Significand == BigInteger.One || Significand == BigInteger.Zero || Significand == BigInteger.MinusOne);
+
 	private static int LowestDecimalDigits(SignificantNumber left, SignificantNumber right)
 	{
 		int leftDecimalDigits = left.CountDecimalDigits();
 		int rightDecimalDigits = right.CountDecimalDigits();
+
+		leftDecimalDigits = left.HasInfinitePrecision ? rightDecimalDigits : leftDecimalDigits;
+		rightDecimalDigits = right.HasInfinitePrecision ? leftDecimalDigits : rightDecimalDigits;
+
 		return leftDecimalDigits < rightDecimalDigits
-		? leftDecimalDigits
-		: rightDecimalDigits;
+			? leftDecimalDigits
+			: rightDecimalDigits;
 	}
 
-	private static int LowestSignificantDigits(SignificantNumber left, SignificantNumber right) =>
-		left.SignificantDigits < right.SignificantDigits
-		? left.SignificantDigits
-		: right.SignificantDigits;
+	private static int LowestSignificantDigits(SignificantNumber left, SignificantNumber right)
+	{
+		int leftSignificantDigits = left.SignificantDigits;
+		int rightSignificantDigits = right.SignificantDigits;
+
+		leftSignificantDigits = left.HasInfinitePrecision ? rightSignificantDigits : leftSignificantDigits;
+		rightSignificantDigits = right.HasInfinitePrecision ? leftSignificantDigits : rightSignificantDigits;
+
+		return leftSignificantDigits < rightSignificantDigits
+		? leftSignificantDigits
+		: rightSignificantDigits;
+	}
 
 	private int CountDecimalDigits() =>
 		Exponent > 0
@@ -267,20 +286,20 @@ public readonly struct SignificantNumber
 		return new(newExponent, newSignificand);
 	}
 
-	private SignificantNumber WithCommonExponent(SignificantNumber other)
+	private static int MakeCommonized(ref SignificantNumber left, ref SignificantNumber right)
 	{
-		int absExponent = int.Abs(Exponent);
-		int absOtherExponent = int.Abs(other.Exponent);
-		int highestExponent = absExponent > absOtherExponent ? absExponent : absOtherExponent;
-		int exponentDifference = highestExponent - absExponent;
-		var newSignificand = Significand * BigInteger.Pow(10, exponentDifference);
-		int newExponent = Exponent == 0
-			? -highestExponent
-			: int.CopySign(highestExponent, Exponent);
-		return new SignificantNumber(newExponent, newSignificand, sanitize: false);
+		int smallestExponent = left.Exponent < right.Exponent ? left.Exponent : right.Exponent;
+		int exponentDifferenceLeft = Math.Abs(left.Exponent - smallestExponent);
+		int exponentDifferenceRight = Math.Abs(right.Exponent - smallestExponent);
+		var newSignificandLeft = left.Significand * BigInteger.Pow(10, exponentDifferenceLeft);
+		var newSignificandRight = right.Significand * BigInteger.Pow(10, exponentDifferenceRight);
+
+		left = new(smallestExponent, newSignificandLeft, sanitize: false);
+		right = new(smallestExponent, newSignificandRight, sanitize: false);
+
+		return smallestExponent;
 	}
 
-	[SuppressMessage("Major Code Smell", "S3358:Ternary operators should not be nested", Justification = "<Pending>")]
 	public int CompareTo(object? obj) =>
 		obj switch
 		{
@@ -289,7 +308,6 @@ public readonly struct SignificantNumber
 			_ => throw new ArgumentException(null, nameof(obj)),
 		};
 
-	[SuppressMessage("Major Code Smell", "S3358:Ternary operators should not be nested", Justification = "<Pending>")]
 	public int CompareTo(SignificantNumber other) =>
 		this < other
 		? -1
@@ -298,35 +316,35 @@ public readonly struct SignificantNumber
 		: 0;
 
 	public static SignificantNumber Abs(SignificantNumber value) => value.Significand < 0 ? -value : value;
-	public static bool IsCanonical(SignificantNumber _) => true;
+	public static bool IsCanonical(SignificantNumber value) => true;
 	public static bool IsComplexNumber(SignificantNumber value) => !IsRealNumber(value);
 	public static bool IsEvenInteger(SignificantNumber value) => IsInteger(value) && value.Significand.IsEven;
-	public static bool IsFinite(SignificantNumber _) => true;
+	public static bool IsFinite(SignificantNumber value) => true;
 	public static bool IsImaginaryNumber(SignificantNumber value) => !IsRealNumber(value);
 	public static bool IsInfinity(SignificantNumber value) => !IsFinite(value);
 	public static bool IsInteger(SignificantNumber value) => value.Exponent >= 0;
-	public static bool IsNaN(SignificantNumber _) => false;
+	public static bool IsNaN(SignificantNumber value) => false;
 	public static bool IsNegative(SignificantNumber value) => !IsPositive(value);
 	public static bool IsNegativeInfinity(SignificantNumber value) => IsNegative(value);
-	public static bool IsNormal(SignificantNumber _) => true;
+	public static bool IsNormal(SignificantNumber value) => true;
 	public static bool IsOddInteger(SignificantNumber value) => IsInteger(value) && !value.Significand.IsEven;
 	public static bool IsPositive(SignificantNumber value) => value.Significand >= 0;
 	public static bool IsPositiveInfinity(SignificantNumber value) => IsInfinity(value) && IsPositive(value);
-	public static bool IsRealNumber(SignificantNumber _) => true;
+	public static bool IsRealNumber(SignificantNumber value) => true;
 	public static bool IsSubnormal(SignificantNumber value) => !IsNormal(value);
 	public static bool IsZero(SignificantNumber value) => value.Significand == 0;
 	public static SignificantNumber MaxMagnitude(SignificantNumber x, SignificantNumber y) => x.Abs() > y.Abs() ? x : y;
 	public static SignificantNumber MaxMagnitudeNumber(SignificantNumber x, SignificantNumber y) => MaxMagnitude(x, y);
 	public static SignificantNumber MinMagnitude(SignificantNumber x, SignificantNumber y) => x.Abs() < y.Abs() ? x : y;
 	public static SignificantNumber MinMagnitudeNumber(SignificantNumber x, SignificantNumber y) => MinMagnitude(x, y);
-	public static SignificantNumber Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) => throw new NotImplementedException();
-	public static SignificantNumber Parse(string s, NumberStyles style, IFormatProvider? provider) => throw new NotImplementedException();
-	public static SignificantNumber Parse(string s, IFormatProvider? provider) => throw new NotImplementedException();
-	public static SignificantNumber Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => throw new NotImplementedException();
-	public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotImplementedException();
-	public static bool TryParse([NotNullWhen(true)] string? s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotImplementedException();
-	public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotImplementedException();
-	public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotImplementedException();
+	public static SignificantNumber Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) => throw new NotSupportedException();
+	public static SignificantNumber Parse(string s, NumberStyles style, IFormatProvider? provider) => throw new NotSupportedException();
+	public static SignificantNumber Parse(string s, IFormatProvider? provider) => throw new NotSupportedException();
+	public static SignificantNumber Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => throw new NotSupportedException();
+	public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotSupportedException();
+	public static bool TryParse([NotNullWhen(true)] string? s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotSupportedException();
+	public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotSupportedException();
+	public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotSupportedException();
 	public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
 	{
 		int requiredLength = SignificantDigits + Exponent + 2;
@@ -373,12 +391,12 @@ public readonly struct SignificantNumber
 			}
 			else if (Exponent > 0)
 			{
-				//string exponentSymbol = format == "G" ? "E" : "e";
-				//int overflowChars = int.Abs(Exponent) + significandStr.Length - MaxDecimalPlaces;
-				//output = overflowChars > 0
-				//	? $"{sign}{significandStr[..1]}{numberFormat.NumberDecimalSeparator}{significandStr[1..MaxDecimalPlaces]}{exponentSymbol}{Exponent + int.CopySign(overflowChars, Exponent):D3}"
-				//	: $"{sign}{significandStr}{new string('0', Exponent)}";
-				Span<char> trainlingZeroes = stackalloc char[Exponent];
+				int desiredAlloc = Exponent;
+				int stackAlloc = Math.Min(desiredAlloc, 128);
+				Span<char> trainlingZeroes = stackAlloc == desiredAlloc
+					? stackalloc char[stackAlloc]
+					: new char[desiredAlloc];
+
 				trainlingZeroes.Fill('0');
 				output = $"{sign}{significandStr}{trainlingZeroes}";
 			}
@@ -391,7 +409,12 @@ public readonly struct SignificantNumber
 					? "0"
 					: significandStr[..^absExponent];
 
-				Span<char> fractionalZeroes = stackalloc char[absExponent - significandStr.Length];
+				int desiredAlloc = Math.Max(absExponent - significandStr.Length, 0);
+				int stackAlloc = Math.Min(desiredAlloc, 128);
+				Span<char> fractionalZeroes = stackAlloc == desiredAlloc
+					? stackalloc char[stackAlloc]
+					: new char[desiredAlloc];
+
 				fractionalZeroes.Fill('0');
 
 				string fractionalComponent = absExponent >= significandStr.Length
@@ -408,6 +431,8 @@ public readonly struct SignificantNumber
 		charsWritten = output.Length;
 		return true;
 	}
+
+	public string ToString(string? format, IFormatProvider? formatProvider) => ToString(this, format, formatProvider);
 	int IComparable.CompareTo(object? obj) => CompareTo(obj);
 	int IComparable<SignificantNumber>.CompareTo(SignificantNumber other) => CompareTo(other);
 	static SignificantNumber INumberBase<SignificantNumber>.Abs(SignificantNumber value) => Abs(value);
@@ -434,21 +459,24 @@ public readonly struct SignificantNumber
 	static SignificantNumber INumberBase<SignificantNumber>.MinMagnitudeNumber(SignificantNumber x, SignificantNumber y) => MinMagnitudeNumber(x, y);
 	static SignificantNumber INumberBase<SignificantNumber>.Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) => Parse(s, style, provider);
 	static SignificantNumber INumberBase<SignificantNumber>.Parse(string s, NumberStyles style, IFormatProvider? provider) => Parse(s, style, provider);
-	static bool INumberBase<SignificantNumber>.TryConvertFromChecked<TOther>(TOther value, out SignificantNumber result) => throw new NotImplementedException();
-	static bool INumberBase<SignificantNumber>.TryConvertFromSaturating<TOther>(TOther value, out SignificantNumber result) => throw new NotImplementedException();
-	static bool INumberBase<SignificantNumber>.TryConvertFromTruncating<TOther>(TOther value, out SignificantNumber result) => throw new NotImplementedException();
-	static bool INumberBase<SignificantNumber>.TryConvertToChecked<TOther>(SignificantNumber value, out TOther result) => throw new NotImplementedException();
-	static bool INumberBase<SignificantNumber>.TryConvertToSaturating<TOther>(SignificantNumber value, out TOther result) => throw new NotImplementedException();
-	static bool INumberBase<SignificantNumber>.TryConvertToTruncating<TOther>(SignificantNumber value, out TOther result) => throw new NotImplementedException();
+	static bool INumberBase<SignificantNumber>.TryConvertFromChecked<TOther>(TOther value, out SignificantNumber result) => throw new NotSupportedException();
+	static bool INumberBase<SignificantNumber>.TryConvertFromSaturating<TOther>(TOther value, out SignificantNumber result) => throw new NotSupportedException();
+	static bool INumberBase<SignificantNumber>.TryConvertFromTruncating<TOther>(TOther value, out SignificantNumber result) => throw new NotSupportedException();
+	static bool INumberBase<SignificantNumber>.TryConvertToChecked<TOther>(SignificantNumber value, out TOther result) => throw new NotSupportedException();
+	static bool INumberBase<SignificantNumber>.TryConvertToSaturating<TOther>(SignificantNumber value, out TOther result) => throw new NotSupportedException();
+	static bool INumberBase<SignificantNumber>.TryConvertToTruncating<TOther>(SignificantNumber value, out TOther result) => throw new NotSupportedException();
 	static bool INumberBase<SignificantNumber>.TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, out SignificantNumber result) => TryParse(s, style, provider, out result);
 	static bool INumberBase<SignificantNumber>.TryParse(string? s, NumberStyles style, IFormatProvider? provider, out SignificantNumber result) => TryParse(s, style, provider, out result);
 	bool IEquatable<SignificantNumber>.Equals(SignificantNumber other) => Equals(other);
 	bool ISpanFormattable.TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider) => TryFormat(destination, out charsWritten, format, provider);
-	string IFormattable.ToString(string? format, IFormatProvider? formatProvider) => ToString(this, format, formatProvider);
+	string IFormattable.ToString(string? format, IFormatProvider? formatProvider) => ToString(format, formatProvider);
 	static SignificantNumber ISpanParsable<SignificantNumber>.Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s, provider);
-	static bool ISpanParsable<SignificantNumber>.TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out SignificantNumber result) => TryParse(s.ToString(), provider, out result);
+	static bool ISpanParsable<SignificantNumber>.TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out SignificantNumber result) => TryParse(s, provider, out result);
 	static SignificantNumber IParsable<SignificantNumber>.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
 	static bool IParsable<SignificantNumber>.TryParse(string? s, IFormatProvider? provider, out SignificantNumber result) => TryParse(s, provider, out result);
+
+	private static void AssertExponentsMatch(SignificantNumber left, SignificantNumber right) =>
+		Debug.Assert(left.Exponent == right.Exponent, $"{nameof(AssertExponentsMatch)}: {left.Exponent} == {right.Exponent}");
 
 	public static SignificantNumber operator -(SignificantNumber value)
 	{
@@ -459,79 +487,124 @@ public readonly struct SignificantNumber
 
 	public static SignificantNumber operator -(SignificantNumber left, SignificantNumber right)
 	{
-		var leftCommon = left.WithCommonExponent(right);
-		var rightCommon = right.WithCommonExponent(left);
 		int decimalDigits = LowestDecimalDigits(left, right);
-		var newSignificand = leftCommon.Significand - rightCommon.Significand;
-		int newExponent = leftCommon.Exponent;
-		return new SignificantNumber(newExponent, newSignificand).Round(decimalDigits);
+		int commonExponent = MakeCommonized(ref left, ref right);
+		AssertExponentsMatch(left, left);
+
+		var newSignificand = left.Significand - right.Significand;
+		return new SignificantNumber(commonExponent, newSignificand).Round(decimalDigits);
 	}
 
 	public static bool operator !=(SignificantNumber left, SignificantNumber right) => !(left == right);
 
 	public static SignificantNumber operator *(SignificantNumber left, SignificantNumber right)
 	{
-		var leftCommon = left.WithCommonExponent(right);
-		var rightCommon = right.WithCommonExponent(left);
 		int significantDigits = LowestSignificantDigits(left, right);
-		int newExponent = leftCommon.Exponent;
-		var newSignificand = leftCommon.Significand * rightCommon.Significand / BigInteger.Pow(10, int.Abs(newExponent));
-		return new SignificantNumber(newExponent, newSignificand).ReduceSignificance(significantDigits);
+		int commonExponent = MakeCommonized(ref left, ref right);
+		AssertExponentsMatch(left, right);
+
+		var newSignificand = left.Significand * right.Significand / BigInteger.Pow(10, int.Abs(commonExponent));
+		return new SignificantNumber(commonExponent, newSignificand).ReduceSignificance(significantDigits);
 	}
 
 	public static SignificantNumber operator /(SignificantNumber left, SignificantNumber right)
 	{
-		var leftCommon = left.WithCommonExponent(right);
-		var rightCommon = right.WithCommonExponent(left);
 		int significantDigits = LowestSignificantDigits(left, right);
-		int newExponent = leftCommon.Exponent;
-		var newSignificand = leftCommon.Significand * BigInteger.Pow(10, int.Abs(newExponent)) / rightCommon.Significand;
-		return new SignificantNumber(newExponent, newSignificand).ReduceSignificance(significantDigits);
+		int commonExponent = MakeCommonized(ref left, ref right);
+		AssertExponentsMatch(left, right);
+
+		var newSignificand = left.Significand * BigInteger.Pow(10, int.Abs(commonExponent)) / right.Significand;
+		return new SignificantNumber(commonExponent, newSignificand).ReduceSignificance(significantDigits);
 	}
 
 	public static SignificantNumber operator +(SignificantNumber value) => value;
 
 	public static SignificantNumber operator +(SignificantNumber left, SignificantNumber right)
 	{
-		var leftCommon = left.WithCommonExponent(right);
-		var rightCommon = right.WithCommonExponent(left);
 		int decimalDigits = LowestDecimalDigits(left, right);
-		var newSignificand = leftCommon.Significand + rightCommon.Significand;
-		int newExponent = leftCommon.Exponent;
-		return new SignificantNumber(newExponent, newSignificand).Round(decimalDigits);
+		int commonExponent = MakeCommonized(ref left, ref right);
+		AssertExponentsMatch(left, right);
+
+		var newSignificand = left.Significand + right.Significand;
+		return new SignificantNumber(commonExponent, newSignificand).Round(decimalDigits);
 	}
 
 	public static bool operator ==(SignificantNumber left, SignificantNumber right)
 	{
-		var leftCommon = left.WithCommonExponent(right);
-		var rightCommon = right.WithCommonExponent(left);
 		int decimalDigits = LowestDecimalDigits(left, right);
-		var leftSignificant = leftCommon.Round(decimalDigits);
-		var rightSignificant = rightCommon.Round(decimalDigits);
-		return leftSignificant.Exponent == rightSignificant.Exponent
-			&& leftSignificant.Significand == rightSignificant.Significand;
+		MakeCommonized(ref left, ref right);
+		AssertExponentsMatch(left, right);
+		var leftSignificant = left.Round(decimalDigits);
+		var rightSignificant = right.Round(decimalDigits);
+		MakeCommonized(ref leftSignificant, ref rightSignificant);
+		AssertExponentsMatch(leftSignificant, rightSignificant);
+		return leftSignificant.Significand == rightSignificant.Significand;
 	}
 
-	public static bool operator >(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	public static bool operator >=(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	public static bool operator <(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	public static bool operator <=(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	public static SignificantNumber operator %(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	public static SignificantNumber operator --(SignificantNumber value) => throw new NotImplementedException();
-	public static SignificantNumber operator ++(SignificantNumber value) => throw new NotImplementedException();
-	static bool IComparisonOperators<SignificantNumber, SignificantNumber, bool>.operator >(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	static bool IComparisonOperators<SignificantNumber, SignificantNumber, bool>.operator >=(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	static bool IComparisonOperators<SignificantNumber, SignificantNumber, bool>.operator <(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	static bool IComparisonOperators<SignificantNumber, SignificantNumber, bool>.operator <=(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	static SignificantNumber IModulusOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator %(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	static SignificantNumber IAdditionOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator +(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	static SignificantNumber IDecrementOperators<SignificantNumber>.operator --(SignificantNumber value) => throw new NotImplementedException();
-	static SignificantNumber IDivisionOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator /(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	static bool IEqualityOperators<SignificantNumber, SignificantNumber, bool>.operator ==(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	static bool IEqualityOperators<SignificantNumber, SignificantNumber, bool>.operator !=(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
+	public static bool operator >(SignificantNumber left, SignificantNumber right)
+	{
+		int decimalDigits = LowestDecimalDigits(left, right);
+		MakeCommonized(ref left, ref right);
+		AssertExponentsMatch(left, right);
+		var leftSignificant = left.Round(decimalDigits);
+		var rightSignificant = right.Round(decimalDigits);
+		MakeCommonized(ref leftSignificant, ref rightSignificant);
+		AssertExponentsMatch(leftSignificant, rightSignificant);
+		return leftSignificant.Significand > rightSignificant.Significand;
+	}
+
+	public static bool operator <(SignificantNumber left, SignificantNumber right)
+	{
+		int decimalDigits = LowestDecimalDigits(left, right);
+		MakeCommonized(ref left, ref right);
+		AssertExponentsMatch(left, right);
+		var leftSignificant = left.Round(decimalDigits);
+		var rightSignificant = right.Round(decimalDigits);
+		MakeCommonized(ref leftSignificant, ref rightSignificant);
+		AssertExponentsMatch(leftSignificant, rightSignificant);
+		return leftSignificant.Significand < rightSignificant.Significand;
+	}
+
+	public static bool operator >=(SignificantNumber left, SignificantNumber right)
+	{
+		int decimalDigits = LowestDecimalDigits(left, right);
+		MakeCommonized(ref left, ref right);
+		AssertExponentsMatch(left, right);
+		var leftSignificant = left.Round(decimalDigits);
+		var rightSignificant = right.Round(decimalDigits);
+		MakeCommonized(ref leftSignificant, ref rightSignificant);
+		AssertExponentsMatch(leftSignificant, rightSignificant);
+		return leftSignificant.Significand >= rightSignificant.Significand;
+	}
+
+	public static bool operator <=(SignificantNumber left, SignificantNumber right)
+	{
+		int decimalDigits = LowestDecimalDigits(left, right);
+		MakeCommonized(ref left, ref right);
+		AssertExponentsMatch(left, right);
+		var leftSignificant = left.Round(decimalDigits);
+		var rightSignificant = right.Round(decimalDigits);
+		MakeCommonized(ref leftSignificant, ref rightSignificant);
+		AssertExponentsMatch(leftSignificant, rightSignificant);
+		return leftSignificant.Significand <= rightSignificant.Significand;
+	}
+
+	public static SignificantNumber operator %(SignificantNumber left, SignificantNumber right) => throw new NotSupportedException();
+	public static SignificantNumber operator --(SignificantNumber value) => throw new NotSupportedException();
+	public static SignificantNumber operator ++(SignificantNumber value) => throw new NotSupportedException();
+	static bool IComparisonOperators<SignificantNumber, SignificantNumber, bool>.operator >(SignificantNumber left, SignificantNumber right) => left > right;
+	static bool IComparisonOperators<SignificantNumber, SignificantNumber, bool>.operator >=(SignificantNumber left, SignificantNumber right) => left >= right;
+	static bool IComparisonOperators<SignificantNumber, SignificantNumber, bool>.operator <(SignificantNumber left, SignificantNumber right) => left < right;
+	static bool IComparisonOperators<SignificantNumber, SignificantNumber, bool>.operator <=(SignificantNumber left, SignificantNumber right) => left <= right;
+	static SignificantNumber IModulusOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator %(SignificantNumber left, SignificantNumber right) => left % right;
+	static SignificantNumber IAdditionOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator +(SignificantNumber left, SignificantNumber right) => left + right;
+	static SignificantNumber IDecrementOperators<SignificantNumber>.operator --(SignificantNumber value) => throw new NotSupportedException();
+	static SignificantNumber IDivisionOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator /(SignificantNumber left, SignificantNumber right) => left / right;
+	static bool IEqualityOperators<SignificantNumber, SignificantNumber, bool>.operator ==(SignificantNumber left, SignificantNumber right) => left == right;
+	static bool IEqualityOperators<SignificantNumber, SignificantNumber, bool>.operator !=(SignificantNumber left, SignificantNumber right) => left != right;
 	static SignificantNumber IIncrementOperators<SignificantNumber>.operator ++(SignificantNumber value) => throw new NotImplementedException();
-	static SignificantNumber IMultiplyOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator *(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	static SignificantNumber ISubtractionOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator -(SignificantNumber left, SignificantNumber right) => throw new NotImplementedException();
-	static SignificantNumber IUnaryNegationOperators<SignificantNumber, SignificantNumber>.operator -(SignificantNumber value) => throw new NotImplementedException();
-	static SignificantNumber IUnaryPlusOperators<SignificantNumber, SignificantNumber>.operator +(SignificantNumber value) => throw new NotImplementedException();
+	static SignificantNumber IMultiplyOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator *(SignificantNumber left, SignificantNumber right) => left * right;
+	static SignificantNumber ISubtractionOperators<SignificantNumber, SignificantNumber, SignificantNumber>.operator -(SignificantNumber left, SignificantNumber right) => left - right;
+	static SignificantNumber IUnaryNegationOperators<SignificantNumber, SignificantNumber>.operator -(SignificantNumber value) => -value;
+	static SignificantNumber IUnaryPlusOperators<SignificantNumber, SignificantNumber>.operator +(SignificantNumber value) => +value;
 }
