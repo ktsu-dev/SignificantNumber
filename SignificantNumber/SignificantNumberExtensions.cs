@@ -8,7 +8,20 @@ public static class SignificantNumberExtensions
 	public static SignificantNumber ToSignificantNumber<TInput>(this INumber<TInput> input)
 		where TInput : INumber<TInput>
 	{
-		return TryCreate((TInput)input, out var significantNumber)
+		// if TInput is already a SignificantNumber then just return it
+		SignificantNumber significantNumber;
+		bool success = typeof(TInput) == typeof(SignificantNumber);
+
+		if (success)
+		{
+			significantNumber = (SignificantNumber)(object)input;
+		}
+		else
+		{
+			success = TryCreate((TInput)input, out significantNumber);
+		}
+
+		return success
 			? significantNumber
 			: throw new NotSupportedException();
 	}
