@@ -26,7 +26,7 @@ public static class SignificantNumberExtensions
 			: throw new NotSupportedException();
 	}
 
-	private static bool TryCreate<TInput>([NotNullWhen(true)] TInput input, [MaybeNullWhen(false)] out SignificantNumber significantNumber)
+	internal static bool TryCreate<TInput>([NotNullWhen(true)] TInput input, [MaybeNullWhen(false)] out SignificantNumber significantNumber)
 		where TInput : INumber<TInput>
 	{
 		var type = typeof(TInput);
