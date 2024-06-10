@@ -1,5 +1,6 @@
 namespace ktsu.io.SignificantNumber.Test;
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using ktsu.io.SignificantNumber;
@@ -7,6 +8,7 @@ using ktsu.io.SignificantNumber;
 [TestClass]
 public class Tests
 {
+
 	[TestMethod]
 	public void TestZero()
 	{
@@ -105,10 +107,13 @@ public class Tests
 		Assert.AreEqual(1, a.Significand);
 		Assert.AreEqual(3, a.Exponent);
 		Assert.AreEqual(1, a.SignificantDigits);
+
+		var b = a.ToSignificantNumber();
+		Assert.AreEqual(a, b);
 	}
 
 	[TestMethod]
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0008:Use explicit type", Justification = "<Pending>")]
+	[SuppressMessage("Style", "IDE0008:Use explicit type", Justification = "<Pending>")]
 	public void TestRoundTripWithRandomValues()
 	{
 		const int numIterations = 10000;
@@ -402,7 +407,7 @@ public class Tests
 	}
 
 	[TestMethod]
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "<Pending>")]
+	[SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "<Pending>")]
 	public void TestToString()
 	{
 		var a = 0.ToSignificantNumber();
@@ -589,5 +594,95 @@ public class Tests
 	{
 		Assert.AreEqual(SignificantNumber.Zero, SignificantNumber.AdditiveIdentity);
 		Assert.AreEqual(SignificantNumber.One, SignificantNumber.MultiplicativeIdentity);
+	}
+
+	[TestMethod]
+	public void DoesImplementGenericInterfaceNonGenericInterfaceThrowsArgumentException()
+	{
+		// Arrange
+		var type = typeof(List<int>);
+		var nonGenericInterface = typeof(IDisposable);
+
+		// Act & Assert
+		Assert.ThrowsException<ArgumentException>(() => SignificantNumber.DoesImplementGenericInterface(type, nonGenericInterface));
+	}
+
+	[TestMethod]
+	public void DoesImplementGenericInterfaceGenericInterfaceNotImplementedReturnsFalse()
+	{
+		// Arrange
+		var type = typeof(List<int>);
+		var genericInterface = typeof(IDictionary<,>);
+
+		// Act
+		bool result = SignificantNumber.DoesImplementGenericInterface(type, genericInterface);
+
+		// Assert
+		Assert.IsFalse(result);
+	}
+
+	[TestMethod]
+	public void DoesImplementGenericInterfaceGenericInterfaceImplementedReturnsTrue()
+	{
+		// Arrange
+		var type = typeof(List<int>);
+		var genericInterface = typeof(IEnumerable<>);
+
+		// Act
+		bool result = SignificantNumber.DoesImplementGenericInterface(type, genericInterface);
+
+		// Assert
+		Assert.IsTrue(result);
+	}
+
+	[TestMethod]
+	public void ToSignificantNumberValidInputReturnsSignificantNumber()
+	{
+		// Arrange
+		int input = 5;
+
+		// Act
+		var result = input.ToSignificantNumber();
+
+		// Assert
+		Assert.IsNotNull(result);
+	}
+
+	[TestMethod]
+	public void ToSignificantNumberInvalidInputThrowsNotSupportedException()
+	{
+		// Arrange
+		var input = new InvalidNumber();
+
+		// Act & Assert
+		Assert.ThrowsException<NotSupportedException>(() => input.ToSignificantNumber());
+	}
+
+	[TestMethod]
+	public void TryCreateValidInputReturnsTrueAndSetsOutParameter()
+	{
+		// Arrange
+		int input = 5;
+
+		// Act
+		bool result = SignificantNumberExtensions.TryCreate(input, out var significantNumber);
+
+		// Assert
+		Assert.IsTrue(result);
+		Assert.IsNotNull(significantNumber);
+	}
+
+	[TestMethod]
+	public void TryCreateInvalidInputReturnsFalseAndSetsOutParameterToDefault()
+	{
+		// Arrange
+		var input = new InvalidNumber();
+
+		// Act
+		bool result = SignificantNumberExtensions.TryCreate(input, out var significantNumber);
+
+		// Assert
+		Assert.IsFalse(result);
+		Assert.AreEqual(default, significantNumber);
 	}
 }
