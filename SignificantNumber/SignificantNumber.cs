@@ -306,12 +306,12 @@ public readonly struct SignificantNumber
 	}
 
 	public int CompareTo(object? obj) =>
-		obj switch
-		{
-			null => 1,
-			SignificantNumber number => CompareTo(number),
-			_ => throw new ArgumentException(null, nameof(obj)),
-		};
+	obj switch
+	{
+		null => 1,
+		SignificantNumber number => CompareTo(number),
+		_ => throw new ArgumentException($"{obj.GetType().Name} is not comparable with {nameof(SignificantNumber)}", nameof(obj)),
+	};
 
 	public int CompareTo(SignificantNumber other)
 	{
@@ -636,24 +636,10 @@ public readonly struct SignificantNumber
 
 	internal static bool DoesImplementGenericInterface(Type type, Type genericInterface)
 	{
-		EnsureTypeIsInterface(genericInterface);
-		EnsureTypeIsGeneric(genericInterface);
-		return Array.Exists(type.GetInterfaces(), x => x.IsGenericType && x.GetGenericTypeDefinition() == genericInterface);
-	}
+		bool genericInterfaceIsValid = genericInterface.IsInterface && genericInterface.IsGenericType;
 
-	internal static void EnsureTypeIsInterface(Type type)
-	{
-		if (!type.IsInterface)
-		{
-			throw new ArgumentException($"{type.Name} is expected to be an interface", nameof(type));
-		}
-	}
-
-	internal static void EnsureTypeIsGeneric(Type type)
-	{
-		if (!type.IsGenericType)
-		{
-			throw new ArgumentException($"{type.Name} is expected to be an generic type", nameof(type));
-		}
+		return genericInterfaceIsValid
+			? Array.Exists(type.GetInterfaces(), x => x.IsGenericType && x.GetGenericTypeDefinition() == genericInterface)
+			: throw new ArgumentException($"{genericInterface.Name} is not a generic interface");
 	}
 }
