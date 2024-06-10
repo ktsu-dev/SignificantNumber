@@ -214,7 +214,9 @@ public readonly struct SignificantNumber
 
 		Span<char> inputSpan = stackalloc char[sizeOfSignificand + sizeOfExponent];
 		_ = input.TryFormat(inputSpan, out int charsWritten, "", CultureInfo.InvariantCulture);
-		ReadOnlySpan<char> integerComponent = inputSpan;
+		int length = inputSpan.IndexOf('\0');
+		length = length == -1 ? inputSpan.Length : length;
+		ReadOnlySpan<char> integerComponent = inputSpan[..length];
 		while (integerComponent.Length > 1 && integerComponent[^1] == '0')
 		{
 			integerComponent = integerComponent[..^1];
