@@ -820,4 +820,95 @@ public class Tests
 		// Assert
 		Assert.AreEqual(expected, result);
 	}
+
+	[TestMethod]
+	public void CompareToAnyObjectThrowsNotSupportedException()
+	{
+		// Arrange
+		var significantNumber = 2.ToSignificantNumber();
+		object obj = new();
+
+		// Act & Assert
+		Assert.ThrowsException<NotSupportedException>(() => significantNumber.CompareTo(obj));
+	}
+
+	[TestMethod]
+	public void CompareToSmallerNumberReturnsPositive()
+	{
+		// Arrange
+		var number = 5.ToSignificantNumber();
+		int smallerNumber = 3;
+
+		// Act
+		int result = number.CompareTo(smallerNumber);
+
+		// Assert
+		Assert.IsTrue(result > 0);
+	}
+
+	[TestMethod]
+	public void CompareToLargerNumberReturnsNegative()
+	{
+		// Arrange
+		var number = 2.ToSignificantNumber();
+		int largerNumber = 3;
+
+		// Act
+		int result = number.CompareTo(largerNumber);
+
+		// Assert
+		Assert.IsTrue(result < 0);
+	}
+
+	[TestMethod]
+	public void CompareToEqualNumberReturnsZero()
+	{
+		// Arrange
+		var number = 2.ToSignificantNumber();
+		int equalNumber = 2;
+
+		// Act
+		int result = number.CompareTo(equalNumber);
+
+		// Assert
+		Assert.AreEqual(0, result);
+	}
+
+	[TestMethod]
+	public void MaxMagnitudeGivenTwoNumbersReturnsNumberWithMaxMagnitude()
+	{
+		// Arrange
+		var number1 = 2.ToSignificantNumber();
+		var number2 = 3.ToSignificantNumber();
+
+		// Act
+		var result = SignificantNumber.MaxMagnitude(number1, number2);
+
+		// Assert
+		Assert.AreEqual(number2, result); // Assuming number2 has the max magnitude
+	}
+
+	[TestMethod]
+	public void MinMagnitudeGivenTwoNumbersReturnsNumberWithMinMagnitude()
+	{
+		// Arrange
+		var number1 = 2.ToSignificantNumber();
+		var number2 = 3.ToSignificantNumber();
+
+		// Act
+		var result = SignificantNumber.MinMagnitude(number1, number2);
+
+		// Assert
+		Assert.AreEqual(number1, result); // Assuming number1 has the min magnitude
+	}
+
+	[TestMethod]
+	public void ParseValidStringThrowsNotSupportedException()
+	{
+		// Arrange
+		string validString = "123";
+
+		// Act & Assert
+		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Parse(validString, null));
+	}
 }
