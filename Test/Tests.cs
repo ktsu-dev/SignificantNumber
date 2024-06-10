@@ -911,4 +911,91 @@ public class Tests
 		// Act & Assert
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Parse(validString, null));
 	}
+
+	[TestMethod]
+	public void ModulusOperatorThrowsNotSupportedException()
+	{
+		// Arrange
+		var left = 5.ToSignificantNumber();
+		var right = 3.ToSignificantNumber();
+
+		// Act & Assert
+		Assert.ThrowsException<NotSupportedException>(() => left % right);
+	}
+
+	[TestMethod]
+	public void DecrementOperatorThrowsNotSupportedException()
+	{
+		// Arrange
+		var value = 5.ToSignificantNumber();
+
+		// Act & Assert
+		Assert.ThrowsException<NotSupportedException>(() => value--);
+	}
+
+	[TestMethod]
+	public void IncrementOperatorThrowsNotSupportedException()
+	{
+		// Arrange
+		var value = 5.ToSignificantNumber();
+
+		// Act & Assert
+		Assert.ThrowsException<NotSupportedException>(() => value++);
+	}
+
+	[TestMethod]
+	public void GreaterThanOperatorGivenTwoNumbersReturnsCorrectResult()
+	{
+		// Arrange
+		var largerNumber = 5.ToSignificantNumber();
+		var smallerNumber = 3.ToSignificantNumber();
+
+		// Act
+		bool result = largerNumber > smallerNumber;
+
+		// Assert
+		Assert.IsTrue(result);
+	}
+
+	[TestMethod]
+	public void GreaterThanOrEqualOperatorGivenTwoNumbersReturnsCorrectResult()
+	{
+		// Arrange
+		var largerNumber = 5.ToSignificantNumber();
+		var smallerNumber = 3.ToSignificantNumber();
+
+		// Act
+		bool result = largerNumber >= smallerNumber;
+
+		// Assert
+		Assert.IsTrue(result);
+	}
+
+	[TestMethod]
+	public void LessThanOperatorGivenTwoNumbersReturnsCorrectResult()
+	{
+		// Arrange
+		var largerNumber = 5.ToSignificantNumber();
+		var smallerNumber = 3.ToSignificantNumber();
+
+		// Act
+		bool result = smallerNumber < largerNumber;
+
+		// Assert
+		Assert.IsTrue(result);
+	}
+
+	[TestMethod]
+	public void LessThanOrEqualOperatorGivenTwoNumbersReturnsCorrectResult()
+	{
+		// Arrange
+		var largerNumber = 5.ToSignificantNumber();
+		var smallerNumber = 3.ToSignificantNumber();
+
+		// Act
+		bool result = smallerNumber <= largerNumber;
+
+		// Assert
+		Assert.IsTrue(result);
+	}
 }
