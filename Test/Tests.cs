@@ -765,4 +765,30 @@ public class Tests
 		// Assert
 		Assert.IsFalse(result);
 	}
+
+	[TestMethod]
+	public void DoesImplementINumberTypeImplementsINumberReturnsTrue()
+	{
+		// Arrange
+		var type = typeof(int); // Replace with actual type that implements INumber<T>
+
+		// Act
+		bool result = SignificantNumber.DoesImplementINumber(type);
+
+		// Assert
+		Assert.IsTrue(result);
+	}
+
+	[TestMethod]
+	public void DoesImplementINumberTypeDoesNotImplementINumberReturnsFalse()
+	{
+		// Arrange
+		var type = typeof(string); // Replace with actual type that does not implement INumber<T>
+
+		// Act
+		bool result = SignificantNumber.DoesImplementINumber(type);
+
+		// Assert
+		Assert.IsFalse(result);
+	}
 }
