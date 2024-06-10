@@ -596,6 +596,8 @@ public class Tests
 		Assert.AreEqual(SignificantNumber.One, SignificantNumber.MultiplicativeIdentity);
 	}
 
+	// AI generated tests
+
 	[TestMethod]
 	public void DoesImplementGenericInterfaceNonGenericInterfaceThrowsArgumentException()
 	{
@@ -684,5 +686,83 @@ public class Tests
 		// Assert
 		Assert.IsFalse(result);
 		Assert.AreEqual(default, significantNumber);
+	}
+
+	[TestMethod]
+	public void IsEvenIntegerEvenIntegerReturnsTrue()
+	{
+		// Arrange
+		var evenInteger = 2.ToSignificantNumber();
+
+		// Act
+		bool result = SignificantNumber.IsEvenInteger(evenInteger);
+
+		// Assert
+		Assert.IsTrue(result);
+	}
+
+	[TestMethod]
+	public void IsEvenIntegerOddIntegerReturnsFalse()
+	{
+		// Arrange
+		var oddInteger = 3.ToSignificantNumber();
+
+		// Act
+		bool result = SignificantNumber.IsEvenInteger(oddInteger);
+
+		// Assert
+		Assert.IsFalse(result);
+	}
+
+	[TestMethod]
+	public void IsOddIntegerOddIntegerReturnsTrue()
+	{
+		// Arrange
+		var oddInteger = 3.ToSignificantNumber();
+
+		// Act
+		bool result = SignificantNumber.IsOddInteger(oddInteger);
+
+		// Assert
+		Assert.IsTrue(result);
+	}
+
+	[TestMethod]
+	public void IsOddIntegerEvenIntegerReturnsFalse()
+	{
+		// Arrange
+		var evenInteger = 2.ToSignificantNumber();
+
+		// Act
+		bool result = SignificantNumber.IsOddInteger(evenInteger);
+
+		// Assert
+		Assert.IsFalse(result);
+	}
+
+	[TestMethod]
+	public void IsZeroZeroReturnsTrue()
+	{
+		// Arrange
+		var zero = 0.ToSignificantNumber();
+
+		// Act
+		bool result = SignificantNumber.IsZero(zero);
+
+		// Assert
+		Assert.IsTrue(result);
+	}
+
+	[TestMethod]
+	public void IsZeroNonZeroReturnsFalse()
+	{
+		// Arrange
+		var nonZero = 1.ToSignificantNumber();
+
+		// Act
+		bool result = SignificantNumber.IsZero(nonZero);
+
+		// Assert
+		Assert.IsFalse(result);
 	}
 }
