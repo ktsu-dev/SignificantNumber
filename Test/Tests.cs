@@ -791,4 +791,33 @@ public class Tests
 		// Assert
 		Assert.IsFalse(result);
 	}
+
+	[TestMethod]
+	public void AddTwoSignificantNumbersReturnsCorrectResult()
+	{
+		// Arrange
+		var left = 2.ToSignificantNumber();
+		var right = 3.ToSignificantNumber();
+		var expected = 5.ToSignificantNumber();
+		// Act
+		var result = SignificantNumber.Add(left, right);
+
+		// Assert
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void SubtractTwoSignificantNumbersReturnsCorrectResult()
+	{
+		// Arrange
+		var left = 5.ToSignificantNumber();
+		var right = 3.ToSignificantNumber();
+		var expected = 2.ToSignificantNumber();
+
+		// Act
+		var result = SignificantNumber.Subtract(left, right);
+
+		// Assert
+		Assert.AreEqual(expected, result);
+	}
 }
