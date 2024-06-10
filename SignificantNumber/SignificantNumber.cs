@@ -306,17 +306,20 @@ public readonly struct SignificantNumber
 	}
 
 	public int CompareTo(object? obj) =>
-	obj switch
-	{
-		null => 1,
-		SignificantNumber number => CompareTo(number),
-		_ => throw new ArgumentException($"{obj.GetType().Name} is not comparable with {nameof(SignificantNumber)}", nameof(obj)),
-	};
+		throw new NotSupportedException();
 
 	public int CompareTo(SignificantNumber other)
 	{
 		int greaterOrEqual = this > other ? 1 : 0;
 		return this < other ? -1 : greaterOrEqual;
+	}
+
+	public int CompareTo<TInput>(TInput other)
+		where TInput : INumber<TInput>
+	{
+		var significantOther = other.ToSignificantNumber();
+		int greaterOrEqual = this > significantOther ? 1 : 0;
+		return this < significantOther ? -1 : greaterOrEqual;
 	}
 
 	public static SignificantNumber Abs(SignificantNumber value) => value.Significand < 0 ? -value : value;
@@ -642,4 +645,7 @@ public readonly struct SignificantNumber
 			? Array.Exists(type.GetInterfaces(), x => x.IsGenericType && x.GetGenericTypeDefinition() == genericInterface)
 			: throw new ArgumentException($"{genericInterface.Name} is not a generic interface");
 	}
+
+	internal static bool DoesImplementINumber(Type type) =>
+		DoesImplementGenericInterface(type, typeof(INumber<>));
 }
