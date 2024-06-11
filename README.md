@@ -1,6 +1,6 @@
 # SignificantNumber
 
-The `SignificantNumber` class represents a number with a significant figure and an exponent, enabling high-precision arithmetic operations. It provides a robust set of functionalities for mathematical computations and formatting.
+The `SignificantNumber` class represents a number with a significand and an exponent, enabling high-precision arithmetic operations that comply with calculation rules for significant figures. It provides a robust set of functionalities for mathematical computations and formatting.
 
 ## Features
 
@@ -18,6 +18,10 @@ The `SignificantNumber` class represents a number with a significant figure and 
   - [Comparison Operations](#comparison-operations)
   - [Formatting and Parsing](#formatting-and-parsing)
   - [Extension Methods](#extension-methods)
+- [Precision](#precision)
+  - [Significand and Exponent](#significand-and-exponent)
+  - [Precision Handling](#precision-handling)
+  - [Example of Precision](#example-of-precision)
 - [API Reference](#api-reference)
 - [Contributing](#contributing)
 - [License](#license)
@@ -47,9 +51,11 @@ using ktsu.io.SignificantNumber;
 
 double floatingPointValue = 123.45;
 SignificantNumber significantNumberFromFloat = floatingPointValue.ToSignificantNumber();
+significantNumberFromFloat = 537.89.ToSignificantNumber();
 
 int integerValue = 12345;
 SignificantNumber significantNumberFromInt = integerValue.ToSignificantNumber();
+significantNumberFromInt = 98765.ToSignificantNumber();
 ```
 
 ### Arithmetic Operations
@@ -95,6 +101,13 @@ catch (NotSupportedException ex)
 }
 ```
 
+Instead you should parse the number as another numeric type and convert it to a `SignificantNumber`:
+
+```csharp
+double parsedDouble = double.Parse("123.45", CultureInfo.InvariantCulture);
+SignificantNumber significantNumberFromDouble = parsedDouble.ToSignificantNumber();
+```
+
 ### Extension Methods
 
 #### `ToSignificantNumber`
@@ -125,6 +138,32 @@ SignificantNumber significantNumberFromFloat = floatingPointValue.ToSignificantN
 int integerValue = 12345;
 SignificantNumber significantNumberFromInt = integerValue.ToSignificantNumber();
 ```
+
+## Precision
+
+The `SignificantNumber` class is designed to handle high-precision arithmetic operations with significant figures and exponents.
+
+Here's how it ensures precision:
+
+### Significand and Exponent
+
+A `SignificantNumber` consists of two main components:
+- **Significand**: This is the significant part of the number, stored as a `BigInteger` to accommodate a wide range of values with high precision.
+- **Exponent**: This is the exponent part of the number, which scales the significand by a power of ten.
+
+### Precision Handling
+
+- **Maximum Significant Digits**: When converting from a floating-point number to a `SignificantNumber` maximum number of significant digits is limited to 7 for `float` values, and 16 for `double` values.
+- **Trailing Zero Removal**: The class automatically sanitizes the significand by removing trailing zeros, ensuring that the number is stored in its most compact and precise form.
+- **Rounding**: You can round a `SignificantNumber` to a specified number of decimal digits, ensuring that you can control the precision of your calculations.
+
+### Example of Precision
+
+Consider the number `123.456000`:
+- When stored as a `SignificantNumber`, it will be represented as `123456e-3` after removing the trailing zeros and adjusting the exponent accordingly.
+- This ensures that the number is represented with the exact precision required for your calculations, without unnecessary trailing zeros.
+
+By using the `SignificantNumber` class, you can perform high-precision arithmetic operations and maintain control over the significant figures and exponent, ensuring accurate and efficient mathematical computations.
 
 ## API Reference
 
