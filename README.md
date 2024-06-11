@@ -72,13 +72,16 @@ bool isLessOrEqual = number1 <= number2;
 
 ### Formatting and Parsing
 
-You can format a `SignificantNumber` as a string and parse it from a string:
+You can format a `SignificantNumber` as a string:
 
 ```csharp
 string formatted = number1.ToString("G", CultureInfo.InvariantCulture);
 Console.WriteLine(formatted);  // Outputs the formatted number
+```
 
-// Parsing is not supported and will throw NotSupportedException
+Parsing is not supported and will throw `NotSupportedException`:
+
+```csharp
 try
 {
     var parsedNumber = SignificantNumber.Parse("123.45", CultureInfo.InvariantCulture);
@@ -93,9 +96,6 @@ catch (NotSupportedException ex)
 
 ### Properties
 
-- `int Exponent { get; }` - Gets the exponent of the significant number.
-- `BigInteger Significand { get; }` - Gets the significand of the significant number.
-- `int SignificantDigits { get; }` - Gets the number of significant digits in the significant number.
 - `static SignificantNumber NegativeOne` - Gets the value -1 for the type.
 - `static SignificantNumber One` - Gets the value 1 for the type.
 - `static SignificantNumber Zero` - Gets the value 0 for the type.
@@ -151,10 +151,10 @@ catch (NotSupportedException ex)
 - `static bool TryConvertFromChecked<TOther>(TOther value, out SignificantNumber result) where TOther : INumberBase<TOther>` - Tries to convert a number to a significant number using checked conversion.
 - `static bool TryConvertFromSaturating<TOther>(TOther value, out SignificantNumber result) where TOther : INumberBase<TOther>` - Tries to convert a number to a significant number using saturating conversion.
 - `static bool TryConvertFromTruncating<TOther>(TOther value, out SignificantNumber result) where TOther : INumberBase<TOther>` - Tries to convert a number to a significant number using truncating conversion.
-- `
+- `static bool TryConvertToChecked<TOther>(SignificantNumber value, out TOther result) where TOther : INumberBase<TOther>` - Tries to convert a significant number to another number using checked conversion.
+- `static bool TryConvertToSaturating<TOther>(SignificantNumber
 
-static bool TryConvertToChecked<TOther>(SignificantNumber value, out TOther result) where TOther : INumberBase<TOther>` - Tries to convert a significant number to another number using checked conversion.
-- `static bool TryConvertToSaturating<TOther>(SignificantNumber value, out TOther result) where TOther : INumberBase<TOther>` - Tries to convert a significant number to another number using saturating conversion.
+ value, out TOther result) where TOther : INumberBase<TOther>` - Tries to convert a significant number to another number using saturating conversion.
 - `static bool TryConvertToTruncating<TOther>(SignificantNumber value, out TOther result) where TOther : INumberBase<TOther>` - Tries to convert a significant number to another number using truncating conversion.
 - `static void AssertExponentsMatch(SignificantNumber left, SignificantNumber right)` - Asserts that the exponents of two significant numbers match.
 - `static bool DoesImplementGenericInterface(Type type, Type genericInterface)` - Determines whether a type implements a specified generic interface.
