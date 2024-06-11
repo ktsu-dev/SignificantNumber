@@ -1,10 +1,10 @@
 # ktsu.io.SignificantNumber
 
+![NuGet Version](https://img.shields.io/nuget/v/ktsu.io.SignificantNumber?logo=nuget&label=stable)
+![NuGet Version](https://img.shields.io/nuget/vpre/ktsu.io.SignificantNumber?logo=nuget&label=dev)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ktsu-io/SignificantNumber?label=commits)
 ![GitHub branch status](https://img.shields.io/github/checks-status/ktsu-io/SignificantNumber/main)
 ![Sonar Coverage](https://img.shields.io/sonar/coverage/ktsu-io_SignificantNumber?server=https%3A%2F%2Fsonarcloud.io)
-![NuGet Version](https://img.shields.io/nuget/v/ktsu.io.SignificantNumber?logo=nuget&label=stable)
-![NuGet Version](https://img.shields.io/nuget/vpre/ktsu.io.SignificantNumber?logo=nuget&label=dev)
 
 The `SignificantNumber` class represents a number with a significand and an exponent, enabling high-precision arithmetic operations that comply with calculation rules for significant figures. It provides a robust set of functionalities for mathematical computations and formatting.
 
