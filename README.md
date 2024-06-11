@@ -17,6 +17,7 @@ The `SignificantNumber` class represents a number with a significant figure and 
   - [Arithmetic Operations](#arithmetic-operations)
   - [Comparison Operations](#comparison-operations)
   - [Formatting and Parsing](#formatting-and-parsing)
+  - [Extension Methods](#extension-methods)
 - [API Reference](#api-reference)
 - [Contributing](#contributing)
 - [License](#license)
@@ -39,14 +40,16 @@ Or, add the package reference directly in your project file:
 
 ### Creating a SignificantNumber
 
-You can create a `SignificantNumber` from integers or floating-point numbers:
+You can create a `SignificantNumber` from various numeric types using the `ToSignificantNumber` extension method:
 
 ```csharp
 using ktsu.io.SignificantNumber;
 
-var number1 = new SignificantNumber(2, 12345);
-var number2 = SignificantNumber.CreateFromInteger(12345);
-var number3 = SignificantNumber.CreateFromFloatingPoint(123.45);
+double floatingPointValue = 123.45;
+SignificantNumber significantNumberFromFloat = floatingPointValue.ToSignificantNumber();
+
+int integerValue = 12345;
+SignificantNumber significantNumberFromInt = integerValue.ToSignificantNumber();
 ```
 
 ### Arithmetic Operations
@@ -90,6 +93,37 @@ catch (NotSupportedException ex)
 {
     Console.WriteLine(ex.Message);
 }
+```
+
+### Extension Methods
+
+#### `ToSignificantNumber`
+
+Converts various numeric types to a `SignificantNumber`.
+
+#### Usage:
+
+```csharp
+public static SignificantNumber ToSignificantNumber<TInput>(this INumber<TInput> input)
+    where TInput : INumber<TInput>
+```
+
+#### Parameters:
+
+- `input`: The input number to convert.
+
+#### Returns:
+
+- `SignificantNumber`: The converted `SignificantNumber`.
+
+#### Example:
+
+```csharp
+double floatingPointValue = 123.45;
+SignificantNumber significantNumberFromFloat = floatingPointValue.ToSignificantNumber();
+
+int integerValue = 12345;
+SignificantNumber significantNumberFromInt = integerValue.ToSignificantNumber();
 ```
 
 ## API Reference
@@ -149,12 +183,12 @@ catch (NotSupportedException ex)
 - `static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result)` - Tries to parse a significant number from a string using the specified format provider.
 - `static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result)` - Tries to parse a significant number from a span of characters using the specified format provider.
 - `static bool TryConvertFromChecked<TOther>(TOther value, out SignificantNumber result) where TOther : INumberBase<TOther>` - Tries to convert a number to a significant number using checked conversion.
-- `static bool TryConvertFromSaturating<TOther>(TOther value, out SignificantNumber result) where TOther : INumberBase<TOther>` - Tries to convert a number to a significant number using saturating conversion.
+- `static bool TryConvertFrom
+
+Saturating<TOther>(TOther value, out SignificantNumber result) where TOther : INumberBase<TOther>` - Tries to convert a number to a significant number using saturating conversion.
 - `static bool TryConvertFromTruncating<TOther>(TOther value, out SignificantNumber result) where TOther : INumberBase<TOther>` - Tries to convert a number to a significant number using truncating conversion.
 - `static bool TryConvertToChecked<TOther>(SignificantNumber value, out TOther result) where TOther : INumberBase<TOther>` - Tries to convert a significant number to another number using checked conversion.
-- `static bool TryConvertToSaturating<TOther>(SignificantNumber
-
- value, out TOther result) where TOther : INumberBase<TOther>` - Tries to convert a significant number to another number using saturating conversion.
+- `static bool TryConvertToSaturating<TOther>(SignificantNumber value, out TOther result) where TOther : INumberBase<TOther>` - Tries to convert a significant number to another number using saturating conversion.
 - `static bool TryConvertToTruncating<TOther>(SignificantNumber value, out TOther result) where TOther : INumberBase<TOther>` - Tries to convert a significant number to another number using truncating conversion.
 - `static void AssertExponentsMatch(SignificantNumber left, SignificantNumber right)` - Asserts that the exponents of two significant numbers match.
 - `static bool DoesImplementGenericInterface(Type type, Type genericInterface)` - Determines whether a type implements a specified generic interface.
