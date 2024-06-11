@@ -46,7 +46,7 @@ dotnet add package ktsu.io.SignificantNumber
 Or, add the package reference directly in your project file:
 
 ```xml
-<PackageReference Include="ktsu.io.SignificantNumber" Version="1.0.0" />
+<PackageReference Include="ktsu.io.SignificantNumber" Version="1.0.1" />
 ```
 
 ## Usage
