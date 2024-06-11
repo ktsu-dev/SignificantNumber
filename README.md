@@ -14,6 +14,8 @@ The `SignificantNumber` class represents a number with a significand and an expo
 - [Installation](#installation)
 - [Usage](#usage)
   - [Creating a SignificantNumber](#creating-a-significantnumber)
+      - [Supported Numeric Types](#supported-numeric-types)
+      - [Examples](#examples)
   - [Arithmetic Operations](#arithmetic-operations)
   - [Comparison Operations](#comparison-operations)
   - [Formatting and Parsing](#formatting-and-parsing)
@@ -46,16 +48,53 @@ Or, add the package reference directly in your project file:
 
 You can create a `SignificantNumber` from various numeric types using the `ToSignificantNumber` extension method:
 
+#### Supported Numeric Types
+
+The `SignificantNumber` class supports a wide range of numeric types through the `ToSignificantNumber` extension method, leveraging the `INumber` interface for conversions. The following types are supported:
+
+- **Integer Types**: 
+  - `int`
+  - `long`
+  - `short`
+  - `sbyte`
+  - `uint`
+  - `ulong`
+  - `ushort`
+  - `byte`
+  - `BigInteger`
+
+- **Floating-Point Types**: 
+  - `double`
+  - `float`
+  - `Half`
+  - `decimal`
+
+### Examples
+
+You can convert various numeric types to `SignificantNumber` using the `ToSignificantNumber` extension method:
+
 ```csharp
 using ktsu.io.SignificantNumber;
 
-double floatingPointValue = 123.45;
-SignificantNumber significantNumberFromFloat = floatingPointValue.ToSignificantNumber();
-significantNumberFromFloat = 537.89.ToSignificantNumber();
+// Integer types
+int intValue = 12345;
+SignificantNumber significantNumberFromInt = intValue.ToSignificantNumber();
 
-int integerValue = 12345;
-SignificantNumber significantNumberFromInt = integerValue.ToSignificantNumber();
-significantNumberFromInt = 98765.ToSignificantNumber();
+BigInteger bigIntValue = new BigInteger(9876543210);
+SignificantNumber significantNumberFromBigInt = bigIntValue.ToSignificantNumber();
+
+// Floating-point types
+double doubleValue = 123.45;
+SignificantNumber significantNumberFromDouble = doubleValue.ToSignificantNumber();
+
+Half halfValue = (Half)123.45;
+SignificantNumber significantNumberFromHalf = halfValue.ToSignificantNumber();
+
+float floatValue = 123.45f;
+SignificantNumber significantNumberFromFloat = floatValue.ToSignificantNumber();
+
+decimal decimalValue = 123.45m;
+SignificantNumber significantNumberFromDecimal = decimalValue.ToSignificantNumber();
 ```
 
 ### Arithmetic Operations
@@ -137,6 +176,9 @@ SignificantNumber significantNumberFromFloat = floatingPointValue.ToSignificantN
 
 int integerValue = 12345;
 SignificantNumber significantNumberFromInt = integerValue.ToSignificantNumber();
+
+SignificantNumber result = significantNumberFromFloat + significantNumberFromInt;
+// result = 12468.45
 ```
 
 ## Precision
