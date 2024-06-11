@@ -16,9 +16,6 @@ using System.Numerics;
 public readonly struct SignificantNumber
 	: INumber<SignificantNumber>
 {
-	internal const int MaxDecimalPlaces = 15;
-	private const string FormatSpecifier = "e15";
-
 	/// <summary>
 	/// Initializes a new instance of the <see cref="SignificantNumber"/> struct.
 	/// </summary>
@@ -230,24 +227,33 @@ public readonly struct SignificantNumber
 			return NegativeOne;
 		}
 
-		string str = input.ToString(FormatSpecifier, InvariantCulture);
-		int indexOfE = str.IndexOf('e', StringComparison.OrdinalIgnoreCase);
-		Debug.Assert(indexOfE > -1, $"Exponent delimiter not found in: {str}");
+		string format = GetStringFormatForFloatType<TFloat>();
 
-		var significandStr = str.AsSpan(0, indexOfE);
-		var exponentStr = str.AsSpan(indexOfE + 1, str.Length - indexOfE - 1);
-		int exponentValue = int.Parse(exponentStr, InvariantCulture);
+		string significandString = input.ToString(format, InvariantCulture).ToUpperInvariant();
+		var significandSpan = significandString.AsSpan();
 
-		while (significandStr.Length > 2 && significandStr[^1] == '0')
+		int exponentValue = 0;
+		if (significandString.Contains('E', StringComparison.OrdinalIgnoreCase))
 		{
-			significandStr = significandStr[..^1];
+			string[] expComponents = significandString.Split('E');
+			Debug.Assert(expComponents.Length == 2, $"Unexpected format: {significandString}");
+			significandSpan = expComponents[0].AsSpan();
+			exponentValue = int.Parse(expComponents[1], InvariantCulture);
 		}
 
-		string[] components = significandStr.ToString().Split('.');
-		Debug.Assert(components.Length == 2, $"Missing decimal separator in: {significandStr}");
+		while (significandSpan.Length > 2 && significandSpan[^1] == '0')
+		{
+			significandSpan = significandSpan[..^1];
+		}
+
+		string[] components = significandSpan.ToString().Split('.');
+		Debug.Assert(components.Length <= 2, $"Invalid format: {significandSpan}");
 
 		var integerComponent = components[0].AsSpan();
-		var fractionalComponent = components[1].AsSpan();
+		var fractionalComponent =
+			components.Length == 2
+			? components[1].AsSpan()
+			: "0".AsSpan();
 		int fractionalLength = fractionalComponent.Length;
 		exponentValue -= fractionalLength;
 
@@ -256,6 +262,17 @@ public readonly struct SignificantNumber
 		string significandStrWithoutDecimal = $"{integerComponent}{fractionalComponent}";
 		var significandValue = BigInteger.Parse(significandStrWithoutDecimal, InvariantCulture);
 		return new(exponentValue, significandValue);
+	}
+
+	internal static string GetStringFormatForFloatType<TFloat>()
+		where TFloat : INumber<TFloat>
+	{
+		return typeof(TFloat) switch
+		{
+			_ when typeof(TFloat) == typeof(float) => "E7",
+			_ when typeof(TFloat) == typeof(double) => "E15",
+			_ => "R",
+		};
 	}
 
 	/// <summary>
