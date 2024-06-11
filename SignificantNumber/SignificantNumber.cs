@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 
+
 /// <summary>
 /// Represents a significant number.
 /// </summary>
@@ -19,6 +20,12 @@ public readonly struct SignificantNumber
 	internal const int MinDecimalPlaces = 1;
 	private const string FormatSpecifier = "e15";
 
+	/// <summary>
+	/// Initializes a new instance of the <see cref="SignificantNumber"/> struct.
+	/// </summary>
+	/// <param name="exponent">The exponent of the number.</param>
+	/// <param name="significand">The significand of the number.</param>
+	/// <param name="sanitize">If true, trailing zeros in the significand will be removed.</param>
 	internal SignificantNumber(int exponent, BigInteger significand, bool sanitize = true)
 	{
 		const int ten = 10;
@@ -41,7 +48,7 @@ public readonly struct SignificantNumber
 			}
 		}
 
-		//count digits
+		// count digits
 		int significantDigits = 0;
 		var number = significand;
 		while (number != 0)
@@ -60,70 +67,69 @@ public readonly struct SignificantNumber
 	/// </summary>
 	public static SignificantNumber NegativeOne => new(0, -1);
 
-	/// <summary>
-	/// Gets the value 1 for the type.
-	/// </summary>
+	/// <inheritdoc/>
 	public static SignificantNumber One => new(0, 1);
 
-	/// <summary>
-	/// Gets the value 0 for the type.
-	/// </summary>
+	/// <inheritdoc/>
 	public static SignificantNumber Zero => new(0, 0);
 
+	/// <summary>
+	/// Gets the exponent of the significant number.
+	/// </summary>
 	internal int Exponent { get; }
 
+	/// <summary>
+	/// Gets the significand of the significant number.
+	/// </summary>
 	internal BigInteger Significand { get; }
 
+	/// <summary>
+	/// Gets the number of significant digits in the significant number.
+	/// </summary>
 	internal int SignificantDigits { get; }
 
 	private static CultureInfo InvariantCulture { get; } = CultureInfo.InvariantCulture;
 
 	private const int BinaryRadix = 2;
 
-	/// <summary>
-	/// Gets the radix, or base, for the type.
-	/// </summary>
+	/// <inheritdoc/>
 	public static int Radix => BinaryRadix;
 
-	/// <summary>
-	/// Gets the additive identity of the current type.
-	/// </summary>
+	/// <inheritdoc/>
 	public static SignificantNumber AdditiveIdentity => Zero;
 
-	/// <summary>
-	/// Gets the multiplicative identity of the current type.
-	/// </summary>
+	/// <inheritdoc/>
 	public static SignificantNumber MultiplicativeIdentity => One;
 
-	/// <summary>Determines whether the specified object is equal to the current object.</summary>
-	/// <param name="obj">The object to compare with the current object.</param>
-	/// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+	/// <inheritdoc/>
 	public override bool Equals(object? obj) => obj is SignificantNumber number && this == number;
 
-	/// <summary>Determines whether the specified object is equal to the current object.</summary>
+	/// <summary>
+	/// Determines whether the specified object is equal to the current object.
+	/// </summary>
 	/// <param name="other">The object to compare with the current object.</param>
 	/// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
 	public bool Equals(SignificantNumber other) => this == other;
 
-	/// <summary>Serves as the default hash function.</summary>
-	/// <returns>A hash code for the current object.</returns>
+	/// <inheritdoc/>
 	public override int GetHashCode() => HashCode.Combine(Exponent, Significand);
 
-	/// <summary>Returns a string that represents the current object.</summary>
-	/// <returns>A string that represents the current object.</returns>
+	/// <inheritdoc/>
 	public override string ToString() => ToString(this, null, null);
 
-	/// <summary>
-	/// Converts the current instance to its equivalent string representation using the specified format provider.
-	/// </summary>
-	/// <param name="formatProvider">An object that supplies culture-specific formatting information.</param>
-	/// <returns>A string representation of the current instance.</returns>
+	/// <inheritdoc/>
 	public string ToString(IFormatProvider? formatProvider) => ToString(this, null, formatProvider);
 
-	/// <summary>Returns a string that represents the current object.</summary>
-	/// <returns>A string that represents the current object.</returns>
+	/// <inheritdoc/>
 	public string ToString(string format) => ToString(this, format, null);
 
+	/// <summary>
+	/// Converts the current instance to its equivalent string representation using the specified format and format provider.
+	/// </summary>
+	/// <param name="number">The significant number to convert.</param>
+	/// <param name="format">A numeric format string.</param>
+	/// <param name="formatProvider">An object that supplies culture-specific formatting information.</param>
+	/// <returns>A string representation of the current instance.</returns>
 	public static string ToString(SignificantNumber number, string? format, IFormatProvider? formatProvider)
 	{
 		int desiredAlloc = int.Abs(number.Exponent) + number.SignificantDigits + 2; // +2 is for negative symbol and decimal symbol
@@ -132,16 +138,25 @@ public readonly struct SignificantNumber
 			? stackalloc char[stackAlloc]
 			: new char[desiredAlloc];
 
-
 		return number.TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider)
 			? buffer[..charsWritten].ToString()
 			: string.Empty;
 	}
 
+	/// <inheritdoc/>
 	public string ToString(string? format, IFormatProvider? formatProvider) => ToString(this, format, formatProvider);
 
+	/// <summary>
+	/// Returns the absolute value of the current instance.
+	/// </summary>
+	/// <returns>The absolute value of the current instance.</returns>
 	public SignificantNumber Abs() => Abs(this);
 
+	/// <summary>
+	/// Rounds the current instance to the specified number of decimal digits.
+	/// </summary>
+	/// <param name="decimalDigits">The number of decimal digits to round to.</param>
+	/// <returns>A new instance of <see cref="SignificantNumber"/> rounded to the specified number of decimal digits.</returns>
 	public SignificantNumber Round(int decimalDigits)
 	{
 		int currentDecimalDigits = CountDecimalDigits();
@@ -171,9 +186,15 @@ public readonly struct SignificantNumber
 		var sigMax = max.ToSignificantNumber();
 		var clampedToMax = this > sigMax ? sigMax : this;
 		return this < sigMin ? sigMin : clampedToMax;
-
 	}
 
+	/// <summary>
+	/// Creates a significant number from a floating point value.
+	/// </summary>
+	/// <typeparam name="TFloat">The type of the floating point value.</typeparam>
+	/// <param name="input">The floating point value.</param>
+	/// <returns>A significant number representing the floating point value.</returns>
+	/// <exception cref="ArgumentOutOfRangeException">Thrown when the input is infinite or NaN.</exception>
 	internal static SignificantNumber CreateFromFloatingPoint<TFloat>(TFloat input)
 		where TFloat : INumber<TFloat>
 	{
@@ -211,7 +232,7 @@ public readonly struct SignificantNumber
 		}
 
 		string str = input.ToString(FormatSpecifier, InvariantCulture);
-		int indexOfE = str.IndexOf('e');
+		int indexOfE = str.IndexOf('e', StringComparison.OrdinalIgnoreCase);
 		Debug.Assert(indexOfE > -1, $"Exponent delimiter not found in: {str}");
 
 		var significandStr = str.AsSpan(0, indexOfE);
@@ -231,7 +252,6 @@ public readonly struct SignificantNumber
 		int fractionalLength = fractionalComponent.Length;
 		exponentValue -= fractionalLength;
 
-
 		Debug.Assert(fractionalLength != 0 || integerComponent.TrimStart("-").Length == 1, $"Unexpected format: {integerComponent}.{fractionalComponent}");
 
 		string significandStrWithoutDecimal = $"{integerComponent}{fractionalComponent}";
@@ -239,6 +259,12 @@ public readonly struct SignificantNumber
 		return new(exponentValue, significandValue);
 	}
 
+	/// <summary>
+	/// Creates a significant number from an integer value.
+	/// </summary>
+	/// <typeparam name="TInteger">The type of the integer value.</typeparam>
+	/// <param name="input">The integer value.</param>
+	/// <returns>A significant number representing the integer value.</returns>
 	internal static SignificantNumber CreateFromInteger<TInteger>(TInteger input)
 		where TInteger : INumber<TInteger>
 	{
@@ -276,6 +302,12 @@ public readonly struct SignificantNumber
 		return new(exponentValue, significandValue);
 	}
 
+	/// <summary>
+	/// Creates a repeating digit sequence of a specified length.
+	/// </summary>
+	/// <param name="digit">The digit to repeat.</param>
+	/// <param name="numberOfRepeats">The number of times to repeat the digit.</param>
+	/// <returns>A <see cref="BigInteger"/> representing the repeating digit sequence.</returns>
 	internal static BigInteger CreateRepeatingDigits(int digit, int numberOfRepeats)
 	{
 		if (numberOfRepeats <= 0)
@@ -294,10 +326,19 @@ public readonly struct SignificantNumber
 		return repeatingDigit;
 	}
 
+	/// <summary>
+	/// Gets a value indicating whether the current instance has infinite precision.
+	/// </summary>
 	internal bool HasInfinitePrecision =>
 		Exponent == 0
 		&& (Significand == BigInteger.One || Significand == BigInteger.Zero || Significand == BigInteger.MinusOne);
 
+	/// <summary>
+	/// Gets the lower of the decimal digit counts of two significant numbers.
+	/// </summary>
+	/// <param name="left">The first significant number.</param>
+	/// <param name="right">The second significant number.</param>
+	/// <returns>The lower of the decimal digit counts of the two significant numbers.</returns>
 	internal static int LowestDecimalDigits(SignificantNumber left, SignificantNumber right)
 	{
 		int leftDecimalDigits = left.CountDecimalDigits();
@@ -311,6 +352,12 @@ public readonly struct SignificantNumber
 			: rightDecimalDigits;
 	}
 
+	/// <summary>
+	/// Gets the lower of the significant digit counts of two significant numbers.
+	/// </summary>
+	/// <param name="left">The first significant number.</param>
+	/// <param name="right">The second significant number.</param>
+	/// <returns>The lower of the significant digit counts of the two significant numbers.</returns>
 	internal static int LowestSignificantDigits(SignificantNumber left, SignificantNumber right)
 	{
 		int leftSignificantDigits = left.SignificantDigits;
@@ -324,11 +371,20 @@ public readonly struct SignificantNumber
 		: rightSignificantDigits;
 	}
 
+	/// <summary>
+	/// Counts the number of decimal digits in the current instance.
+	/// </summary>
+	/// <returns>The number of decimal digits in the current instance.</returns>
 	internal int CountDecimalDigits() =>
 		Exponent > 0
 		? 0
 		: int.Abs(Exponent);
 
+	/// <summary>
+	/// Reduces the significance of the current instance to a specified number of significant digits.
+	/// </summary>
+	/// <param name="significantDigits">The number of significant digits to reduce to.</param>
+	/// <returns>A new instance of <see cref="SignificantNumber"/> reduced to the specified number of significant digits.</returns>
 	internal SignificantNumber ReduceSignificance(int significantDigits)
 	{
 		int significantDifference = significantDigits < SignificantDigits
@@ -348,9 +404,20 @@ public readonly struct SignificantNumber
 		return new(newExponent, newSignificand);
 	}
 
+	/// <summary>
+	/// Makes two significant numbers have a common exponent.
+	/// </summary>
+	/// <param name="left">The first significant number.</param>
+	/// <param name="right">The second significant number.</param>
 	internal static void MakeCommonized(ref SignificantNumber left, ref SignificantNumber right) =>
 		_ = MakeCommonizedAndGetExponent(ref left, ref right);
 
+	/// <summary>
+	/// Makes two significant numbers have a common exponent and returns the common exponent.
+	/// </summary>
+	/// <param name="left">The first significant number.</param>
+	/// <param name="right">The second significant number.</param>
+	/// <returns>The common exponent.</returns>
 	internal static int MakeCommonizedAndGetExponent(ref SignificantNumber left, ref SignificantNumber right)
 	{
 		int smallestExponent = left.Exponent < right.Exponent ? left.Exponent : right.Exponent;
@@ -365,6 +432,7 @@ public readonly struct SignificantNumber
 		return smallestExponent;
 	}
 
+	/// <inheritdoc/>
 	public int CompareTo(object? obj)
 	{
 		return obj is SignificantNumber significantNumber
@@ -372,12 +440,23 @@ public readonly struct SignificantNumber
 			: throw new NotSupportedException();
 	}
 
+	/// <summary>
+	/// Compares the current instance with another significant number.
+	/// </summary>
+	/// <param name="other">The significant number to compare with the current instance.</param>
+	/// <returns>A value indicating whether the current instance is less than, equal to, or greater than the other instance.</returns>
 	public int CompareTo(SignificantNumber other)
 	{
 		int greaterOrEqual = this > other ? 1 : 0;
 		return this < other ? -1 : greaterOrEqual;
 	}
 
+	/// <summary>
+	/// Compares the current instance with another number.
+	/// </summary>
+	/// <typeparam name="TInput">The type of the other number.</typeparam>
+	/// <param name="other">The number to compare with the current instance.</param>
+	/// <returns>A value indicating whether the current instance is less than, equal to, or greater than the other number.</returns>
 	public int CompareTo<TInput>(TInput other)
 		where TInput : INumber<TInput>
 	{
@@ -386,36 +465,101 @@ public readonly struct SignificantNumber
 		return this < significantOther ? -1 : greaterOrEqual;
 	}
 
+	/// <inheritdoc/>
 	public static SignificantNumber Abs(SignificantNumber value) => value.Significand < 0 ? -value : value;
+
+	/// <inheritdoc/>
 	public static bool IsCanonical(SignificantNumber value) => true;
+
+	/// <inheritdoc/>
 	public static bool IsComplexNumber(SignificantNumber value) => !IsRealNumber(value);
+
+	/// <inheritdoc/>
 	public static bool IsEvenInteger(SignificantNumber value) => IsInteger(value) && value.Significand.IsEven;
+
+	/// <inheritdoc/>
 	public static bool IsFinite(SignificantNumber value) => true;
+
+	/// <inheritdoc/>
 	public static bool IsImaginaryNumber(SignificantNumber value) => !IsRealNumber(value);
+
+	/// <inheritdoc/>
 	public static bool IsInfinity(SignificantNumber value) => !IsFinite(value);
+
+	/// <inheritdoc/>
 	public static bool IsInteger(SignificantNumber value) => value.Exponent >= 0;
+
+	/// <inheritdoc/>
 	public static bool IsNaN(SignificantNumber value) => false;
+
+	/// <inheritdoc/>
 	public static bool IsNegative(SignificantNumber value) => !IsPositive(value);
+
+	/// <inheritdoc/>
 	public static bool IsNegativeInfinity(SignificantNumber value) => IsInfinity(value) && IsNegative(value);
+
+	/// <summary>
+	/// Determines whether the specified value is normal.
+	/// </summary>
+	/// <param name="value">The significant number.</param>
+	/// <returns><c>true</c> if the specified value is normal; otherwise, <c>false</c>.</returns>
 	public static bool IsNormal(SignificantNumber value) => true;
+
+	/// <inheritdoc/>
 	public static bool IsOddInteger(SignificantNumber value) => IsInteger(value) && !value.Significand.IsEven;
+
+	/// <inheritdoc/>
 	public static bool IsPositive(SignificantNumber value) => value.Significand >= 0;
+
+	/// <inheritdoc/>
 	public static bool IsPositiveInfinity(SignificantNumber value) => IsInfinity(value) && IsPositive(value);
+
+	/// <inheritdoc/>
 	public static bool IsRealNumber(SignificantNumber value) => true;
+
+	/// <inheritdoc/>
 	public static bool IsSubnormal(SignificantNumber value) => !IsNormal(value);
+
+	/// <inheritdoc/>
 	public static bool IsZero(SignificantNumber value) => value.Significand == 0;
+
+	/// <inheritdoc/>
 	public static SignificantNumber MaxMagnitude(SignificantNumber x, SignificantNumber y) => x.Abs() >= y.Abs() ? x : y;
+
+	/// <inheritdoc/>
 	public static SignificantNumber MaxMagnitudeNumber(SignificantNumber x, SignificantNumber y) => MaxMagnitude(x, y);
+
+	/// <inheritdoc/>
 	public static SignificantNumber MinMagnitude(SignificantNumber x, SignificantNumber y) => x.Abs() <= y.Abs() ? x : y;
+
+	/// <inheritdoc/>
 	public static SignificantNumber MinMagnitudeNumber(SignificantNumber x, SignificantNumber y) => MinMagnitude(x, y);
+
+	/// <inheritdoc/>
 	public static SignificantNumber Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) => throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static SignificantNumber Parse(string s, NumberStyles style, IFormatProvider? provider) => throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static SignificantNumber Parse(string s, IFormatProvider? provider) => throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static SignificantNumber Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static bool TryParse([NotNullWhen(true)] string? s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
 	{
 		int requiredLength = SignificantDigits + Exponent + 2;
@@ -502,48 +646,197 @@ public readonly struct SignificantNumber
 		return success;
 	}
 
+	/// <inheritdoc/>
 	public static bool TryConvertFromChecked<TOther>(TOther value, out SignificantNumber result)
 		where TOther : INumberBase<TOther>
 		=> throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static bool TryConvertFromSaturating<TOther>(TOther value, out SignificantNumber result)
 		where TOther : INumberBase<TOther>
 		=> throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static bool TryConvertFromTruncating<TOther>(TOther value, out SignificantNumber result)
 		where TOther : INumberBase<TOther>
 		=> throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static bool TryConvertToChecked<TOther>(SignificantNumber value, out TOther result)
 		where TOther : INumberBase<TOther>
 		=> throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static bool TryConvertToSaturating<TOther>(SignificantNumber value, out TOther result)
 		where TOther : INumberBase<TOther>
 		=> throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static bool TryConvertToTruncating<TOther>(SignificantNumber value, out TOther result)
 		where TOther : INumberBase<TOther>
 		=> throw new NotSupportedException();
 
+	/// <summary>
+	/// Asserts that the exponents of two significant numbers match.
+	/// </summary>
+	/// <param name="left">The first significant number.</param>
+	/// <param name="right">The second significant number.</param>
 	internal static void AssertExponentsMatch(SignificantNumber left, SignificantNumber right) =>
 		Debug.Assert(left.Exponent == right.Exponent, $"{nameof(AssertExponentsMatch)}: {left.Exponent} == {right.Exponent}");
 
+	/// <summary>
+	/// Negates a significant number.
+	/// </summary>
+	/// <param name="value">The significant number to negate.</param>
+	/// <returns>The negated significant number.</returns>
 	public static SignificantNumber Negate(SignificantNumber value) => -value;
+
+	/// <summary>
+	/// Subtracts one significant number from another.
+	/// </summary>
+	/// <param name="left">The significant number to subtract from.</param>
+	/// <param name="right">The significant number to subtract.</param>
+	/// <returns>The result of the subtraction.</returns>
 	public static SignificantNumber Subtract(SignificantNumber left, SignificantNumber right) => left - right;
+
+	/// <summary>
+	/// Adds two significant numbers.
+	/// </summary>
+	/// <param name="left">The first significant number to add.</param>
+	/// <param name="right">The second significant number to add.</param>
+	/// <returns>The result of the addition.</returns>
 	public static SignificantNumber Add(SignificantNumber left, SignificantNumber right) => left + right;
+
+	/// <summary>
+	/// Multiplies two significant numbers.
+	/// </summary>
+	/// <param name="left">The first significant number to multiply.</param>
+	/// <param name="right">The second significant number to multiply.</param>
+	/// <returns>The result of the multiplication.</returns>
 	public static SignificantNumber Multiply(SignificantNumber left, SignificantNumber right) => left * right;
+
+	/// <summary>
+	/// Divides one significant number by another.
+	/// </summary>
+	/// <param name="left">The significant number to divide.</param>
+	/// <param name="right">The significant number to divide by.</param>
+	/// <returns>The result of the division.</returns>
 	public static SignificantNumber Divide(SignificantNumber left, SignificantNumber right) => left / right;
+
+	/// <summary>
+	/// Increments a significant number.
+	/// </summary>
+	/// <param name="value">The significant number to increment.</param>
+	/// <returns>The incremented significant number.</returns>
+	/// <exception cref="NotSupportedException">Incrementing is not supported.</exception>
 	public static SignificantNumber Increment(SignificantNumber value) => throw new NotSupportedException();
+
+	/// <summary>
+	/// Decrements a significant number.
+	/// </summary>
+	/// <param name="value">The significant number to decrement.</param>
+	/// <returns>The decremented significant number.</returns>
+	/// <exception cref="NotSupportedException">Decrementing is not supported.</exception>
 	public static SignificantNumber Decrement(SignificantNumber value) => throw new NotSupportedException();
+
+	/// <summary>
+	/// Returns the unary plus of a significant number.
+	/// </summary>
+	/// <param name="value">The significant number.</param>
+	/// <returns>The unary plus of the significant number.</returns>
 	public static SignificantNumber Plus(SignificantNumber value) => +value;
+
+	/// <summary>
+	/// Computes the modulus of two significant numbers.
+	/// </summary>
+	/// <param name="left">The significant number to divide.</param>
+	/// <param name="right">The significant number to divide by.</param>
+	/// <returns>The modulus of the two significant numbers.</returns>
+	/// <exception cref="NotSupportedException">Modulus operation is not supported.</exception>
 	public static SignificantNumber Mod(SignificantNumber left, SignificantNumber right) => throw new NotSupportedException();
+
+	/// <summary>
+	/// Determines whether one significant number is greater than another.
+	/// </summary>
+	/// <param name="left">The first significant number.</param>
+	/// <param name="right">The second significant number.</param>
+	/// <returns><c>true</c> if the first significant number is greater than the second; otherwise, <c>false</c>.</returns>
 	public static bool GreaterThan(SignificantNumber left, SignificantNumber right) => left > right;
+
+	/// <summary>
+	/// Determines whether one significant number is greater than or equal to another.
+	/// </summary>
+	/// <param name="left">The first significant number.</param>
+	/// <param name="right">The second significant number.</param>
+	/// <returns><c>true</c> if the first significant number is greater than or equal to the second; otherwise, <c>false</c>.</returns>
 	public static bool GreaterThanOrEqual(SignificantNumber left, SignificantNumber right) => left >= right;
+
+	/// <summary>
+	/// Determines whether one significant number is less than another.
+	/// </summary>
+	/// <param name="left">The first significant number.</param>
+	/// <param name="right">The second significant number.</param>
+	/// <returns><c>true</c> if the first significant number is less than the second; otherwise, <c>false</c>.</returns>
 	public static bool LessThan(SignificantNumber left, SignificantNumber right) => left < right;
+
+	/// <summary>
+	/// Determines whether one significant number is less than or equal to another.
+	/// </summary>
+	/// <param name="left">The first significant number.</param>
+	/// <param name="right">The second significant number.</param>
+	/// <returns><c>true</c> if the first significant number is less than or equal to the second; otherwise, <c>false</c>.</returns>
 	public static bool LessThanOrEqual(SignificantNumber left, SignificantNumber right) => left <= right;
+
+	/// <summary>
+	/// Determines whether two significant numbers are equal.
+	/// </summary>
+	/// <param name="left">The first significant number.</param>
+	/// <param name="right">The second significant number.</param>
+	/// <returns><c>true</c> if the two significant numbers are equal; otherwise, <c>false</c>.</returns>
 	public static bool Equal(SignificantNumber left, SignificantNumber right) => left == right;
+
+	/// <summary>
+	/// Determines whether two significant numbers are not equal.
+	/// </summary>
+	/// <param name="left">The first significant number.</param>
+	/// <param name="right">The second significant number.</param>
+	/// <returns><c>true</c> if the two significant numbers are not equal; otherwise, <c>false</c>.</returns>
 	public static bool NotEqual(SignificantNumber left, SignificantNumber right) => left != right;
+
+	/// <summary>
+	/// Returns the larger of two significant numbers.
+	/// </summary>
+	/// <param name="x">The first significant number.</param>
+	/// <param name="y">The second significant number.</param>
+	/// <returns>The larger of the two significant numbers.</returns>
 	public static SignificantNumber Max(SignificantNumber x, SignificantNumber y) => x > y ? x : y;
+
+	/// <summary>
+	/// Returns the smaller of two significant numbers.
+	/// </summary>
+	/// <param name="x">The first significant number.</param>
+	/// <param name="y">The second significant number.</param>
+	/// <returns>The smaller of the two significant numbers.</returns>
 	public static SignificantNumber Min(SignificantNumber x, SignificantNumber y) => x < y ? x : y;
+
+	/// <summary>
+	/// Clamps a significant number to the specified minimum and maximum values.
+	/// </summary>
+	/// <param name="value">The significant number to clamp.</param>
+	/// <param name="min">The minimum value.</param>
+	/// <param name="max">The maximum value.</param>
+	/// <returns>The clamped significant number.</returns>
 	public static SignificantNumber Clamp(SignificantNumber value, SignificantNumber min, SignificantNumber max) => value.Clamp(min, max);
+
+	/// <summary>
+	/// Rounds a significant number to the specified number of decimal digits.
+	/// </summary>
+	/// <param name="value">The significant number to round.</param>
+	/// <param name="decimalDigits">The number of decimal digits to round to.</param>
+	/// <returns>The rounded significant number.</returns>
 	public static SignificantNumber Round(SignificantNumber value, int decimalDigits) => value.Round(decimalDigits);
 
+	/// <inheritdoc/>
 	public static SignificantNumber operator -(SignificantNumber value)
 	{
 		return value == Zero
@@ -551,6 +844,7 @@ public readonly struct SignificantNumber
 			: new(value.Exponent, -value.Significand);
 	}
 
+	/// <inheritdoc/>
 	public static SignificantNumber operator -(SignificantNumber left, SignificantNumber right)
 	{
 		int decimalDigits = LowestDecimalDigits(left, right);
@@ -561,8 +855,10 @@ public readonly struct SignificantNumber
 		return new SignificantNumber(commonExponent, newSignificand).Round(decimalDigits);
 	}
 
+	/// <inheritdoc/>
 	public static bool operator !=(SignificantNumber left, SignificantNumber right) => !(left == right);
 
+	/// <inheritdoc/>
 	public static SignificantNumber operator *(SignificantNumber left, SignificantNumber right)
 	{
 		int significantDigits = LowestSignificantDigits(left, right);
@@ -574,6 +870,7 @@ public readonly struct SignificantNumber
 		return new SignificantNumber(newExponent, newSignificand).ReduceSignificance(significantDigits);
 	}
 
+	/// <inheritdoc/>
 	public static SignificantNumber operator /(SignificantNumber left, SignificantNumber right)
 	{
 		int significantDigits = LowestSignificantDigits(left, right);
@@ -584,8 +881,10 @@ public readonly struct SignificantNumber
 		return new SignificantNumber(commonExponent, newSignificand).ReduceSignificance(significantDigits);
 	}
 
+	/// <inheritdoc/>
 	public static SignificantNumber operator +(SignificantNumber value) => value;
 
+	/// <inheritdoc/>
 	public static SignificantNumber operator +(SignificantNumber left, SignificantNumber right)
 	{
 		int decimalDigits = LowestDecimalDigits(left, right);
@@ -596,6 +895,7 @@ public readonly struct SignificantNumber
 		return new SignificantNumber(commonExponent, newSignificand).Round(decimalDigits);
 	}
 
+	/// <inheritdoc/>
 	public static bool operator ==(SignificantNumber left, SignificantNumber right)
 	{
 		int decimalDigits = LowestDecimalDigits(left, right);
@@ -608,6 +908,7 @@ public readonly struct SignificantNumber
 		return leftSignificant.Significand == rightSignificant.Significand;
 	}
 
+	/// <inheritdoc/>
 	public static bool operator >(SignificantNumber left, SignificantNumber right)
 	{
 		int decimalDigits = LowestDecimalDigits(left, right);
@@ -620,6 +921,7 @@ public readonly struct SignificantNumber
 		return leftSignificant.Significand > rightSignificant.Significand;
 	}
 
+	/// <inheritdoc/>
 	public static bool operator <(SignificantNumber left, SignificantNumber right)
 	{
 		int decimalDigits = LowestDecimalDigits(left, right);
@@ -632,6 +934,7 @@ public readonly struct SignificantNumber
 		return leftSignificant.Significand < rightSignificant.Significand;
 	}
 
+	/// <inheritdoc/>
 	public static bool operator >=(SignificantNumber left, SignificantNumber right)
 	{
 		int decimalDigits = LowestDecimalDigits(left, right);
@@ -644,6 +947,7 @@ public readonly struct SignificantNumber
 		return leftSignificant.Significand >= rightSignificant.Significand;
 	}
 
+	/// <inheritdoc/>
 	public static bool operator <=(SignificantNumber left, SignificantNumber right)
 	{
 		int decimalDigits = LowestDecimalDigits(left, right);
@@ -656,13 +960,31 @@ public readonly struct SignificantNumber
 		return leftSignificant.Significand <= rightSignificant.Significand;
 	}
 
+	/// <inheritdoc/>
 	public static SignificantNumber operator %(SignificantNumber left, SignificantNumber right) => throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static SignificantNumber operator --(SignificantNumber value) => throw new NotSupportedException();
+
+	/// <inheritdoc/>
 	public static SignificantNumber operator ++(SignificantNumber value) => throw new NotSupportedException();
 
+	/// <summary>
+	/// Asserts that a type implements a specified generic interface.
+	/// </summary>
+	/// <param name="type">The type to check.</param>
+	/// <param name="genericInterface">The generic interface to check for.</param>
+	/// <exception cref="ArgumentException">Thrown when the specified type does not implement the generic interface.</exception>
 	internal static void AssertDoesImplementGenericInterface(Type type, Type genericInterface) =>
 		Debug.Assert(DoesImplementGenericInterface(type, genericInterface), $"{type.Name} does not implement {genericInterface.Name}");
 
+	/// <summary>
+	/// Determines whether a type implements a specified generic interface.
+	/// </summary>
+	/// <param name="type">The type to check.</param>
+	/// <param name="genericInterface">The generic interface to check for.</param>
+	/// <returns><c>true</c> if the type implements the generic interface; otherwise, <c>false</c>.</returns>
+	/// <exception cref="ArgumentException">Thrown when the specified type is not a valid generic interface.</exception>
 	internal static bool DoesImplementGenericInterface(Type type, Type genericInterface)
 	{
 		bool genericInterfaceIsValid = genericInterface.IsInterface && genericInterface.IsGenericType;
