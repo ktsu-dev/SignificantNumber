@@ -2,7 +2,7 @@
 
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ktsu-io/SignificantNumber?label=commits)
 ![GitHub branch status](https://img.shields.io/github/checks-status/ktsu-io/SignificantNumber/main)
-![Codecov](https://img.shields.io/codecov/c/github/ktsu-io/SignificantNumber)
+![Sonar Coverage](https://img.shields.io/sonar/coverage/ktsu-io_SignificantNumber?server=https%3A%2F%2Fsonarcloud.io)
 ![NuGet Version](https://img.shields.io/nuget/v/ktsu.io.SignificantNumber?logo=nuget&label=stable)
 ![NuGet Version](https://img.shields.io/nuget/vpre/ktsu.io.SignificantNumber?logo=nuget&label=dev)
 
