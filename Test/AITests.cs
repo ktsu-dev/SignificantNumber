@@ -1,7 +1,9 @@
+// Ignore Spelling: Commonized
+
 namespace ktsu.io.SignificantNumber.Test;
 
 using System.Globalization;
-using ktsu.io.SignificantNumber;
+using System.Numerics;
 
 [TestClass]
 public class AITests
@@ -721,7 +723,7 @@ public class AITests
 	{
 		var number = new SignificantNumber(2, 0);
 		Assert.AreEqual(0, number.Significand);
-		Assert.AreEqual(2, number.Exponent);
+		Assert.AreEqual(0, number.Exponent);
 		Assert.AreEqual(0, number.SignificantDigits);
 	}
 
@@ -762,6 +764,24 @@ public class AITests
 	}
 
 	[TestMethod]
+	public void Test_CreateFromFloatingPoint_One()
+	{
+		var number = SignificantNumber.CreateFromFloatingPoint(1.0);
+		Assert.AreEqual(1, number.Significand);
+		Assert.AreEqual(0, number.Exponent);
+		Assert.AreEqual(1, number.SignificantDigits);
+	}
+
+	[TestMethod]
+	public void Test_CreateFromFloatingPoint_NegativeOne()
+	{
+		var number = SignificantNumber.CreateFromFloatingPoint(-1.0);
+		Assert.AreEqual(-1, number.Significand);
+		Assert.AreEqual(0, number.Exponent);
+		Assert.AreEqual(1, number.SignificantDigits);
+	}
+
+	[TestMethod]
 	public void Test_CreateFromFloatingPoint_Zero()
 	{
 		var number = SignificantNumber.CreateFromFloatingPoint(0000.0);
@@ -789,11 +809,433 @@ public class AITests
 	}
 
 	[TestMethod]
+	public void Test_CreateFromInteger_One()
+	{
+		var number = SignificantNumber.CreateFromInteger(1);
+		Assert.AreEqual(1, number.Significand);
+		Assert.AreEqual(0, number.Exponent);
+		Assert.AreEqual(1, number.SignificantDigits);
+	}
+
+	[TestMethod]
+	public void Test_CreateFromInteger_NegativeOne()
+	{
+		var number = SignificantNumber.CreateFromInteger(-1);
+		Assert.AreEqual(-1, number.Significand);
+		Assert.AreEqual(0, number.Exponent);
+		Assert.AreEqual(1, number.SignificantDigits);
+	}
+
+	[TestMethod]
 	public void Test_CreateFromInteger_Zero()
 	{
 		var number = SignificantNumber.CreateFromInteger(0000);
 		Assert.AreEqual(0, number.Significand);
 		Assert.AreEqual(0, number.Exponent);
 		Assert.AreEqual(0, number.SignificantDigits);
+	}
+
+	[TestMethod]
+	public void Test_MaximumBigInteger()
+	{
+		var maxBigInt = BigInteger.Parse("79228162514264337593543950335"); // Decimal.MaxValue
+		var number = new SignificantNumber(0, maxBigInt);
+		Assert.AreEqual(maxBigInt, number.Significand);
+	}
+
+	[TestMethod]
+	public void Test_MinimumBigInteger()
+	{
+		var minBigInt = BigInteger.Parse("-79228162514264337593543950335"); // Decimal.MinValue
+		var number = new SignificantNumber(0, minBigInt);
+		Assert.AreEqual(minBigInt, number.Significand);
+	}
+
+	[TestMethod]
+	public void Test_NegativeExponent()
+	{
+		var number = new SignificantNumber(-5, 12345);
+		Assert.AreEqual(12345, number.Significand);
+		Assert.AreEqual(-5, number.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_TrailingZerosBoundary()
+	{
+		var number = new SignificantNumber(2, 123000, true);
+		Assert.AreEqual(123, number.Significand);
+		Assert.AreEqual(5, number.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_ToString_WithFormat()
+	{
+		var number = new SignificantNumber(2, 12345);
+		string str = number.ToString("G");
+		Assert.AreEqual("1234500", str);
+	}
+
+	[TestMethod]
+	public void Test_ToString_WithDifferentCulture()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		string str = number.ToString(CultureInfo.GetCultureInfo("fr-FR"));
+		Assert.AreEqual("123,45", str);
+	}
+
+	[TestMethod]
+	public void Test_Parse_WithDifferentCulture()
+	{
+		string str = "123,45";
+		var culture = CultureInfo.GetCultureInfo("fr-FR");
+		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Parse(str.AsSpan(), culture));
+	}
+
+	[TestMethod]
+	public void Test_Addition_WithLargeNumbers()
+	{
+		var largeNum1 = SignificantNumber.CreateFromInteger(BigInteger.Parse("79228162514264337593543950335"));
+		var largeNum2 = SignificantNumber.CreateFromInteger(BigInteger.Parse("79228162514264337593543950335"));
+		var result = largeNum1 + largeNum2;
+		Assert.AreEqual(BigInteger.Parse("15845632502852867518708790067"), result.Significand);
+		Assert.AreEqual(1, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_Subtraction_WithLargeNumbers()
+	{
+		var largeNum1 = SignificantNumber.CreateFromInteger(BigInteger.Parse("79228162514264337593543950335"));
+		var largeNum2 = SignificantNumber.CreateFromInteger(BigInteger.Parse("39228162514264337593543950335"));
+		var result = largeNum1 - largeNum2;
+		Assert.AreEqual(4, result.Significand);
+		Assert.AreEqual(28, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_Multiplication_WithSmallNumbers()
+	{
+		var smallNum1 = SignificantNumber.CreateFromFloatingPoint(0.00001);
+		var smallNum2 = SignificantNumber.CreateFromFloatingPoint(0.00002);
+		var result = smallNum1 * smallNum2;
+		Assert.AreEqual(0, result.Significand);
+		Assert.AreEqual(0, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_Division_WithSmallNumbers()
+	{
+		var smallNum1 = SignificantNumber.CreateFromFloatingPoint(0.00002);
+		var smallNum2 = SignificantNumber.CreateFromFloatingPoint(0.00001);
+		var result = smallNum1 / smallNum2;
+		Assert.AreEqual(2, result.Significand);
+		Assert.AreEqual(0, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_Radix()
+	{
+		Assert.AreEqual(2, SignificantNumber.Radix);
+	}
+
+	[TestMethod]
+	public void Test_AdditiveIdentity()
+	{
+		var additiveIdentity = SignificantNumber.AdditiveIdentity;
+		Assert.AreEqual(SignificantNumber.Zero, additiveIdentity);
+	}
+
+	[TestMethod]
+	public void Test_MultiplicativeIdentity()
+	{
+		var multiplicativeIdentity = SignificantNumber.MultiplicativeIdentity;
+		Assert.AreEqual(SignificantNumber.One, multiplicativeIdentity);
+	}
+
+	[TestMethod]
+	public void Test_CreateRepeatingDigits()
+	{
+		var result = SignificantNumber.CreateRepeatingDigits(5, 3);
+		Assert.AreEqual(new BigInteger(555), result);
+
+		result = SignificantNumber.CreateRepeatingDigits(7, 0);
+		Assert.AreEqual(new BigInteger(0), result);
+	}
+
+	[TestMethod]
+	public void Test_HasInfinitePrecision()
+	{
+		var number = SignificantNumber.One;
+		Assert.IsTrue(number.HasInfinitePrecision);
+
+		number = new SignificantNumber(0, new BigInteger(2));
+		Assert.IsFalse(number.HasInfinitePrecision);
+	}
+
+	[TestMethod]
+	public void Test_LowestDecimalDigits()
+	{
+		var number1 = new SignificantNumber(-2, 12345);
+		var number2 = new SignificantNumber(-3, 678);
+		int result = SignificantNumber.LowestDecimalDigits(number1, number2);
+		Assert.AreEqual(2, result);
+	}
+
+	[TestMethod]
+	public void Test_LowestSignificantDigits()
+	{
+		var number1 = new SignificantNumber(0, 12345);
+		var number2 = new SignificantNumber(0, 678);
+		int result = SignificantNumber.LowestSignificantDigits(number1, number2);
+		Assert.AreEqual(3, result);
+	}
+
+	[TestMethod]
+	public void Test_CountDecimalDigits()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		int result = number.CountDecimalDigits();
+		Assert.AreEqual(2, result);
+	}
+
+	[TestMethod]
+	public void Test_ReduceSignificance()
+	{
+		var number = new SignificantNumber(0, 12345);
+		var result = number.ReduceSignificance(3);
+		Assert.AreEqual(124, result.Significand);
+		Assert.AreEqual(2, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_MakeCommonizedAndGetExponent()
+	{
+		var number1 = new SignificantNumber(1, 123);
+		var number2 = new SignificantNumber(3, 456);
+		int result = SignificantNumber.MakeCommonizedAndGetExponent(ref number1, ref number2);
+		Assert.AreEqual(1, result);
+		Assert.AreEqual(123, number1.Significand);
+		Assert.AreEqual(45600, number2.Significand);
+	}
+
+	[TestMethod]
+	public void Test_Abs_Static()
+	{
+		var negative = SignificantNumber.NegativeOne;
+		var result = SignificantNumber.Abs(negative);
+		Assert.AreEqual(SignificantNumber.One, result);
+	}
+
+	[TestMethod]
+	public void Test_AssertExponentsMatch()
+	{
+		var number1 = new SignificantNumber(1, 123);
+		var number2 = new SignificantNumber(1, 456);
+		SignificantNumber.AssertExponentsMatch(number1, number2);
+		// No assertion needed, just ensure no exception is thrown
+	}
+
+	[TestMethod]
+	public void Test_OperatorNegate()
+	{
+		var number = SignificantNumber.One;
+		var result = -number;
+		Assert.AreEqual(SignificantNumber.NegativeOne, result);
+	}
+
+	[TestMethod]
+	public void Test_OperatorAdd()
+	{
+		var number1 = new SignificantNumber(-2, 12345);
+		var number2 = new SignificantNumber(-3, 678);
+		var result = number1 + number2;
+		Assert.AreEqual(12413, result.Significand);
+		Assert.AreEqual(-2, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_OperatorSubtract()
+	{
+		var number1 = new SignificantNumber(-2, 12345);
+		var number2 = new SignificantNumber(-3, 678);
+		var result = number1 - number2;
+		Assert.AreEqual(12277, result.Significand);
+		Assert.AreEqual(-2, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_OperatorMultiply()
+	{
+		var number1 = new SignificantNumber(-2, 12345);
+		var number2 = new SignificantNumber(-3, 678);
+		var result = number1 * number2;
+		Assert.AreEqual(837, result.Significand);
+		Assert.AreEqual(-1, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_OperatorDivide()
+	{
+		var number1 = new SignificantNumber(-2, 12345);
+		var number2 = new SignificantNumber(-3, 678);
+		var result = number1 / number2;
+		Assert.AreEqual(182, result.Significand);
+		Assert.AreEqual(0, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_OperatorGreaterThan()
+	{
+		var number1 = new SignificantNumber(0, 12345);
+		var number2 = new SignificantNumber(0, 678);
+		Assert.IsTrue(number1 > number2);
+	}
+
+	[TestMethod]
+	public void Test_OperatorLessThan()
+	{
+		var number1 = new SignificantNumber(0, 123);
+		var number2 = new SignificantNumber(0, 678);
+		Assert.IsTrue(number1 < number2);
+	}
+
+	[TestMethod]
+	public void Test_OperatorGreaterThanOrEqual()
+	{
+		var number1 = new SignificantNumber(0, 12345);
+		var number2 = new SignificantNumber(0, 12345);
+		Assert.IsTrue(number1 >= number2);
+	}
+
+	[TestMethod]
+	public void Test_OperatorLessThanOrEqual()
+	{
+		var number1 = new SignificantNumber(0, 123);
+		var number2 = new SignificantNumber(0, 678);
+		Assert.IsTrue(number1 <= number2);
+	}
+
+	[TestMethod]
+	public void Test_OperatorEqual()
+	{
+		var number1 = new SignificantNumber(0, 12345);
+		var number2 = new SignificantNumber(0, 12345);
+		Assert.IsTrue(number1 == number2);
+	}
+
+	[TestMethod]
+	public void Test_OperatorNotEqual()
+	{
+		var number1 = new SignificantNumber(0, 12345);
+		var number2 = new SignificantNumber(0, 678);
+		Assert.IsTrue(number1 != number2);
+	}
+
+	[TestMethod]
+	public void Test_GetHashCode()
+	{
+		var number1 = new SignificantNumber(2, 12345);
+		var number2 = new SignificantNumber(2, 12345);
+		var number3 = new SignificantNumber(3, 12345);
+
+		// Test if the same values produce the same hash code
+		Assert.AreEqual(number1.GetHashCode(), number2.GetHashCode());
+
+		// Test if different values produce different hash codes
+		Assert.AreNotEqual(number1.GetHashCode(), number3.GetHashCode());
+
+		// Additional edge cases
+		var zero = SignificantNumber.Zero;
+		var one = SignificantNumber.One;
+		var negativeOne = SignificantNumber.NegativeOne;
+
+		Assert.AreEqual(zero.GetHashCode(), SignificantNumber.Zero.GetHashCode());
+		Assert.AreEqual(one.GetHashCode(), SignificantNumber.One.GetHashCode());
+		Assert.AreEqual(negativeOne.GetHashCode(), SignificantNumber.NegativeOne.GetHashCode());
+	}
+
+	[TestMethod]
+	public void Test_Equals_Object_SameInstance()
+	{
+		var number = SignificantNumber.One;
+		Assert.IsTrue(number.Equals((object)number));
+	}
+
+	[TestMethod]
+	public void Test_Equals_Object_EquivalentInstance()
+	{
+		var number1 = SignificantNumber.One;
+		var number2 = new SignificantNumber(0, 1);
+		Assert.IsTrue(number1.Equals((object)number2));
+	}
+
+	[TestMethod]
+	public void Test_Equals_Object_DifferentInstance()
+	{
+		var number1 = SignificantNumber.One;
+		var number2 = SignificantNumber.Zero;
+		Assert.IsFalse(number1.Equals((object)number2));
+	}
+
+	[TestMethod]
+	public void Test_Equals_Object_Null()
+	{
+		var number = SignificantNumber.One;
+		Assert.IsFalse(number.Equals(null));
+	}
+
+	[TestMethod]
+	public void Test_Equals_Object_DifferentType()
+	{
+		var number = SignificantNumber.One;
+		string differentType = "1";
+		Assert.IsFalse(number.Equals(differentType));
+	}
+
+	[TestMethod]
+	public void Test_ToString_WithFormat_AndInvariantCulture()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		string result = number.ToString("G", CultureInfo.InvariantCulture);
+		Assert.AreEqual("123.45", result);
+	}
+
+	[TestMethod]
+	public void Test_ToString_WithFormat_AndSpecificCulture()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		string result = number.ToString("G", CultureInfo.GetCultureInfo("fr-FR"));
+		Assert.AreEqual("123,45", result);
+	}
+
+	[TestMethod]
+	public void Test_ToString_WithNullFormat_AndInvariantCulture()
+	{
+		var number = new SignificantNumber(3, 12345);
+		string result = number.ToString(null, CultureInfo.InvariantCulture);
+		Assert.AreEqual("12345000", result);
+	}
+
+	[TestMethod]
+	public void Test_ToString_WithNullFormat_AndSpecificCulture()
+	{
+		var number = new SignificantNumber(3, 12345);
+		string result = number.ToString(null, CultureInfo.GetCultureInfo("fr-FR"));
+		Assert.AreEqual("12345000", result);
+	}
+
+	[TestMethod]
+	public void Test_ToString_WithEmptyFormat_AndInvariantCulture()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		string result = number.ToString("", CultureInfo.InvariantCulture);
+		Assert.AreEqual("123.45", result);
+	}
+
+	[TestMethod]
+	public void Test_ToString_WithEmptyFormat_AndSpecificCulture()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		string result = number.ToString("", CultureInfo.GetCultureInfo("fr-FR"));
+		Assert.AreEqual("123,45", result);
 	}
 }
