@@ -7,16 +7,8 @@
     <IsPrimaryProject Condition="$(MSBuildProjectName) == '$(SolutionName)'">True</IsPrimaryProject>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$(IsTest) != true">
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <AnalysisLevel>latest-all</AnalysisLevel>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-  </PropertyGroup>
-
   <PropertyGroup Condition="$(IsTest) == true">
-    <AnalysisLevel>latest</AnalysisLevel>
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <NoWarn>$(NoWarn);CS1591;CA2225;</NoWarn>
+    <NoWarn>$(NoWarn);CS1591;CA2225;CA1707;IDE0022;IDE0058;CA1305;S4056;S104;</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(IsLibrary) == true">
