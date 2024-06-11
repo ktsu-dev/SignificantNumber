@@ -1,4 +1,4 @@
-# SignificantNumber
+# ktsu.io.SignificantNumber
 
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ktsu-io/SignificantNumber?label=commits)
 ![GitHub branch status](https://img.shields.io/github/checks-status/ktsu-io/SignificantNumber/main)
@@ -39,13 +39,13 @@ The `SignificantNumber` class represents a number with a significand and an expo
 To install the `SignificantNumber` library, you can use the .NET CLI:
 
 ```sh
-dotnet add package SignificantNumber
+dotnet add package ktsu.io.SignificantNumber
 ```
 
 Or, add the package reference directly in your project file:
 
 ```xml
-<PackageReference Include="SignificantNumber" Version="1.0.0" />
+<PackageReference Include="ktsu.io.SignificantNumber" Version="1.0.0" />
 ```
 
 ## Usage
