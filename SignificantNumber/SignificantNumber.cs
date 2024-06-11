@@ -8,6 +8,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 
+/// <summary>
+/// Represents a significant number.
+/// </summary>
 [DebuggerDisplay("{Significand}e{Exponent}")]
 public readonly struct SignificantNumber
 	: INumber<SignificantNumber>
@@ -52,10 +55,19 @@ public readonly struct SignificantNumber
 		Significand = significand;
 	}
 
+	/// <summary>
+	/// Gets the value -1 for the type.
+	/// </summary>
 	public static SignificantNumber NegativeOne => new(0, -1);
 
+	/// <summary>
+	/// Gets the value 1 for the type.
+	/// </summary>
 	public static SignificantNumber One => new(0, 1);
 
+	/// <summary>
+	/// Gets the value 0 for the type.
+	/// </summary>
 	public static SignificantNumber Zero => new(0, 0);
 
 	internal int Exponent { get; }
@@ -67,22 +79,51 @@ public readonly struct SignificantNumber
 	private static CultureInfo InvariantCulture { get; } = CultureInfo.InvariantCulture;
 
 	private const int BinaryRadix = 2;
+
+	/// <summary>
+	/// Gets the radix, or base, for the type.
+	/// </summary>
 	public static int Radix => BinaryRadix;
 
+	/// <summary>
+	/// Gets the additive identity of the current type.
+	/// </summary>
 	public static SignificantNumber AdditiveIdentity => Zero;
 
+	/// <summary>
+	/// Gets the multiplicative identity of the current type.
+	/// </summary>
 	public static SignificantNumber MultiplicativeIdentity => One;
 
+	/// <summary>Determines whether the specified object is equal to the current object.</summary>
+	/// <param name="obj">The object to compare with the current object.</param>
+	/// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
 	public override bool Equals(object? obj) => obj is SignificantNumber number && this == number;
 
+	/// <summary>Determines whether the specified object is equal to the current object.</summary>
+	/// <param name="other">The object to compare with the current object.</param>
+	/// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
 	public bool Equals(SignificantNumber other) => this == other;
 
+	/// <summary>Serves as the default hash function.</summary>
+	/// <returns>A hash code for the current object.</returns>
 	public override int GetHashCode() => HashCode.Combine(Exponent, Significand);
 
+	/// <summary>Returns a string that represents the current object.</summary>
+	/// <returns>A string that represents the current object.</returns>
 	public override string ToString() => ToString(this, null, null);
+
+	/// <summary>
+	/// Converts the current instance to its equivalent string representation using the specified format provider.
+	/// </summary>
+	/// <param name="formatProvider">An object that supplies culture-specific formatting information.</param>
+	/// <returns>A string representation of the current instance.</returns>
 	public string ToString(IFormatProvider? formatProvider) => ToString(this, null, formatProvider);
 
+	/// <summary>Returns a string that represents the current object.</summary>
+	/// <returns>A string that represents the current object.</returns>
 	public string ToString(string format) => ToString(this, format, null);
+
 	public static string ToString(SignificantNumber number, string? format, IFormatProvider? formatProvider)
 	{
 		int desiredAlloc = int.Abs(number.Exponent) + number.SignificantDigits + 2; // +2 is for negative symbol and decimal symbol
@@ -116,6 +157,13 @@ public readonly struct SignificantNumber
 		return this;
 	}
 
+	/// <summary>
+	/// Clamps the specified value between the minimum and maximum values.
+	/// </summary>
+	/// <typeparam name="TNumber">The type of the value to clamp.</typeparam>
+	/// <param name="min">The minimum value.</param>
+	/// <param name="max">The maximum value.</param>
+	/// <returns>The clamped value.</returns>
 	public SignificantNumber Clamp<TNumber>(TNumber min, TNumber max)
 		where TNumber : INumber<TNumber>
 	{
