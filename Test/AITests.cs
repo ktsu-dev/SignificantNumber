@@ -917,8 +917,8 @@ public class AITests
 		var smallNum1 = SignificantNumber.CreateFromFloatingPoint(0.00001);
 		var smallNum2 = SignificantNumber.CreateFromFloatingPoint(0.00002);
 		var result = smallNum1 * smallNum2;
-		Assert.AreEqual(0, result.Significand);
-		Assert.AreEqual(0, result.Exponent);
+		Assert.AreEqual(2, result.Significand);
+		Assert.AreEqual(-10, result.Exponent);
 	}
 
 	[TestMethod]
@@ -1238,4 +1238,272 @@ public class AITests
 		string result = number.ToString("", CultureInfo.GetCultureInfo("fr-FR"));
 		Assert.AreEqual("123,45", result);
 	}
+
+	[TestMethod]
+	public void Test_TryFormat_SufficientBuffer()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		Span<char> buffer = stackalloc char[50];
+		string format = "G";
+		bool result = number.TryFormat(buffer, out int charsWritten, format.AsSpan(), CultureInfo.InvariantCulture);
+
+		Assert.IsTrue(result);
+		Assert.AreEqual("123.45", buffer[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	public void Test_TryFormat_InsufficientBuffer()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		Span<char> buffer = stackalloc char[4];
+		string format = "G";
+		bool result = number.TryFormat(buffer, out int charsWritten, format.AsSpan(), CultureInfo.InvariantCulture);
+
+		Assert.IsFalse(result);
+		Assert.AreEqual(0, charsWritten);
+	}
+
+	[TestMethod]
+	public void Test_TryFormat_EmptyFormat()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		Span<char> buffer = stackalloc char[50];
+		string format = string.Empty;
+		bool result = number.TryFormat(buffer, out int charsWritten, format.AsSpan(), CultureInfo.InvariantCulture);
+
+		Assert.IsTrue(result);
+		Assert.AreEqual("123.45", buffer[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	public void Test_TryFormat_InvalidFormat()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		Assert.ThrowsException<FormatException>(() => number.TryFormat(stackalloc char[50], out int charsWritten, "e", CultureInfo.InvariantCulture));
+	}
+
+	[TestMethod]
+	public void Test_TryFormat_NullFormatProvider()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		Span<char> buffer = stackalloc char[50];
+		string format = "G";
+		bool result = number.TryFormat(buffer, out int charsWritten, format.AsSpan(), null);
+
+		Assert.IsTrue(result);
+		Assert.AreEqual("123.45", buffer[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	public void Test_TryFormat_SpecificCulture()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		Span<char> buffer = stackalloc char[50];
+		string format = "G";
+		bool result = number.TryFormat(buffer, out int charsWritten, format.AsSpan(), CultureInfo.GetCultureInfo("fr-FR"));
+
+		Assert.IsTrue(result);
+		Assert.AreEqual("123,45", buffer[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	public void Test_TryFormat_Zero()
+	{
+		var number = SignificantNumber.Zero;
+		Span<char> buffer = stackalloc char[50];
+		string format = "G";
+		bool result = number.TryFormat(buffer, out int charsWritten, format.AsSpan(), CultureInfo.InvariantCulture);
+
+		Assert.IsTrue(result);
+		Assert.AreEqual("0", buffer[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	public void Test_TryFormat_One()
+	{
+		var number = SignificantNumber.One;
+		Span<char> buffer = stackalloc char[50];
+		string format = "G";
+		bool result = number.TryFormat(buffer, out int charsWritten, format.AsSpan(), CultureInfo.InvariantCulture);
+
+		Assert.IsTrue(result);
+		Assert.AreEqual("1", buffer[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	public void Test_TryFormat_NegativeOne()
+	{
+		var number = SignificantNumber.NegativeOne;
+		Span<char> buffer = stackalloc char[50];
+		string format = "G";
+		bool result = number.TryFormat(buffer, out int charsWritten, format.AsSpan(), CultureInfo.InvariantCulture);
+
+		Assert.IsTrue(result);
+		Assert.AreEqual("-1", buffer[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	public void Test_TryFormat_Integer()
+	{
+		var number = 3.ToSignificantNumber();
+		Span<char> buffer = stackalloc char[50];
+		string format = "G";
+		bool result = number.TryFormat(buffer, out int charsWritten, format.AsSpan(), CultureInfo.InvariantCulture);
+
+		Assert.IsTrue(result);
+		Assert.AreEqual("3", buffer[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	public void Test_TryFormat_Float()
+	{
+		var number = 3.0.ToSignificantNumber();
+		Span<char> buffer = stackalloc char[50];
+		string format = "G";
+		bool result = number.TryFormat(buffer, out int charsWritten, format.AsSpan(), CultureInfo.InvariantCulture);
+
+		Assert.IsTrue(result);
+		Assert.AreEqual("3", buffer[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	public void Test_Add_LargeNumbers()
+	{
+		var largeNumber1 = new SignificantNumber(100, BigInteger.Parse("79228162514264337593543950335"));
+		var largeNumber2 = new SignificantNumber(100, BigInteger.Parse("79228162514264337593543950335"));
+		var result = largeNumber1 + largeNumber2;
+		Assert.AreEqual(BigInteger.Parse("15845632502852867518708790067"), result.Significand);
+		Assert.AreEqual(101, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_Subtract_LargeNumbers()
+	{
+		var largeNumber1 = new SignificantNumber(100, BigInteger.Parse("79228162514264337593543950335"));
+		var largeNumber2 = new SignificantNumber(100, BigInteger.Parse("39228162514264337593543950335"));
+		var result = largeNumber1 - largeNumber2;
+		Assert.AreEqual(BigInteger.Parse("4"), result.Significand);
+		Assert.AreEqual(128, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_Multiply_LargeNumbers()
+	{
+		var largeNumber1 = new SignificantNumber(50, BigInteger.Parse("79228162514264337593543950335"));
+		var largeNumber2 = new SignificantNumber(50, BigInteger.Parse("2"));
+		var result = largeNumber1 * largeNumber2;
+		Assert.AreEqual(BigInteger.Parse("2"), result.Significand);
+		Assert.AreEqual(129, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_Divide_LargeNumbers()
+	{
+		var largeNumber1 = new SignificantNumber(100, BigInteger.Parse("79228162514264337593543950335"));
+		var largeNumber2 = new SignificantNumber(1, BigInteger.Parse("2"));
+		var result = largeNumber1 / largeNumber2;
+		Assert.AreEqual(BigInteger.Parse("4"), result.Significand);
+		Assert.AreEqual(129, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_Add_Zero()
+	{
+		var zero = SignificantNumber.Zero;
+		var one = SignificantNumber.One;
+		var result = zero + one;
+		Assert.AreEqual(one, result);
+	}
+
+	[TestMethod]
+	public void Test_Subtract_Zero()
+	{
+		var zero = SignificantNumber.Zero;
+		var one = SignificantNumber.One;
+		var result = one - zero;
+		Assert.AreEqual(one, result);
+	}
+
+	[TestMethod]
+	public void Test_Multiply_Zero()
+	{
+		var zero = SignificantNumber.Zero;
+		var one = SignificantNumber.One;
+		var result = one * zero;
+		Assert.AreEqual(zero, result);
+	}
+
+	[TestMethod]
+	public void Test_Divide_Zero()
+	{
+		var zero = SignificantNumber.Zero;
+		Assert.ThrowsException<DivideByZeroException>(() => zero / zero);
+	}
+
+	[TestMethod]
+	public void Test_CreateFromFloatingPoint_SpecialValues()
+	{
+		Assert.ThrowsException<ArgumentOutOfRangeException>(() => SignificantNumber.CreateFromFloatingPoint(double.NaN));
+		Assert.ThrowsException<ArgumentOutOfRangeException>(() => SignificantNumber.CreateFromFloatingPoint(double.PositiveInfinity));
+		Assert.ThrowsException<ArgumentOutOfRangeException>(() => SignificantNumber.CreateFromFloatingPoint(double.NegativeInfinity));
+	}
+
+	[TestMethod]
+	public void Test_CreateFromInteger_BoundaryValues()
+	{
+		var intMax = SignificantNumber.CreateFromInteger(int.MaxValue);
+		Assert.AreEqual(BigInteger.Parse(int.MaxValue.ToString()), intMax.Significand);
+
+		var intMin = SignificantNumber.CreateFromInteger(int.MinValue);
+		Assert.AreEqual(BigInteger.Parse(int.MinValue.ToString()), intMin.Significand);
+
+		var longMax = SignificantNumber.CreateFromInteger(long.MaxValue);
+		Assert.AreEqual(BigInteger.Parse(long.MaxValue.ToString()), longMax.Significand);
+
+		var longMin = SignificantNumber.CreateFromInteger(long.MinValue);
+		Assert.AreEqual(BigInteger.Parse(long.MinValue.ToString()), longMin.Significand);
+	}
+
+	[TestMethod]
+	public void Test_NegativeExponentHandling()
+	{
+		var number = new SignificantNumber(-3, 12345);
+		Assert.AreEqual(12345, number.Significand);
+		Assert.AreEqual(-3, number.Exponent);
+
+		var result = number.Round(2);
+		Assert.AreEqual(1235, result.Significand); // After rounding, check if the exponent and significand are adjusted correctly
+		Assert.AreEqual(-2, result.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_HandlingTrailingZeros()
+	{
+		var number = new SignificantNumber(2, 123000, true);
+		Assert.AreEqual(123, number.Significand);
+		Assert.AreEqual(5, number.Exponent); // Ensure trailing zeros are removed and exponent is adjusted correctly
+
+		number = new SignificantNumber(-2, 123000, true);
+		Assert.AreEqual(123, number.Significand);
+		Assert.AreEqual(1, number.Exponent);
+	}
+
+	[TestMethod]
+	public void Test_ToString_VariousFormats()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		Assert.ThrowsException<FormatException>(() => number.ToString("E2", CultureInfo.InvariantCulture));
+		Assert.ThrowsException<FormatException>(() => number.ToString("F2", CultureInfo.InvariantCulture));
+		Assert.ThrowsException<FormatException>(() => number.ToString("N2", CultureInfo.InvariantCulture));
+	}
+
+	[TestMethod]
+	public void Test_TryFormat_VariousFormats()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		Assert.ThrowsException<FormatException>(() => number.TryFormat(stackalloc char[50], out int charsWritten, "E2".AsSpan(), CultureInfo.InvariantCulture));
+		Assert.ThrowsException<FormatException>(() => number.TryFormat(stackalloc char[50], out int charsWritten, "F2".AsSpan(), CultureInfo.InvariantCulture));
+		Assert.ThrowsException<FormatException>(() => number.TryFormat(stackalloc char[50], out int charsWritten, "N2".AsSpan(), CultureInfo.InvariantCulture));
+	}
+
 }
