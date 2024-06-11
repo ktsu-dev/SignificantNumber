@@ -17,7 +17,6 @@ public readonly struct SignificantNumber
 	: INumber<SignificantNumber>
 {
 	internal const int MaxDecimalPlaces = 15;
-	internal const int MinDecimalPlaces = 1;
 	private const string FormatSpecifier = "e15";
 
 	/// <summary>
