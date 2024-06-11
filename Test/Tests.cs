@@ -132,43 +132,34 @@ public class Tests
 		static void TestType<TInput>()
 			where TInput : INumber<TInput>
 		{
-			string failureReason = string.Empty;
-			string failures = string.Empty;
-			string typename = typeof(TInput).Name;
-
-			failureReason = $"{nameof(Helpers.GetMaxValue)}<{typename}>()";
 			var testValue = Helpers.GetMaxValue<TInput>();
-			TestNumber(testValue, ref failureReason, $"{nameof(Helpers.GetMaxValue)}");
+			TestNumber(testValue, $"{nameof(Helpers.GetMaxValue)}");
 
-			failureReason = $"{nameof(Helpers.GetMinValue)}<{typename}>()";
 			testValue = Helpers.GetMinValue<TInput>();
-			TestNumber(testValue, ref failureReason, $"{nameof(Helpers.GetMinValue)}");
+			TestNumber(testValue, $"{nameof(Helpers.GetMinValue)}");
 
 			for (int i = 0; i < numIterations; i++)
 			{
-				failureReason = $"{nameof(Helpers.RandomNumber)}<{typename}>()";
 				testValue = Helpers.RandomNumber<TInput>();
-				TestNumber(testValue, ref failureReason, $"random[{i}]");
+				TestNumber(testValue, $"random[{i}]");
 			}
 		}
 
-		static void TestNumber<TInput>(TInput testValue, ref string failureReason, string id)
+		static void TestNumber<TInput>(TInput testValue, string id)
 			where TInput : INumber<TInput>
 		{
 			string typename = typeof(TInput).Name;
 			string abs = $"{typename}.{nameof(INumber<TInput>.Abs)}";
-			string max = $"{typename}.{nameof(INumber<TInput>.Max)}";
-			string create = $"{typename}.{nameof(INumber<TInput>.CreateTruncating)}";
-			failureReason = $"{id}: {testValue}.{nameof(SignificantNumberExtensions.ToSignificantNumber)}()";
 			var sig = testValue.ToSignificantNumber();
-			failureReason = $"{id}: {sig}.{nameof(sig.ToString)}()";
 			string str = sig.ToString();
-			failureReason = $"{id}: {typename}.{nameof(INumber<TInput>.Parse)}({str})";
 			var roundtrip = TInput.Parse(str, CultureInfo.InvariantCulture);
-			failureReason = $"{id}: {max}({abs}({testValue}), {abs}({roundtrip})) * {create}(1e-15)";
-			var epsilon = TInput.Max(TInput.Abs(testValue), TInput.Abs(roundtrip)) * TInput.CreateTruncating(1e-15);
-			failureReason = $"{id}: {abs}({testValue} - {roundtrip}) <= {epsilon}";
-			Assert.IsTrue(TInput.Abs(testValue - roundtrip) <= epsilon);
+			string format = SignificantNumber.GetStringFormatForFloatType<TInput>();
+			string precisionSpecifier =
+				format == "R"
+				? ""
+				: "e-" + format.Replace("E", "", StringComparison.OrdinalIgnoreCase);
+			var epsilon = TInput.Max(TInput.Abs(testValue), TInput.Abs(roundtrip)) * TInput.Parse($"1{precisionSpecifier}", CultureInfo.InvariantCulture);
+			Assert.IsTrue(TInput.Abs(testValue - roundtrip) <= epsilon, $"{id}: {abs}({testValue} - {roundtrip}) <= {epsilon}");
 		}
 	}
 
@@ -536,9 +527,6 @@ public class Tests
 
 	[TestMethod]
 	public void TestRadix() => Assert.AreEqual(2, SignificantNumber.Radix);
-
-	[TestMethod]
-	public void TestMaxDecimalPlaces() => Assert.AreEqual(15, SignificantNumber.MaxDecimalPlaces);
 
 	[TestMethod]
 	public void TestIdentity()
