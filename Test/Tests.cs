@@ -591,4 +591,10 @@ public class Tests
 		Assert.AreEqual(SignificantNumber.Zero, SignificantNumber.AdditiveIdentity);
 		Assert.AreEqual(SignificantNumber.One, SignificantNumber.MultiplicativeIdentity);
 	}
+
+	[TestMethod]
+	public void TestTryCreateWithInvalidType()
+	{
+		Assert.IsFalse(SignificantNumberExtensions.TryCreate(3.ToSignificantNumber(), out var _));
+	}
 }
