@@ -5,9 +5,8 @@ using System.Numerics;
 
 internal static class Helpers
 {
-	public static Random RNG { get; set; } = new((int)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds);
+	public static Random RNG { get; set; } = new((int)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]
 	public static TNumber RandomNumber<TNumber>()
 		where TNumber : INumber<TNumber>
 	{
@@ -32,7 +31,6 @@ internal static class Helpers
 		throw new NotSupportedException();
 	}
 
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]
 	public static TNumber GetMaxValue<TNumber>()
 		where TNumber : INumber<TNumber>
 	{
@@ -56,7 +54,6 @@ internal static class Helpers
 		};
 	}
 
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]
 	public static TNumber GetMinValue<TNumber>()
 		where TNumber : INumber<TNumber>
 	{
