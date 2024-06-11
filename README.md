@@ -26,6 +26,7 @@ The `SignificantNumber` class represents a number with a significand and an expo
   - [Comparison Operations](#comparison-operations)
   - [Formatting and Parsing](#formatting-and-parsing)
   - [Extension Methods](#extension-methods)
+  - [Conversion](#conversion)
 - [Precision](#precision)
   - [Significand and Exponent](#significand-and-exponent)
   - [Precision Handling](#precision-handling)
@@ -146,7 +147,7 @@ catch (NotSupportedException ex)
 }
 ```
 
-Instead you should parse the number as another numeric type and convert it to a `SignificantNumber`:
+Instead, you should parse the number as another numeric type and convert it to a `SignificantNumber`:
 
 ```csharp
 double parsedDouble = double.Parse("123.45", CultureInfo.InvariantCulture);
@@ -185,6 +186,35 @@ SignificantNumber significantNumberFromInt = integerValue.ToSignificantNumber();
 
 SignificantNumber result = significantNumberFromFloat + significantNumberFromInt;
 // result = 12468.45
+```
+
+### Conversion
+
+#### `To<TOutput>`
+
+Converts a `SignificantNumber` to the specified numeric type.
+
+#### Usage:
+
+```csharp
+public TOutput To<TOutput>()
+    where TOutput : INumber<TOutput>
+```
+
+#### Parameters:
+
+- None
+
+#### Returns:
+
+- `TOutput`: The converted value of the `SignificantNumber`.
+
+#### Example:
+
+```csharp
+SignificantNumber significantNumber = new SignificantNumber(3, 12345); // 12345e3
+double result = significantNumber.To<double>();
+Console.WriteLine(result);  // Outputs 12345000
 ```
 
 ## Precision
@@ -226,7 +256,6 @@ By using the `SignificantNumber` class, you can perform high-precision arithmeti
 
 ### Methods
 
-- `SignificantNumber(int exponent, BigInteger significand, bool sanitize = true)` - Initializes a new instance of the `SignificantNumber` struct.
 - `bool Equals(SignificantNumber other)` - Determines whether the specified object is equal to the current object.
 - `int CompareTo(object? obj)` - Compares the current instance with another object.
 - `int CompareTo(SignificantNumber other)` - Compares the current instance with another significant number.
@@ -236,6 +265,7 @@ By using the `SignificantNumber` class, you can perform high-precision arithmeti
 - `SignificantNumber Clamp<TNumber>(TNumber min, TNumber max) where TNumber : INumber<TNumber>` - Clamps the specified value between the minimum and maximum values.
 - `string ToString(string? format, IFormatProvider? formatProvider)` - Converts the current instance to its equivalent string representation using the specified format and format provider.
 - `bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)` - Attempts to format the current instance into the provided span.
+- `TOutput To<TOutput>() where TOutput : INumber<TOutput>` - Converts the current significant number to the specified numeric type.
 
 ### Static Methods
 
@@ -261,25 +291,6 @@ By using the `SignificantNumber` class, you can perform high-precision arithmeti
 - `static SignificantNumber MaxMagnitudeNumber(SignificantNumber x, SignificantNumber y)` - Returns the larger of the magnitudes of two significant numbers.
 - `static SignificantNumber MinMagnitude(SignificantNumber x, SignificantNumber y)` - Returns the smaller of the magnitudes of two significant numbers.
 - `static SignificantNumber MinMagnitudeNumber(SignificantNumber x, SignificantNumber y)` - Returns the smaller of the magnitudes of two significant numbers.
-- `static SignificantNumber Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider)` - Parses a significant number from a span of characters using the specified style and format provider.
-- `static SignificantNumber Parse(string s, NumberStyles style, IFormatProvider? provider)` - Parses a significant number from a string using the specified style and format provider.
-- `static SignificantNumber Parse(string s, IFormatProvider? provider)` - Parses a significant number from a string using the specified format provider.
-- `static SignificantNumber Parse(ReadOnlySpan<char> s, IFormatProvider? provider)` - Parses a significant number from a span of characters using the specified format provider.
-- `static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result)` - Tries to parse a significant number from a span of characters using the specified style and format provider.
-- `static bool TryParse([NotNullWhen(true)] string? s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result)` - Tries to parse a significant number from a string using the specified style and format provider.
-- `static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result)` - Tries to parse a significant number from a string using the specified format provider.
-- `static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result)` - Tries to parse a significant number from a span of characters using the specified format provider.
-- `static bool TryConvertFromChecked<TOther>(TOther value, out SignificantNumber result) where TOther : INumberBase<TOther>` - Tries to convert a number to a significant number using checked conversion.
-- `static bool TryConvertFrom
-
-Saturating<TOther>(TOther value, out SignificantNumber result) where TOther : INumberBase<TOther>` - Tries to convert a number to a significant number using saturating conversion.
-- `static bool TryConvertFromTruncating<TOther>(TOther value, out SignificantNumber result) where TOther : INumberBase<TOther>` - Tries to convert a number to a significant number using truncating conversion.
-- `static bool TryConvertToChecked<TOther>(SignificantNumber value, out TOther result) where TOther : INumberBase<TOther>` - Tries to convert a significant number to another number using checked conversion.
-- `static bool TryConvertToSaturating<TOther>(SignificantNumber value, out TOther result) where TOther : INumberBase<TOther>` - Tries to convert a significant number to another number using saturating conversion.
-- `static bool TryConvertToTruncating<TOther>(SignificantNumber value, out TOther result) where TOther : INumberBase<TOther>` - Tries to convert a significant number to another number using truncating conversion.
-- `static void AssertExponentsMatch(SignificantNumber left, SignificantNumber right)` - Asserts that the exponents of two significant numbers match.
-- `static bool DoesImplementGenericInterface(Type type, Type genericInterface)` - Determines whether a type implements a specified generic interface.
-- `static void AssertDoesImplementGenericInterface(Type type, Type genericInterface)` - Asserts that a type implements a specified generic interface.
 
 ### Operators
 
@@ -295,9 +306,6 @@ Saturating<TOther>(TOther value, out SignificantNumber result) where TOther : IN
 - `static bool operator <(SignificantNumber left, SignificantNumber right)` - Determines whether one significant number is less than another.
 - `static bool operator >=(SignificantNumber left, SignificantNumber right)` - Determines whether one significant number is greater than or equal to another.
 - `static bool operator <=(SignificantNumber left, SignificantNumber right)` - Determines whether one significant number is less than or equal to another.
-- `static SignificantNumber operator %(SignificantNumber left, SignificantNumber right)` - Computes the modulus of two significant numbers (not supported).
-- `static SignificantNumber operator --(SignificantNumber value)` - Decrements a significant number (not supported).
-- `static SignificantNumber operator ++(SignificantNumber value)` - Increments a significant number (not supported).
 
 ## Contributing
 

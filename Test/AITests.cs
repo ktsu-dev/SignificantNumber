@@ -1506,4 +1506,58 @@ public class AITests
 		Assert.ThrowsException<FormatException>(() => number.TryFormat(stackalloc char[50], out int charsWritten, "N2".AsSpan(), CultureInfo.InvariantCulture));
 	}
 
+	[TestMethod]
+	public void To_Double()
+	{
+		var significantNumber = new SignificantNumber(3, 12345); // 12345e3
+		double result = significantNumber.To<double>();
+		Assert.AreEqual(12345e3, result);
+	}
+
+	[TestMethod]
+	public void To_Float()
+	{
+		var significantNumber = new SignificantNumber(2, 12345); // 12345e2
+		float result = significantNumber.To<float>();
+		Assert.AreEqual(12345e2f, result);
+	}
+
+	[TestMethod]
+	public void To_Decimal()
+	{
+		var significantNumber = new SignificantNumber(1, 12345); // 12345e1
+		decimal result = significantNumber.To<decimal>();
+		Assert.AreEqual(12345e1m, result);
+	}
+
+	[TestMethod]
+	public void To_Int()
+	{
+		var significantNumber = new SignificantNumber(0, 12345); // 12345e0
+		int result = significantNumber.To<int>();
+		Assert.AreEqual(12345, result);
+	}
+
+	[TestMethod]
+	public void To_Long()
+	{
+		var significantNumber = new SignificantNumber(0, 123456789012345); // 123456789012345e0
+		long result = significantNumber.To<long>();
+		Assert.AreEqual(123456789012345L, result);
+	}
+
+	[TestMethod]
+	public void To_BigInteger()
+	{
+		var significantNumber = new SignificantNumber(5, 12345); // 12345e5
+		var result = significantNumber.To<BigInteger>();
+		Assert.AreEqual(BigInteger.Parse("1234500000"), result);
+	}
+
+	[TestMethod]
+	public void To_Overflow()
+	{
+		var significantNumber = new SignificantNumber(1000, 12345); // This is a very large number
+		Assert.ThrowsException<InvalidOperationException>(() => significantNumber.To<int>()); // This should throw an exception
+	}
 }

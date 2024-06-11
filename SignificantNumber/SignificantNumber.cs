@@ -16,6 +16,8 @@ using System.Numerics;
 public readonly struct SignificantNumber
 	: INumber<SignificantNumber>
 {
+	private const int Base10 = 10;
+
 	/// <summary>
 	/// Initializes a new instance of the <see cref="SignificantNumber"/> struct.
 	/// </summary>
@@ -24,8 +26,6 @@ public readonly struct SignificantNumber
 	/// <param name="sanitize">If true, trailing zeros in the significand will be removed.</param>
 	internal SignificantNumber(int exponent, BigInteger significand, bool sanitize = true)
 	{
-		const int ten = 10;
-
 		if (sanitize)
 		{
 			if (significand == 0)
@@ -37,9 +37,9 @@ public readonly struct SignificantNumber
 			}
 
 			// remove trailing zeros
-			while (significand != 0 && significand % ten == 0)
+			while (significand != 0 && significand % Base10 == 0)
 			{
-				significand /= ten;
+				significand /= Base10;
 				exponent++;
 			}
 		}
@@ -50,7 +50,7 @@ public readonly struct SignificantNumber
 		while (number != 0)
 		{
 			significantDigits++;
-			number /= ten;
+			number /= Base10;
 		}
 
 		SignificantDigits = significantDigits;
@@ -160,7 +160,7 @@ public readonly struct SignificantNumber
 		if (decimalDifference > 0)
 		{
 			var roundingFactor = BigInteger.CopySign(CreateRepeatingDigits(5, decimalDifference), Significand);
-			var newSignificand = (Significand + roundingFactor) / BigInteger.Pow(10, decimalDifference);
+			var newSignificand = (Significand + roundingFactor) / BigInteger.Pow(Base10, decimalDifference);
 			int newExponent = Exponent - int.CopySign(decimalDifference, Exponent);
 			return new SignificantNumber(newExponent, newSignificand);
 		}
@@ -308,10 +308,9 @@ public readonly struct SignificantNumber
 
 		int exponentValue = 0;
 		var significandValue = BigInteger.CreateChecked(input);
-		const int ten = 10;
-		while (significandValue != 0 && significandValue % ten == 0)
+		while (significandValue != 0 && significandValue % Base10 == 0)
 		{
-			significandValue /= ten;
+			significandValue /= Base10;
 			exponentValue++;
 		}
 
@@ -331,12 +330,10 @@ public readonly struct SignificantNumber
 			return 0;
 		}
 
-		const int ten = 10;
-
 		BigInteger repeatingDigit = digit;
 		for (int i = 1; i < numberOfRepeats; i++)
 		{
-			repeatingDigit = (repeatingDigit * ten) + digit;
+			repeatingDigit = (repeatingDigit * Base10) + digit;
 		}
 
 		return repeatingDigit;
@@ -416,7 +413,7 @@ public readonly struct SignificantNumber
 			? significantDifference
 			: Exponent + significantDifference;
 		var roundingFactor = BigInteger.CopySign(CreateRepeatingDigits(5, significantDifference), Significand);
-		var newSignificand = (Significand + roundingFactor) / BigInteger.Pow(10, significantDifference);
+		var newSignificand = (Significand + roundingFactor) / BigInteger.Pow(Base10, significantDifference);
 		return new(newExponent, newSignificand);
 	}
 
@@ -439,8 +436,8 @@ public readonly struct SignificantNumber
 		int smallestExponent = left.Exponent < right.Exponent ? left.Exponent : right.Exponent;
 		int exponentDifferenceLeft = Math.Abs(left.Exponent - smallestExponent);
 		int exponentDifferenceRight = Math.Abs(right.Exponent - smallestExponent);
-		var newSignificandLeft = left.Significand * BigInteger.Pow(10, exponentDifferenceLeft);
-		var newSignificandRight = right.Significand * BigInteger.Pow(10, exponentDifferenceRight);
+		var newSignificandLeft = left.Significand * BigInteger.Pow(Base10, exponentDifferenceLeft);
+		var newSignificandRight = right.Significand * BigInteger.Pow(Base10, exponentDifferenceRight);
 
 		left = new(smallestExponent, newSignificandLeft, sanitize: false);
 		right = new(smallestExponent, newSignificandRight, sanitize: false);
@@ -893,7 +890,7 @@ public readonly struct SignificantNumber
 		int commonExponent = MakeCommonizedAndGetExponent(ref left, ref right);
 		AssertExponentsMatch(left, right);
 
-		var newSignificand = left.Significand * BigInteger.Pow(10, int.Abs(commonExponent)) / right.Significand;
+		var newSignificand = left.Significand * BigInteger.Pow(Base10, int.Abs(commonExponent)) / right.Significand;
 		return new SignificantNumber(commonExponent, newSignificand).ReduceSignificance(significantDigits);
 	}
 
@@ -1009,4 +1006,18 @@ public readonly struct SignificantNumber
 			? Array.Exists(type.GetInterfaces(), x => x.IsGenericType && x.GetGenericTypeDefinition() == genericInterface)
 			: throw new ArgumentException($"{genericInterface.Name} is not a generic interface");
 	}
+
+	/// <summary>
+	/// Converts the current significant number to the specified numeric type.
+	/// </summary>
+	/// <typeparam name="TOutput">The type to convert to. Must implement <see cref="INumber{TOutput}"/>.</typeparam>
+	/// <returns>The converted value of the significant number as type <typeparamref name="TOutput"/>.</returns>
+	/// <exception cref="OverflowException">
+	/// Thrown if the conversion cannot be performed. This may occur if the target type cannot represent
+	/// the value of the significant number.
+	/// </exception>
+	public TOutput To<TOutput>()
+		where TOutput : INumber<TOutput> =>
+		TOutput.CreateChecked(Significand) * TOutput.CreateChecked(Math.Pow(Base10, Exponent));
+
 }
