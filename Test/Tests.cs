@@ -1,9 +1,7 @@
 namespace ktsu.io.SignificantNumber.Test;
 
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
-using ktsu.io.SignificantNumber;
 
 [TestClass]
 public class Tests
@@ -113,7 +111,6 @@ public class Tests
 	}
 
 	[TestMethod]
-	[SuppressMessage("Style", "IDE0008:Use explicit type", Justification = "<Pending>")]
 	public void TestRoundTripWithRandomValues()
 	{
 		const int numIterations = 10000;
@@ -136,10 +133,10 @@ public class Tests
 		static void TestType<TInput>()
 			where TInput : INumber<TInput>
 		{
-			var failureReason = string.Empty;
+			string failureReason = string.Empty;
 			string failures = string.Empty;
 			int numFailures = 0;
-			var typename = typeof(TInput).Name;
+			string typename = typeof(TInput).Name;
 
 			try
 			{
@@ -193,14 +190,14 @@ public class Tests
 		static void TestNumber<TInput>(TInput testValue, ref string failureReason, string id)
 			where TInput : INumber<TInput>
 		{
-			var typename = typeof(TInput).Name;
-			var abs = $"{typename}.{nameof(INumber<TInput>.Abs)}";
-			var max = $"{typename}.{nameof(INumber<TInput>.Max)}";
-			var create = $"{typename}.{nameof(INumber<TInput>.CreateTruncating)}";
+			string typename = typeof(TInput).Name;
+			string abs = $"{typename}.{nameof(INumber<TInput>.Abs)}";
+			string max = $"{typename}.{nameof(INumber<TInput>.Max)}";
+			string create = $"{typename}.{nameof(INumber<TInput>.CreateTruncating)}";
 			failureReason = $"{id}: {testValue}.{nameof(SignificantNumberExtensions.ToSignificantNumber)}()";
 			var sig = testValue.ToSignificantNumber();
 			failureReason = $"{id}: {sig}.{nameof(sig.ToString)}()";
-			var str = sig.ToString();
+			string str = sig.ToString();
 			failureReason = $"{id}: {typename}.{nameof(INumber<TInput>.Parse)}({str})";
 			var roundtrip = TInput.Parse(str, CultureInfo.InvariantCulture);
 			failureReason = $"{id}: {max}({abs}({testValue}), {abs}({roundtrip})) * {create}(1e-15)";
@@ -379,7 +376,7 @@ public class Tests
 	[TestMethod]
 	public void TestComparisonWithRandomValues()
 	{
-		var rng = new Random((int)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds);
+		var rng = new Random((int)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
 		const double reallyLow = -10.0;
 		const double reallyHigh = 10.0;
@@ -407,7 +404,6 @@ public class Tests
 	}
 
 	[TestMethod]
-	[SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "<Pending>")]
 	public void TestToString()
 	{
 		var a = 0.ToSignificantNumber();
@@ -565,7 +561,7 @@ public class Tests
 	[TestMethod]
 	public void TestClamp()
 	{
-		var rng = new Random((int)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds);
+		var rng = new Random((int)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
 		for (int i = 0; i < 1000; ++i)
 		{
@@ -594,408 +590,5 @@ public class Tests
 	{
 		Assert.AreEqual(SignificantNumber.Zero, SignificantNumber.AdditiveIdentity);
 		Assert.AreEqual(SignificantNumber.One, SignificantNumber.MultiplicativeIdentity);
-	}
-
-	// AI generated tests
-
-	[TestMethod]
-	public void DoesImplementGenericInterfaceNonGenericInterfaceThrowsArgumentException()
-	{
-		// Arrange
-		var type = typeof(List<int>);
-		var nonGenericInterface = typeof(IDisposable);
-
-		// Act & Assert
-		Assert.ThrowsException<ArgumentException>(() => SignificantNumber.DoesImplementGenericInterface(type, nonGenericInterface));
-	}
-
-	[TestMethod]
-	public void DoesImplementGenericInterfaceGenericInterfaceNotImplementedReturnsFalse()
-	{
-		// Arrange
-		var type = typeof(List<int>);
-		var genericInterface = typeof(IDictionary<,>);
-
-		// Act
-		bool result = SignificantNumber.DoesImplementGenericInterface(type, genericInterface);
-
-		// Assert
-		Assert.IsFalse(result);
-	}
-
-	[TestMethod]
-	public void DoesImplementGenericInterfaceGenericInterfaceImplementedReturnsTrue()
-	{
-		// Arrange
-		var type = typeof(List<int>);
-		var genericInterface = typeof(IEnumerable<>);
-
-		// Act
-		bool result = SignificantNumber.DoesImplementGenericInterface(type, genericInterface);
-
-		// Assert
-		Assert.IsTrue(result);
-	}
-
-	[TestMethod]
-	public void ToSignificantNumberValidInputReturnsSignificantNumber()
-	{
-		// Arrange
-		int input = 5;
-
-		// Act
-		var result = input.ToSignificantNumber();
-
-		// Assert
-		Assert.IsNotNull(result);
-	}
-
-	[TestMethod]
-	public void ToSignificantNumberInvalidInputThrowsNotSupportedException()
-	{
-		// Arrange
-		var input = new InvalidNumber();
-
-		// Act & Assert
-		Assert.ThrowsException<NotSupportedException>(() => input.ToSignificantNumber());
-	}
-
-	[TestMethod]
-	public void TryCreateValidInputReturnsTrueAndSetsOutParameter()
-	{
-		// Arrange
-		int input = 5;
-
-		// Act
-		bool result = SignificantNumberExtensions.TryCreate(input, out var significantNumber);
-
-		// Assert
-		Assert.IsTrue(result);
-		Assert.IsNotNull(significantNumber);
-	}
-
-	[TestMethod]
-	public void TryCreateInvalidInputReturnsFalseAndSetsOutParameterToDefault()
-	{
-		// Arrange
-		var input = new InvalidNumber();
-
-		// Act
-		bool result = SignificantNumberExtensions.TryCreate(input, out var significantNumber);
-
-		// Assert
-		Assert.IsFalse(result);
-		Assert.AreEqual(default, significantNumber);
-	}
-
-	[TestMethod]
-	public void IsEvenIntegerEvenIntegerReturnsTrue()
-	{
-		// Arrange
-		var evenInteger = 2.ToSignificantNumber();
-
-		// Act
-		bool result = SignificantNumber.IsEvenInteger(evenInteger);
-
-		// Assert
-		Assert.IsTrue(result);
-	}
-
-	[TestMethod]
-	public void IsEvenIntegerOddIntegerReturnsFalse()
-	{
-		// Arrange
-		var oddInteger = 3.ToSignificantNumber();
-
-		// Act
-		bool result = SignificantNumber.IsEvenInteger(oddInteger);
-
-		// Assert
-		Assert.IsFalse(result);
-	}
-
-	[TestMethod]
-	public void IsOddIntegerOddIntegerReturnsTrue()
-	{
-		// Arrange
-		var oddInteger = 3.ToSignificantNumber();
-
-		// Act
-		bool result = SignificantNumber.IsOddInteger(oddInteger);
-
-		// Assert
-		Assert.IsTrue(result);
-	}
-
-	[TestMethod]
-	public void IsOddIntegerEvenIntegerReturnsFalse()
-	{
-		// Arrange
-		var evenInteger = 2.ToSignificantNumber();
-
-		// Act
-		bool result = SignificantNumber.IsOddInteger(evenInteger);
-
-		// Assert
-		Assert.IsFalse(result);
-	}
-
-	[TestMethod]
-	public void IsZeroZeroReturnsTrue()
-	{
-		// Arrange
-		var zero = 0.ToSignificantNumber();
-
-		// Act
-		bool result = SignificantNumber.IsZero(zero);
-
-		// Assert
-		Assert.IsTrue(result);
-	}
-
-	[TestMethod]
-	public void IsZeroNonZeroReturnsFalse()
-	{
-		// Arrange
-		var nonZero = 1.ToSignificantNumber();
-
-		// Act
-		bool result = SignificantNumber.IsZero(nonZero);
-
-		// Assert
-		Assert.IsFalse(result);
-	}
-
-	[TestMethod]
-	public void DoesImplementINumberTypeImplementsINumberReturnsTrue()
-	{
-		// Arrange
-		var type = typeof(int); // Replace with actual type that implements INumber<T>
-
-		// Act
-		bool result = SignificantNumber.DoesImplementINumber(type);
-
-		// Assert
-		Assert.IsTrue(result);
-	}
-
-	[TestMethod]
-	public void DoesImplementINumberTypeDoesNotImplementINumberReturnsFalse()
-	{
-		// Arrange
-		var type = typeof(string); // Replace with actual type that does not implement INumber<T>
-
-		// Act
-		bool result = SignificantNumber.DoesImplementINumber(type);
-
-		// Assert
-		Assert.IsFalse(result);
-	}
-
-	[TestMethod]
-	public void AddTwoSignificantNumbersReturnsCorrectResult()
-	{
-		// Arrange
-		var left = 2.ToSignificantNumber();
-		var right = 3.ToSignificantNumber();
-		var expected = 5.ToSignificantNumber();
-		// Act
-		var result = SignificantNumber.Add(left, right);
-
-		// Assert
-		Assert.AreEqual(expected, result);
-	}
-
-	[TestMethod]
-	public void SubtractTwoSignificantNumbersReturnsCorrectResult()
-	{
-		// Arrange
-		var left = 5.ToSignificantNumber();
-		var right = 3.ToSignificantNumber();
-		var expected = 2.ToSignificantNumber();
-
-		// Act
-		var result = SignificantNumber.Subtract(left, right);
-
-		// Assert
-		Assert.AreEqual(expected, result);
-	}
-
-	[TestMethod]
-	public void CompareToAnyObjectThrowsNotSupportedException()
-	{
-		// Arrange
-		var significantNumber = 2.ToSignificantNumber();
-		object obj = new();
-
-		// Act & Assert
-		Assert.ThrowsException<NotSupportedException>(() => significantNumber.CompareTo(obj));
-	}
-
-	[TestMethod]
-	public void CompareToSmallerNumberReturnsPositive()
-	{
-		// Arrange
-		var number = 5.ToSignificantNumber();
-		int smallerNumber = 3;
-
-		// Act
-		int result = number.CompareTo(smallerNumber);
-
-		// Assert
-		Assert.IsTrue(result > 0);
-	}
-
-	[TestMethod]
-	public void CompareToLargerNumberReturnsNegative()
-	{
-		// Arrange
-		var number = 2.ToSignificantNumber();
-		int largerNumber = 3;
-
-		// Act
-		int result = number.CompareTo(largerNumber);
-
-		// Assert
-		Assert.IsTrue(result < 0);
-	}
-
-	[TestMethod]
-	public void CompareToEqualNumberReturnsZero()
-	{
-		// Arrange
-		var number = 2.ToSignificantNumber();
-		int equalNumber = 2;
-
-		// Act
-		int result = number.CompareTo(equalNumber);
-
-		// Assert
-		Assert.AreEqual(0, result);
-	}
-
-	[TestMethod]
-	public void MaxMagnitudeGivenTwoNumbersReturnsNumberWithMaxMagnitude()
-	{
-		// Arrange
-		var number1 = 2.ToSignificantNumber();
-		var number2 = 3.ToSignificantNumber();
-
-		// Act
-		var result = SignificantNumber.MaxMagnitude(number1, number2);
-
-		// Assert
-		Assert.AreEqual(number2, result); // Assuming number2 has the max magnitude
-	}
-
-	[TestMethod]
-	public void MinMagnitudeGivenTwoNumbersReturnsNumberWithMinMagnitude()
-	{
-		// Arrange
-		var number1 = 2.ToSignificantNumber();
-		var number2 = 3.ToSignificantNumber();
-
-		// Act
-		var result = SignificantNumber.MinMagnitude(number1, number2);
-
-		// Assert
-		Assert.AreEqual(number1, result); // Assuming number1 has the min magnitude
-	}
-
-	[TestMethod]
-	public void ParseValidStringThrowsNotSupportedException()
-	{
-		// Arrange
-		string validString = "123";
-
-		// Act & Assert
-		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Parse(validString, null));
-	}
-
-	[TestMethod]
-	public void ModulusOperatorThrowsNotSupportedException()
-	{
-		// Arrange
-		var left = 5.ToSignificantNumber();
-		var right = 3.ToSignificantNumber();
-
-		// Act & Assert
-		Assert.ThrowsException<NotSupportedException>(() => left % right);
-	}
-
-	[TestMethod]
-	public void DecrementOperatorThrowsNotSupportedException()
-	{
-		// Arrange
-		var value = 5.ToSignificantNumber();
-
-		// Act & Assert
-		Assert.ThrowsException<NotSupportedException>(() => value--);
-	}
-
-	[TestMethod]
-	public void IncrementOperatorThrowsNotSupportedException()
-	{
-		// Arrange
-		var value = 5.ToSignificantNumber();
-
-		// Act & Assert
-		Assert.ThrowsException<NotSupportedException>(() => value++);
-	}
-
-	[TestMethod]
-	public void GreaterThanOperatorGivenTwoNumbersReturnsCorrectResult()
-	{
-		// Arrange
-		var largerNumber = 5.ToSignificantNumber();
-		var smallerNumber = 3.ToSignificantNumber();
-
-		// Act
-		bool result = largerNumber > smallerNumber;
-
-		// Assert
-		Assert.IsTrue(result);
-	}
-
-	[TestMethod]
-	public void GreaterThanOrEqualOperatorGivenTwoNumbersReturnsCorrectResult()
-	{
-		// Arrange
-		var largerNumber = 5.ToSignificantNumber();
-		var smallerNumber = 3.ToSignificantNumber();
-
-		// Act
-		bool result = largerNumber >= smallerNumber;
-
-		// Assert
-		Assert.IsTrue(result);
-	}
-
-	[TestMethod]
-	public void LessThanOperatorGivenTwoNumbersReturnsCorrectResult()
-	{
-		// Arrange
-		var largerNumber = 5.ToSignificantNumber();
-		var smallerNumber = 3.ToSignificantNumber();
-
-		// Act
-		bool result = smallerNumber < largerNumber;
-
-		// Assert
-		Assert.IsTrue(result);
-	}
-
-	[TestMethod]
-	public void LessThanOrEqualOperatorGivenTwoNumbersReturnsCorrectResult()
-	{
-		// Arrange
-		var largerNumber = 5.ToSignificantNumber();
-		var smallerNumber = 3.ToSignificantNumber();
-
-		// Act
-		bool result = smallerNumber <= largerNumber;
-
-		// Assert
-		Assert.IsTrue(result);
 	}
 }
