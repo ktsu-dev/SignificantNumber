@@ -46,7 +46,7 @@ dotnet add package ktsu.io.SignificantNumber
 Or, add the package reference directly in your project file:
 
 ```xml
-<PackageReference Include="ktsu.io.SignificantNumber" Version="1.0.1" />
+<PackageReference Include="ktsu.io.SignificantNumber" Version="x.x.x" />
 ```
 
 ## Usage
@@ -113,6 +113,13 @@ var result1 = number1 + number2;
 var result2 = number1 - number2;
 var result3 = number1 * number2;
 var result4 = number1 / number2;
+
+// Square and cube operations
+var squared = number1.Squared();
+var cubed = number1.Cubed();
+
+// Power operation
+var powerResult = number1.Pow(3); // number1 raised to the power of 3
 ```
 
 ### Comparison Operations

@@ -1558,6 +1558,77 @@ public class AITests
 	public void To_Overflow()
 	{
 		var significantNumber = new SignificantNumber(1000, 12345); // This is a very large number
-		Assert.ThrowsException<InvalidOperationException>(() => significantNumber.To<int>()); // This should throw an exception
+		Assert.ThrowsException<OverflowException>(() => significantNumber.To<int>()); // This should throw an exception
 	}
+
+	[TestMethod]
+	public void Squared_ShouldReturnCorrectValue()
+	{
+		// Arrange
+		var number = 3.ToSignificantNumber();
+		var expected = 9.ToSignificantNumber();
+
+		// Act
+		var result = number.Squared();
+
+		// Assert
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void Cubed_ShouldReturnCorrectValue()
+	{
+		// Arrange
+		var number = 3.ToSignificantNumber();
+		var expected = 27.ToSignificantNumber();
+
+		// Act
+		var result = number.Cubed();
+
+		// Assert
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void Pow_ShouldReturnCorrectValue()
+	{
+		// Arrange
+		var number = 2.ToSignificantNumber();
+		var expected = 8.ToSignificantNumber();
+
+		// Act
+		var result = number.Pow(3);
+
+		// Assert
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void Pow_ZeroPower_ShouldReturnOne()
+	{
+		// Arrange
+		var number = 5.ToSignificantNumber();
+		var expected = SignificantNumber.One;
+
+		// Act
+		var result = number.Pow(0);
+
+		// Assert
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void Pow_NegativePower_ShouldReturnCorrectValue()
+	{
+		// Arrange
+		var number = 2.ToSignificantNumber();
+		var expected = 0.125.ToSignificantNumber();
+
+		// Act
+		var result = number.Pow(-3);
+
+		// Assert
+		Assert.AreEqual(expected, result);
+	}
+
 }

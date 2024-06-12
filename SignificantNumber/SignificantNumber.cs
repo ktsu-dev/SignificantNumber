@@ -874,24 +874,48 @@ public readonly struct SignificantNumber
 	/// <inheritdoc/>
 	public static SignificantNumber operator *(SignificantNumber left, SignificantNumber right)
 	{
+		if (left == Zero || right == Zero)
+		{
+			return Zero;
+		}
+
 		int significantDigits = LowestSignificantDigits(left, right);
 		int commonExponent = MakeCommonizedAndGetExponent(ref left, ref right);
 		AssertExponentsMatch(left, right);
 
 		var newSignificand = left.Significand * right.Significand;
 		int newExponent = commonExponent * 2;
-		return new SignificantNumber(newExponent, newSignificand).ReduceSignificance(significantDigits);
+		var result = new SignificantNumber(newExponent, newSignificand);
+		return newExponent == 0
+			? result
+			: result.ReduceSignificance(significantDigits);
 	}
 
 	/// <inheritdoc/>
 	public static SignificantNumber operator /(SignificantNumber left, SignificantNumber right)
 	{
+		if (right == Zero)
+		{
+			throw new DivideByZeroException();
+		}
+
+		if (left == right)
+		{
+			return One;
+		}
+
 		int significantDigits = LowestSignificantDigits(left, right);
 		int commonExponent = MakeCommonizedAndGetExponent(ref left, ref right);
 		AssertExponentsMatch(left, right);
 
-		var newSignificand = left.Significand * BigInteger.Pow(Base10, int.Abs(commonExponent)) / right.Significand;
-		return new SignificantNumber(commonExponent, newSignificand).ReduceSignificance(significantDigits);
+		var leftIntermediate = left.Significand * BigInteger.Pow(Base10, int.Abs(commonExponent));
+
+		var integerComponent = leftIntermediate / right.Significand;
+		double fractionalComponent = double.CreateTruncating(leftIntermediate % right.Significand) / double.CreateTruncating(right.Significand) * double.Pow(Base10, commonExponent);
+
+		var result = new SignificantNumber(commonExponent, integerComponent) + fractionalComponent.ToSignificantNumber();
+
+		return result.ReduceSignificance(significantDigits);
 	}
 
 	/// <inheritdoc/>
@@ -1019,5 +1043,40 @@ public readonly struct SignificantNumber
 	public TOutput To<TOutput>()
 		where TOutput : INumber<TOutput> =>
 		TOutput.CreateChecked(Significand) * TOutput.CreateChecked(Math.Pow(Base10, Exponent));
+
+	/// <summary>
+	/// Returns the square of the current significant number.
+	/// </summary>
+	/// <returns>A new instance of <see cref="SignificantNumber"/> that is the square of the current instance.</returns>
+	public SignificantNumber Squared() => this * this;
+
+	/// <summary>
+	/// Returns the cube of the current significant number.
+	/// </summary>
+	/// <returns>A new instance of <see cref="SignificantNumber"/> that is the cube of the current instance.</returns>
+	public SignificantNumber Cubed() => Squared() * this;
+
+	/// <summary>
+	/// Returns the result of raising the current significant number to the specified power.
+	/// </summary>
+	/// <param name="power">The power to raise the significant number to.</param>
+	/// <returns>A new instance of <see cref="SignificantNumber"/> that is the result of raising the current instance to the specified power.</returns>
+	public SignificantNumber Pow(int power)
+	{
+		if (power == 0)
+		{
+			return One;
+		}
+
+		var result = this;
+		int absPower = Math.Abs(power);
+
+		for (int i = 1; i < absPower; i++)
+		{
+			result *= this;
+		}
+
+		return power < 0 ? One / result : result;
+	}
 
 }
