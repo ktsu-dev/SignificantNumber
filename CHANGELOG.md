@@ -1,5 +1,11 @@
 # ktsu.io.SignificanNumber
 
+## Changelist for Version 1.1.1
+
+- **Enhanced `To<TOutput>()` method**:
+  - Improved the conversion method to directly return the current instance when converting to `SignificantNumber`, enhancing performance and reducing unnecessary computation for this specific conversion case.
+  - This additionally prevents an unintended `NotSupportedException` when attempting to convert a `SignificantNumber` to itself.
+
 ## Changelist for Version 1.1.0
 
 ### New Features:
