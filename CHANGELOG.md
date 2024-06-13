@@ -1,5 +1,8 @@
 # ktsu.io.SignificanNumber
 
+## Changelist for Version 1.1.2
+- Fixed Incorrect Exponent Handling for Integers in SignificantNumber Conversion
+
 ## Changelist for Version 1.1.1
 
 - **Enhanced `To<TOutput>()` method**:
