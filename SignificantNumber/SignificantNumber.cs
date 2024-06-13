@@ -1042,7 +1042,9 @@ public readonly struct SignificantNumber
 	/// </exception>
 	public TOutput To<TOutput>()
 		where TOutput : INumber<TOutput> =>
-		TOutput.CreateChecked(Significand) * TOutput.CreateChecked(Math.Pow(Base10, Exponent));
+		typeof(TOutput) == typeof(SignificantNumber)
+		? (TOutput)(object)this
+		: TOutput.CreateChecked(Significand) * TOutput.CreateChecked(Math.Pow(Base10, Exponent));
 
 	/// <summary>
 	/// Returns the square of the current significant number.
