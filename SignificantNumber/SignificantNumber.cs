@@ -241,9 +241,15 @@ public readonly struct SignificantNumber
 			exponentValue = int.Parse(expComponents[1], InvariantCulture);
 		}
 
+		bool isInteger = !significandSpan.Contains('.');
+
 		while (significandSpan.Length > 2 && significandSpan[^1] == '0')
 		{
 			significandSpan = significandSpan[..^1];
+			if (isInteger)
+			{
+				++exponentValue;
+			}
 		}
 
 		string[] components = significandSpan.ToString().Split('.');

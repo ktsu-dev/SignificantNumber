@@ -540,4 +540,22 @@ public class Tests
 	{
 		Assert.IsFalse(SignificantNumberExtensions.TryCreate(3.ToSignificantNumber(), out var _));
 	}
+
+	[TestMethod]
+	public void TestDecimalInteger()
+	{
+		var result = 3600m.ToSignificantNumber();
+		Assert.AreEqual(36, result.Significand);
+		Assert.AreEqual(2, result.Exponent);
+		Assert.AreEqual(2, result.SignificantDigits);
+	}
+
+	[TestMethod]
+	public void TestInteger()
+	{
+		var result = 3600.ToSignificantNumber();
+		Assert.AreEqual(36, result.Significand);
+		Assert.AreEqual(2, result.Exponent);
+		Assert.AreEqual(2, result.SignificantDigits);
+	}
 }
