@@ -558,4 +558,36 @@ public class Tests
 		Assert.AreEqual(2, result.Exponent);
 		Assert.AreEqual(2, result.SignificantDigits);
 	}
+
+	[TestMethod]
+	public void TestLargeIntegerDivision()
+	{
+		var largeValue = 1e18.ToSignificantNumber();
+		var result = largeValue / 1000.ToSignificantNumber();
+		Assert.AreEqual(1e15.ToSignificantNumber(), result);
+	}
+
+	[TestMethod]
+	public void TestSmallDecimalDivision()
+	{
+		var largeValue = 1e-18.ToSignificantNumber();
+		var result = largeValue / 1000.ToSignificantNumber();
+		Assert.AreEqual(1e-21.ToSignificantNumber(), result);
+	}
+
+	[TestMethod]
+	public void TestLargeIntegerMultiplication()
+	{
+		var largeValue = 1e18.ToSignificantNumber();
+		var result = largeValue * 1000.ToSignificantNumber();
+		Assert.AreEqual(1e21.ToSignificantNumber(), result);
+	}
+
+	[TestMethod]
+	public void TestSmallDecimalMultiplication()
+	{
+		var largeValue = 1e-18.ToSignificantNumber();
+		var result = largeValue * 1000.ToSignificantNumber();
+		Assert.AreEqual(1e-15.ToSignificantNumber(), result);
+	}
 }

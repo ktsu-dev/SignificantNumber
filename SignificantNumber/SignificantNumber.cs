@@ -914,12 +914,11 @@ public readonly struct SignificantNumber
 		int commonExponent = MakeCommonizedAndGetExponent(ref left, ref right);
 		AssertExponentsMatch(left, right);
 
-		var leftIntermediate = left.Significand * BigInteger.Pow(Base10, int.Abs(commonExponent));
+		var integerComponent = left.Significand / right.Significand;
+		double remainder = double.CreateTruncating(left.Significand % right.Significand) * double.Pow(Base10, commonExponent);
+		double fractionalComponent = remainder / (double.CreateTruncating(right.Significand) * double.Pow(Base10, commonExponent));
 
-		var integerComponent = leftIntermediate / right.Significand;
-		double fractionalComponent = double.CreateTruncating(leftIntermediate % right.Significand) / double.CreateTruncating(right.Significand) * double.Pow(Base10, commonExponent);
-
-		var result = new SignificantNumber(commonExponent, integerComponent) + fractionalComponent.ToSignificantNumber();
+		var result = new SignificantNumber(0, integerComponent) + fractionalComponent.ToSignificantNumber();
 
 		return result.ReduceSignificance(significantDigits);
 	}

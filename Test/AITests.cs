@@ -1403,7 +1403,7 @@ public class AITests
 		var largeNumber2 = new SignificantNumber(1, BigInteger.Parse("2"));
 		var result = largeNumber1 / largeNumber2;
 		Assert.AreEqual(BigInteger.Parse("4"), result.Significand);
-		Assert.AreEqual(129, result.Exponent);
+		Assert.AreEqual(127, result.Exponent);
 	}
 
 	[TestMethod]
