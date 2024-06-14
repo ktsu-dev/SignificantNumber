@@ -1,1 +1,1 @@
-Significant Number
+High-precision arithmetic class representing numbers with a significand and exponent. Supports significant figure rules, mathematical computations, and formatting.

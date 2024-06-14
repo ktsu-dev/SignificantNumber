@@ -1,5 +1,8 @@
 # ktsu.io.SignificanNumber
 
+## Changelist for Version 1.1.3
+- Fixed Incorrect Exponent Handling during divisions
+
 ## Changelist for Version 1.1.2
 - Fixed Incorrect Exponent Handling for Integers in SignificantNumber Conversion
 
