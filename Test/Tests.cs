@@ -590,4 +590,25 @@ public class Tests
 		var result = largeValue * 1000.ToSignificantNumber();
 		Assert.AreEqual(1e-15.ToSignificantNumber(), result);
 	}
+
+	[TestMethod]
+	public void TestRounding()
+	{
+		var a = 300.ToSignificantNumber();
+		var b = 300.2.ToSignificantNumber();
+		var c = 300.22.ToSignificantNumber();
+		var d = 300.222.ToSignificantNumber();
+
+		Assert.AreEqual(300.ToSignificantNumber(), a.Round(0));
+		Assert.AreEqual(300.ToSignificantNumber(), a.Round(2));
+
+		Assert.AreEqual(300.ToSignificantNumber(), b.Round(0));
+		Assert.AreEqual(300.2.ToSignificantNumber(), b.Round(2));
+
+		Assert.AreEqual(300.ToSignificantNumber(), c.Round(0));
+		Assert.AreEqual(300.22.ToSignificantNumber(), c.Round(2));
+
+		Assert.AreEqual(300.ToSignificantNumber(), d.Round(0));
+		Assert.AreEqual(300.22.ToSignificantNumber(), d.Round(2));
+	}
 }

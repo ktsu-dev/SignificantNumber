@@ -157,7 +157,7 @@ public readonly struct SignificantNumber
 	{
 		int currentDecimalDigits = CountDecimalDigits();
 		int decimalDifference = int.Abs(decimalDigits - currentDecimalDigits);
-		if (decimalDifference > 0)
+		if (currentDecimalDigits > decimalDigits && decimalDifference > 0)
 		{
 			var roundingFactor = BigInteger.CopySign(CreateRepeatingDigits(5, decimalDifference), Significand);
 			var newSignificand = (Significand + roundingFactor) / BigInteger.Pow(Base10, decimalDifference);
