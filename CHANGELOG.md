@@ -1,5 +1,8 @@
 # ktsu.io.SignificanNumber
 
+## Changelist for Version 1.1.4
+- Fixed incorrect result when rounding values with less precision than requested
+
 ## Changelist for Version 1.1.3
 - Fixed Incorrect Exponent Handling during divisions
 
