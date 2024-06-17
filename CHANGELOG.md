@@ -1,5 +1,8 @@
 # ktsu.io.SignificanNumber
 
+## Changelist for Version 1.2.1
+- Support for SignificantNumber exponents in the `Pow` and `Exp` methods
+
 ## Changelist for Version 1.2.0
 - Added `Exp(int power)` method: Returns the result of raising e to the specified power.
 
