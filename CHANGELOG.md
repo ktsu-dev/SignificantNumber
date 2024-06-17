@@ -1,5 +1,8 @@
 # ktsu.io.SignificanNumber
 
+## Changelist for Version 1.2.0
+- Added `Exp(int power)` method: Returns the result of raising e to the specified power.
+
 ## Changelist for Version 1.1.4
 - Fixed incorrect result when rounding values with less precision than requested
 
