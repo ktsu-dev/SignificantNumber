@@ -1057,22 +1057,26 @@ public readonly struct SignificantNumber
 	/// </summary>
 	/// <param name="power">The power to raise the significant number to.</param>
 	/// <returns>A new instance of <see cref="SignificantNumber"/> that is the result of raising the current instance to the specified power.</returns>
-	public SignificantNumber Pow(int power)
+	public SignificantNumber Pow(SignificantNumber power)
 	{
-		if (power == 0)
+		if (power == Zero)
+		{
+			return One;
+		}
+		else if (this == Zero)
+		{
+			return Zero;
+		}
+		else if (this == One)
 		{
 			return One;
 		}
 
-		var result = this;
-		int absPower = Math.Abs(power);
+		int significantDigits = LowestSignificantDigits(this, power);
 
-		for (int i = 1; i < absPower; i++)
-		{
-			result *= this;
-		}
-
-		return power < 0 ? One / result : result;
+		// Use logarithm and exponential to support decimal powers
+		double logValue = Math.Log(To<double>());
+		return Math.Exp(logValue * power.To<double>()).ToSignificantNumber().ReduceSignificance(significantDigits);
 	}
 
 	/// <summary>
@@ -1080,5 +1084,19 @@ public readonly struct SignificantNumber
 	/// </summary>
 	/// <param name="power">The power to raise e to.</param>
 	/// <returns>A new instance of <see cref="SignificantNumber"/> that is the result of raising e to the specified power.</returns>
-	public static SignificantNumber Exp(int power) => E.Pow(power);
+	public static SignificantNumber Exp(SignificantNumber power)
+	{
+		if (power == Zero)
+		{
+			return One;
+		}
+		else if (power == One)
+		{
+			return E;
+		}
+
+		int significantDigits = LowestSignificantDigits(E, power);
+
+		return Math.Exp(power.To<double>()).ToSignificantNumber().ReduceSignificance(significantDigits);
+	}
 }

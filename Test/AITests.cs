@@ -1597,7 +1597,7 @@ public class AITests
 		var expected = 8.ToSignificantNumber();
 
 		// Act
-		var result = number.Pow(3);
+		var result = number.Pow(3.ToSignificantNumber());
 
 		// Assert
 		Assert.AreEqual(expected, result);
@@ -1611,7 +1611,7 @@ public class AITests
 		var expected = SignificantNumber.One;
 
 		// Act
-		var result = number.Pow(0);
+		var result = number.Pow(0.ToSignificantNumber());
 
 		// Assert
 		Assert.AreEqual(expected, result);
@@ -1625,7 +1625,7 @@ public class AITests
 		var expected = 0.125.ToSignificantNumber();
 
 		// Act
-		var result = number.Pow(-3);
+		var result = number.Pow(-3.ToSignificantNumber());
 
 		// Assert
 		Assert.AreEqual(expected, result);
@@ -1634,7 +1634,7 @@ public class AITests
 	[TestMethod]
 	public void TestExpWithZeroPower()
 	{
-		var result = SignificantNumber.Exp(0);
+		var result = SignificantNumber.Exp(0.ToSignificantNumber());
 		var expected = SignificantNumber.One; // e^0 = 1
 		Assert.AreEqual(expected, result);
 	}
@@ -1642,7 +1642,7 @@ public class AITests
 	[TestMethod]
 	public void TestExpWithPositivePower()
 	{
-		var result = SignificantNumber.Exp(1);
+		var result = SignificantNumber.Exp(1.ToSignificantNumber());
 		var expected = SignificantNumber.E; // e^1 = e
 		Assert.AreEqual(expected, result);
 	}
@@ -1650,7 +1650,7 @@ public class AITests
 	[TestMethod]
 	public void TestExpWithNegativePower()
 	{
-		var result = SignificantNumber.Exp(-1);
+		var result = SignificantNumber.Exp(-1.ToSignificantNumber());
 		var expected = SignificantNumber.One / SignificantNumber.E; // e^-1 = 1/e
 		Assert.AreEqual(expected, result);
 	}
@@ -1658,16 +1658,16 @@ public class AITests
 	[TestMethod]
 	public void TestExpWithLargePositivePower()
 	{
-		var result = SignificantNumber.Exp(5);
-		var expected = SignificantNumber.E.Pow(5); // e^5
+		var result = SignificantNumber.Exp(5.ToSignificantNumber());
+		var expected = 148.413159.ToSignificantNumber();
 		Assert.AreEqual(expected, result);
 	}
 
 	[TestMethod]
 	public void TestExpWithLargeNegativePower()
 	{
-		var result = SignificantNumber.Exp(-5);
-		var expected = SignificantNumber.One / SignificantNumber.E.Pow(5); // e^-5 = 1/(e^5)
+		var result = SignificantNumber.Exp(-5.ToSignificantNumber());
+		var expected = 0.006737947.ToSignificantNumber();
 		Assert.AreEqual(expected, result);
 	}
 }
