@@ -1631,4 +1631,43 @@ public class AITests
 		Assert.AreEqual(expected, result);
 	}
 
+	[TestMethod]
+	public void TestExpWithZeroPower()
+	{
+		var result = SignificantNumber.Exp(0);
+		var expected = SignificantNumber.One; // e^0 = 1
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void TestExpWithPositivePower()
+	{
+		var result = SignificantNumber.Exp(1);
+		var expected = SignificantNumber.E; // e^1 = e
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void TestExpWithNegativePower()
+	{
+		var result = SignificantNumber.Exp(-1);
+		var expected = SignificantNumber.One / SignificantNumber.E; // e^-1 = 1/e
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void TestExpWithLargePositivePower()
+	{
+		var result = SignificantNumber.Exp(5);
+		var expected = SignificantNumber.E.Pow(5); // e^5
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void TestExpWithLargeNegativePower()
+	{
+		var result = SignificantNumber.Exp(-5);
+		var expected = SignificantNumber.One / SignificantNumber.E.Pow(5); // e^-5 = 1/(e^5)
+		Assert.AreEqual(expected, result);
+	}
 }
