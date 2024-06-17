@@ -61,13 +61,20 @@ public readonly struct SignificantNumber
 	/// <summary>
 	/// Gets the value -1 for the type.
 	/// </summary>
-	public static SignificantNumber NegativeOne => new(0, -1);
+	public static SignificantNumber NegativeOne { get; } = new(0, -1);
 
 	/// <inheritdoc/>
-	public static SignificantNumber One => new(0, 1);
+	public static SignificantNumber One { get; } = new(0, 1);
 
 	/// <inheritdoc/>
-	public static SignificantNumber Zero => new(0, 0);
+	public static SignificantNumber Zero { get; } = new(0, 0);
+
+	private const int EExponent = -40;
+
+	/// <summary>
+	/// Gets the value of e for the type.
+	/// </summary>
+	public static SignificantNumber E { get; } = new(EExponent, BigInteger.Parse("27182818284590452353602874713526624977572", InvariantCulture));
 
 	/// <summary>
 	/// Gets the exponent of the significant number.
@@ -1086,4 +1093,10 @@ public readonly struct SignificantNumber
 		return power < 0 ? One / result : result;
 	}
 
+	/// <summary>
+	/// Returns the result of raising e to the specified power.
+	/// </summary>
+	/// <param name="power">The power to raise e to.</param>
+	/// <returns>A new instance of <see cref="SignificantNumber"/> that is the result of raising e to the specified power.</returns>
+	public static SignificantNumber Exp(int power) => E.Pow(power);
 }
