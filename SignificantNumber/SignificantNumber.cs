@@ -1,3 +1,5 @@
+// Ignore Spelling: Commonized
+
 [assembly: CLSCompliant(true)]
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 namespace ktsu.io.SignificantNumber;
@@ -634,12 +636,12 @@ public readonly struct SignificantNumber
 			{
 				int desiredAlloc = Exponent;
 				int stackAlloc = Math.Min(desiredAlloc, 128);
-				Span<char> trainlingZeroes = stackAlloc == desiredAlloc
+				Span<char> trailingZeros = stackAlloc == desiredAlloc
 					? stackalloc char[stackAlloc]
 					: new char[desiredAlloc];
 
-				trainlingZeroes.Fill('0');
-				output = $"{sign}{significandStr}{trainlingZeroes}";
+				trailingZeros.Fill('0');
+				output = $"{sign}{significandStr}{trailingZeros}";
 			}
 			else
 			{
@@ -652,14 +654,14 @@ public readonly struct SignificantNumber
 
 				int desiredAlloc = Math.Max(absExponent - significandStr.Length, 0);
 				int stackAlloc = Math.Min(desiredAlloc, 128);
-				Span<char> fractionalZeroes = stackAlloc == desiredAlloc
+				Span<char> fractionalZeros = stackAlloc == desiredAlloc
 					? stackalloc char[stackAlloc]
 					: new char[desiredAlloc];
 
-				fractionalZeroes.Fill('0');
+				fractionalZeros.Fill('0');
 
 				string fractionalComponent = absExponent >= significandStr.Length
-					? $"{fractionalZeroes}{BigInteger.Abs(Significand)}"
+					? $"{fractionalZeros}{BigInteger.Abs(Significand)}"
 					: significandStr[^absExponent..];
 
 				output = $"{sign}{integralComponent}{numberFormat.NumberDecimalSeparator}{fractionalComponent}";
