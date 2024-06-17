@@ -209,35 +209,34 @@ public readonly struct SignificantNumber
 		{
 			throw new ArgumentOutOfRangeException(nameof(input), "Infinite values are not supported");
 		}
-
-		if (TFloat.IsNaN(input))
+		else if (TFloat.IsNaN(input))
 		{
 			throw new ArgumentOutOfRangeException(nameof(input), "NaN values are not supported");
 		}
 
 		AssertDoesImplementGenericInterface(typeof(TFloat), typeof(IFloatingPoint<>));
 
-		bool isOne = input == TFloat.One;
-		bool isNegativeOne = input == -TFloat.One;
-		bool isZero = TFloat.IsZero(input);
-
-		if (isZero)
+		if (TFloat.IsZero(input))
 		{
 			return Zero;
 		}
-
-		if (isOne)
+		else if (input == TFloat.One)
 		{
 			return One;
 		}
-
-		if (isNegativeOne)
+		else if (input == -TFloat.One)
 		{
 			return NegativeOne;
 		}
 
-		string format = GetStringFormatForFloatType<TFloat>();
+		return CreateSignificantNumberFromNonSpecialFloat(input);
 
+	}
+
+	private static SignificantNumber CreateSignificantNumberFromNonSpecialFloat<TFloat>(TFloat input)
+		where TFloat : INumber<TFloat>
+	{
+		string format = GetStringFormatForFloatType<TFloat>();
 		string significandString = input.ToString(format, InvariantCulture).ToUpperInvariant();
 		var significandSpan = significandString.AsSpan();
 
@@ -265,10 +264,7 @@ public readonly struct SignificantNumber
 		Debug.Assert(components.Length <= 2, $"Invalid format: {significandSpan}");
 
 		var integerComponent = components[0].AsSpan();
-		var fractionalComponent =
-			components.Length == 2
-			? components[1].AsSpan()
-			: "0".AsSpan();
+		var fractionalComponent = components.Length == 2 ? components[1].AsSpan() : "0".AsSpan();
 		int fractionalLength = fractionalComponent.Length;
 		exponentValue -= fractionalLength;
 
@@ -276,8 +272,10 @@ public readonly struct SignificantNumber
 
 		string significandStrWithoutDecimal = $"{integerComponent}{fractionalComponent}";
 		var significandValue = BigInteger.Parse(significandStrWithoutDecimal, InvariantCulture);
+
 		return new(exponentValue, significandValue);
 	}
+
 
 	internal static string GetStringFormatForFloatType<TFloat>()
 		where TFloat : INumber<TFloat>
@@ -605,74 +603,56 @@ public readonly struct SignificantNumber
 
 		destination.Clear();
 
-		string output;
-
-		provider ??= InvariantCulture;
-		var numberFormat = NumberFormatInfo.GetInstance(provider);
-
-		if (this == Zero)
-		{
-			output = "0";
-		}
-		else if (this == One)
-		{
-			output = "1";
-		}
-		else if (this == NegativeOne)
-		{
-			output = $"{numberFormat.NegativeSign}1";
-		}
-		else
-		{
-
-			string sign = Significand < 0 ? numberFormat.NegativeSign : string.Empty;
-			string significandStr = BigInteger.Abs(Significand).ToString(InvariantCulture);
-
-			if (Exponent == 0)
-			{
-				output = $"{sign}{significandStr}";
-			}
-			else if (Exponent > 0)
-			{
-				int desiredAlloc = Exponent;
-				int stackAlloc = Math.Min(desiredAlloc, 128);
-				Span<char> trailingZeros = stackAlloc == desiredAlloc
-					? stackalloc char[stackAlloc]
-					: new char[desiredAlloc];
-
-				trailingZeros.Fill('0');
-				output = $"{sign}{significandStr}{trailingZeros}";
-			}
-			else
-			{
-
-				int absExponent = -Exponent;
-
-				string integralComponent = absExponent >= significandStr.Length
-					? "0"
-					: significandStr[..^absExponent];
-
-				int desiredAlloc = Math.Max(absExponent - significandStr.Length, 0);
-				int stackAlloc = Math.Min(desiredAlloc, 128);
-				Span<char> fractionalZeros = stackAlloc == desiredAlloc
-					? stackalloc char[stackAlloc]
-					: new char[desiredAlloc];
-
-				fractionalZeros.Fill('0');
-
-				string fractionalComponent = absExponent >= significandStr.Length
-					? $"{fractionalZeros}{BigInteger.Abs(Significand)}"
-					: significandStr[^absExponent..];
-
-				output = $"{sign}{integralComponent}{numberFormat.NumberDecimalSeparator}{fractionalComponent}";
-			}
-		}
+		string output = FormatOutput(provider);
 
 		bool success = output.TryCopyTo(destination);
-
 		charsWritten = success ? output.Length : 0;
 		return success;
 	}
+
+	private string FormatOutput(IFormatProvider? provider)
+	{
+		if (this == Zero)
+		{
+			return "0";
+		}
+		else if (this == One)
+		{
+			return "1";
+		}
+		else if (this == NegativeOne)
+		{
+			return $"{NumberFormatInfo.GetInstance(provider).NegativeSign}1";
+		}
+
+		provider ??= InvariantCulture;
+		var numberFormat = NumberFormatInfo.GetInstance(provider);
+		string sign = Significand < 0 ? numberFormat.NegativeSign : string.Empty;
+		string significandStr = BigInteger.Abs(Significand).ToString(InvariantCulture);
+
+		if (Exponent == 0)
+		{
+			return $"{sign}{significandStr}";
+		}
+		else if (Exponent > 0)
+		{
+			return $"{sign}{significandStr}{new string('0', Exponent)}";
+		}
+
+		return FormatNegativeExponent(sign, significandStr, numberFormat);
+	}
+
+	private string FormatNegativeExponent(string sign, string significandStr, NumberFormatInfo numberFormat)
+	{
+		int absExponent = -Exponent;
+		string integralComponent = absExponent >= significandStr.Length ? "0" : significandStr[..^absExponent];
+		string fractionalComponent = absExponent >= significandStr.Length
+			? $"{new string('0', absExponent - significandStr.Length)}{BigInteger.Abs(Significand)}"
+			: significandStr[^absExponent..];
+
+		return $"{sign}{integralComponent}{numberFormat.NumberDecimalSeparator}{fractionalComponent}";
+	}
+
 
 	/// <inheritdoc/>
 	public static bool TryConvertFromChecked<TOther>(TOther value, out SignificantNumber result)
