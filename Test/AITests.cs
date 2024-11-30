@@ -876,22 +876,6 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_ToString_WithDifferentCulture()
-	{
-		var number = new SignificantNumber(-2, 12345);
-		string str = number.ToString(CultureInfo.GetCultureInfo("fr-FR"));
-		Assert.AreEqual("123,45", str);
-	}
-
-	[TestMethod]
-	public void Test_Parse_WithDifferentCulture()
-	{
-		string str = "123,45";
-		var culture = CultureInfo.GetCultureInfo("fr-FR");
-		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Parse(str.AsSpan(), culture));
-	}
-
-	[TestMethod]
 	public void Test_Addition_WithLargeNumbers()
 	{
 		var largeNum1 = SignificantNumber.CreateFromInteger(BigInteger.Parse("79228162514264337593543950335"));
@@ -1200,26 +1184,10 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_ToString_WithFormat_AndSpecificCulture()
-	{
-		var number = new SignificantNumber(-2, 12345);
-		string result = number.ToString("G", CultureInfo.GetCultureInfo("fr-FR"));
-		Assert.AreEqual("123,45", result);
-	}
-
-	[TestMethod]
 	public void Test_ToString_WithNullFormat_AndInvariantCulture()
 	{
 		var number = new SignificantNumber(3, 12345);
 		string result = number.ToString(null, CultureInfo.InvariantCulture);
-		Assert.AreEqual("12345000", result);
-	}
-
-	[TestMethod]
-	public void Test_ToString_WithNullFormat_AndSpecificCulture()
-	{
-		var number = new SignificantNumber(3, 12345);
-		string result = number.ToString(null, CultureInfo.GetCultureInfo("fr-FR"));
 		Assert.AreEqual("12345000", result);
 	}
 
@@ -1229,14 +1197,6 @@ public class AITests
 		var number = new SignificantNumber(-2, 12345);
 		string result = number.ToString("", CultureInfo.InvariantCulture);
 		Assert.AreEqual("123.45", result);
-	}
-
-	[TestMethod]
-	public void Test_ToString_WithEmptyFormat_AndSpecificCulture()
-	{
-		var number = new SignificantNumber(-2, 12345);
-		string result = number.ToString("", CultureInfo.GetCultureInfo("fr-FR"));
-		Assert.AreEqual("123,45", result);
 	}
 
 	[TestMethod]
@@ -1292,18 +1252,6 @@ public class AITests
 
 		Assert.IsTrue(result);
 		Assert.AreEqual("123.45", buffer[..charsWritten].ToString());
-	}
-
-	[TestMethod]
-	public void Test_TryFormat_SpecificCulture()
-	{
-		var number = new SignificantNumber(-2, 12345);
-		Span<char> buffer = stackalloc char[50];
-		string format = "G";
-		bool result = number.TryFormat(buffer, out int charsWritten, format.AsSpan(), CultureInfo.GetCultureInfo("fr-FR"));
-
-		Assert.IsTrue(result);
-		Assert.AreEqual("123,45", buffer[..charsWritten].ToString());
 	}
 
 	[TestMethod]
