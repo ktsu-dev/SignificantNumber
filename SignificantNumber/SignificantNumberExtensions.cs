@@ -1,4 +1,4 @@
-namespace ktsu.io.SignificantNumber;
+namespace ktsu.SignificantNumber;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;

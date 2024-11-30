@@ -1,10 +1,9 @@
-# ktsu.io.SignificantNumber
+# ktsu.SignificantNumber
 
-![NuGet Version](https://img.shields.io/nuget/v/ktsu.io.SignificantNumber?logo=nuget&label=stable)
-![NuGet Version](https://img.shields.io/nuget/vpre/ktsu.io.SignificantNumber?logo=nuget&label=dev)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ktsu-io/SignificantNumber?label=commits)
-![GitHub branch status](https://img.shields.io/github/checks-status/ktsu-io/SignificantNumber/main)
-![Sonar Coverage](https://img.shields.io/sonar/coverage/ktsu-io_SignificantNumber?server=https%3A%2F%2Fsonarcloud.io)
+![NuGet Version](https://img.shields.io/nuget/v/ktsu.SignificantNumber?logo=nuget&label=stable)
+![NuGet Version](https://img.shields.io/nuget/vpre/ktsu.SignificantNumber?logo=nuget&label=dev)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ktsu-dev/SignificantNumber?label=commits)
+![GitHub branch status](https://img.shields.io/github/checks-status/ktsu-dev/SignificantNumber/main)
 
 The `SignificantNumber` class represents a number with a significand and an exponent, enabling high-precision arithmetic operations that comply with calculation rules for significant figures. It provides a robust set of functionalities for mathematical computations and formatting.
 
@@ -40,13 +39,13 @@ The `SignificantNumber` class represents a number with a significand and an expo
 To install the `SignificantNumber` library, you can use the .NET CLI:
 
 ```sh
-dotnet add package ktsu.io.SignificantNumber
+dotnet add package ktsu.SignificantNumber
 ```
 
 Or, add the package reference directly in your project file:
 
 ```xml
-<PackageReference Include="ktsu.io.SignificantNumber" Version="x.x.x" />
+<PackageReference Include="ktsu.SignificantNumber" Version="x.x.x" />
 ```
 
 ## Usage
@@ -81,7 +80,7 @@ The `SignificantNumber` class supports a wide range of numeric types through the
 You can convert various numeric types to `SignificantNumber` using the `ToSignificantNumber` extension method:
 
 ```csharp
-using ktsu.io.SignificantNumber;
+using ktsu.SignificantNumber;
 
 // Integer types
 int intValue = 12345;

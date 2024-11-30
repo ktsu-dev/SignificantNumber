@@ -2,7 +2,7 @@
 
 [assembly: CLSCompliant(true)]
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
-namespace ktsu.io.SignificantNumber;
+namespace ktsu.SignificantNumber;
 
 using System;
 using System.Diagnostics;

@@ -1,6 +1,6 @@
 // Ignore Spelling: Commonized
 
-namespace ktsu.io.SignificantNumber.Test;
+namespace ktsu.SignificantNumber.Test;
 
 using System.Globalization;
 using System.Numerics;

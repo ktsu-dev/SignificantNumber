@@ -1,5 +1,6 @@
-namespace ktsu.io.SignificantNumber.Test;
+namespace ktsu.SignificantNumber.Test;
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 
@@ -129,7 +130,7 @@ public class Tests
 		TestType<BigInteger>();
 		TestType<Half>();
 
-		static void TestType<TInput>()
+		static void TestType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] TInput>()
 			where TInput : INumber<TInput>
 		{
 			var testValue = Helpers.GetMaxValue<TInput>();

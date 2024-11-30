@@ -1,4 +1,4 @@
-# ktsu.io.SignificanNumber
+# ktsu.SignificanNumber
 
 ## Changelist for Version 1.2.1
 - Support for SignificantNumber exponents in the `Pow` and `Exp` methods
