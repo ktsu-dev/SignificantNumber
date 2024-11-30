@@ -34,7 +34,7 @@ public readonly struct SignificantNumber
 			{
 				Exponent = 0;
 				Significand = 0;
-				SignificantDigits = 0;
+				SignificantDigits = 1;
 				return;
 			}
 
@@ -930,12 +930,18 @@ public readonly struct SignificantNumber
 	public static bool operator ==(SignificantNumber left, SignificantNumber right)
 	{
 		int decimalDigits = LowestDecimalDigits(left, right);
+		int sigDigits = LowestSignificantDigits(left, right);
 		MakeCommonized(ref left, ref right);
 		AssertExponentsMatch(left, right);
 		var leftSignificant = left.Round(decimalDigits);
 		var rightSignificant = right.Round(decimalDigits);
 		MakeCommonized(ref leftSignificant, ref rightSignificant);
 		AssertExponentsMatch(leftSignificant, rightSignificant);
+		if (decimalDigits == 0)
+		{
+			leftSignificant = leftSignificant.ReduceSignificance(sigDigits);
+			rightSignificant = rightSignificant.ReduceSignificance(sigDigits);
+		}
 		return leftSignificant.Significand == rightSignificant.Significand;
 	}
 

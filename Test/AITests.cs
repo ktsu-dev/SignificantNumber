@@ -724,7 +724,7 @@ public class AITests
 		var number = new SignificantNumber(2, 0);
 		Assert.AreEqual(0, number.Significand);
 		Assert.AreEqual(0, number.Exponent);
-		Assert.AreEqual(0, number.SignificantDigits);
+		Assert.AreEqual(1, number.SignificantDigits);
 	}
 
 	[TestMethod]
@@ -787,7 +787,7 @@ public class AITests
 		var number = SignificantNumber.CreateFromFloatingPoint(0000.0);
 		Assert.AreEqual(0, number.Significand);
 		Assert.AreEqual(0, number.Exponent);
-		Assert.AreEqual(0, number.SignificantDigits);
+		Assert.AreEqual(1, number.SignificantDigits);
 	}
 
 	[TestMethod]
@@ -832,7 +832,7 @@ public class AITests
 		var number = SignificantNumber.CreateFromInteger(0000);
 		Assert.AreEqual(0, number.Significand);
 		Assert.AreEqual(0, number.Exponent);
-		Assert.AreEqual(0, number.SignificantDigits);
+		Assert.AreEqual(1, number.SignificantDigits);
 	}
 
 	[TestMethod]
