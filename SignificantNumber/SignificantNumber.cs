@@ -941,6 +941,7 @@ public readonly struct SignificantNumber
 		{
 			leftSignificant = leftSignificant.ReduceSignificance(sigDigits);
 			rightSignificant = rightSignificant.ReduceSignificance(sigDigits);
+			MakeCommonized(ref leftSignificant, ref rightSignificant);
 		}
 		return leftSignificant.Significand == rightSignificant.Significand;
 	}
