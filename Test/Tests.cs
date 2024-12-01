@@ -397,6 +397,12 @@ public class Tests
 
 		a = -0.001.ToSignificantNumber();
 		Assert.AreEqual("-0.001", a.ToString());
+
+		a = 10.ToSignificantNumber();
+		Assert.AreEqual("10", a.ToString());
+
+		a = 100.ToSignificantNumber();
+		Assert.AreEqual("100", a.ToString());
 	}
 
 	[TestMethod]
