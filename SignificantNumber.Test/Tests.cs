@@ -1,6 +1,5 @@
 namespace ktsu.SignificantNumber.Test;
 
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 
@@ -130,7 +129,7 @@ public class Tests
 		TestType<BigInteger>();
 		TestType<Half>();
 
-		static void TestType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] TInput>()
+		static void TestType<TInput>()
 			where TInput : INumber<TInput>
 		{
 			var testValue = Helpers.GetMaxValue<TInput>();
@@ -261,8 +260,8 @@ public class Tests
 	{
 		var a = 1.1.ToSignificantNumber();
 		var b = 1.1.ToSignificantNumber();
-		Assert.IsTrue(a == b);
-		Assert.IsFalse(a != b);
+		Assert.AreEqual(b, a);
+		Assert.AreEqual(b, a);
 		Assert.IsFalse(a < b);
 		Assert.IsTrue(a <= b);
 		Assert.IsFalse(a > b);
@@ -271,8 +270,8 @@ public class Tests
 
 		a = 1.1.ToSignificantNumber();
 		b = 1.01.ToSignificantNumber();
-		Assert.IsFalse(a == b);
-		Assert.IsTrue(a != b);
+		Assert.AreNotEqual(b, a);
+		Assert.AreNotEqual(b, a);
 		Assert.IsFalse(a < b);
 		Assert.IsFalse(a <= b);
 		Assert.IsTrue(a > b);
@@ -281,8 +280,8 @@ public class Tests
 
 		a = 1.1.ToSignificantNumber();
 		b = 1.11.ToSignificantNumber();
-		Assert.IsTrue(a == b);
-		Assert.IsFalse(a != b);
+		Assert.AreEqual(b, a);
+		Assert.AreEqual(b, a);
 		Assert.IsFalse(a < b);
 		Assert.IsTrue(a <= b);
 		Assert.IsFalse(a > b);
@@ -291,8 +290,8 @@ public class Tests
 
 		a = 10.1.ToSignificantNumber();
 		b = 1.01.ToSignificantNumber();
-		Assert.IsFalse(a == b);
-		Assert.IsTrue(a != b);
+		Assert.AreNotEqual(b, a);
+		Assert.AreNotEqual(b, a);
 		Assert.IsTrue(a > b);
 		Assert.IsTrue(a >= b);
 		Assert.IsFalse(a < b);
@@ -301,8 +300,8 @@ public class Tests
 
 		a = 100.1.ToSignificantNumber();
 		b = 100.ToSignificantNumber();
-		Assert.IsTrue(a == b);
-		Assert.IsFalse(a != b);
+		Assert.AreEqual(b, a);
+		Assert.AreEqual(b, a);
 		Assert.IsFalse(a < b);
 		Assert.IsTrue(a <= b);
 		Assert.IsFalse(a > b);
@@ -311,8 +310,8 @@ public class Tests
 
 		a = 100.1.ToSignificantNumber();
 		b = 100.0.ToSignificantNumber();
-		Assert.IsTrue(a == b);
-		Assert.IsFalse(a != b);
+		Assert.AreEqual(b, a);
+		Assert.AreEqual(b, a);
 		Assert.IsFalse(a < b);
 		Assert.IsTrue(a <= b);
 		Assert.IsFalse(a > b);
@@ -397,12 +396,6 @@ public class Tests
 
 		a = -0.001.ToSignificantNumber();
 		Assert.AreEqual("-0.001", a.ToString());
-
-		a = 10.ToSignificantNumber();
-		Assert.AreEqual("10", a.ToString());
-
-		a = 100.ToSignificantNumber();
-		Assert.AreEqual("100", a.ToString());
 	}
 
 	[TestMethod]

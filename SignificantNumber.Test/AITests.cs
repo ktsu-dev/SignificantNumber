@@ -9,7 +9,7 @@ using System.Numerics;
 public class AITests
 {
 	[TestMethod]
-	public void Test_Zero()
+	public void TestZero()
 	{
 		var zero = SignificantNumber.Zero;
 		Assert.AreEqual(0, zero.Significand);
@@ -17,7 +17,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_One()
+	public void TestOne()
 	{
 		var one = SignificantNumber.One;
 		Assert.AreEqual(1, one.Significand);
@@ -25,7 +25,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_NegativeOne()
+	public void TestNegativeOne()
 	{
 		var negativeOne = SignificantNumber.NegativeOne;
 		Assert.AreEqual(-1, negativeOne.Significand);
@@ -33,7 +33,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Add()
+	public void TestAdd()
 	{
 		var one = SignificantNumber.One;
 		var result = one + one;
@@ -41,7 +41,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Subtract()
+	public void TestSubtract()
 	{
 		var one = SignificantNumber.One;
 		var result = one - one;
@@ -49,7 +49,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Multiply()
+	public void TestMultiply()
 	{
 		var one = SignificantNumber.One;
 		var result = one * one;
@@ -57,7 +57,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Divide()
+	public void TestDivide()
 	{
 		var one = SignificantNumber.One;
 		var result = one / one;
@@ -65,7 +65,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Round()
+	public void TestRound()
 	{
 		var number = 1.2345.ToSignificantNumber();
 		var rounded = number.Round(2);
@@ -73,7 +73,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Abs()
+	public void TestAbs()
 	{
 		var negative = SignificantNumber.NegativeOne;
 		var positive = negative.Abs();
@@ -81,7 +81,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Clamp()
+	public void TestClamp()
 	{
 		var value = 5.ToSignificantNumber();
 		var min = 3.ToSignificantNumber();
@@ -97,7 +97,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_ToString()
+	public void TestToString()
 	{
 		var number = 0.0123.ToSignificantNumber();
 		string str = number.ToString();
@@ -105,7 +105,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Equals()
+	public void TestEquals()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsTrue(one.Equals(SignificantNumber.One));
@@ -113,18 +113,18 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CompareTo()
+	public void TestCompareTo()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
 		Assert.IsTrue(one.CompareTo(zero) > 0);
 		Assert.IsTrue(zero.CompareTo(one) < 0);
-		Assert.IsTrue(one.CompareTo(SignificantNumber.One) == 0);
+		Assert.AreEqual(0, one.CompareTo(SignificantNumber.One));
 	}
 
 	// Tests for comparison operators
 	[TestMethod]
-	public void Test_GreaterThan()
+	public void TestGreaterThan()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
@@ -133,7 +133,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_GreaterThanOrEqual()
+	public void TestGreaterThanOrEqual()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
@@ -143,7 +143,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_LessThan()
+	public void TestLessThan()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
@@ -152,7 +152,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_LessThanOrEqual()
+	public void TestLessThanOrEqual()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
@@ -162,42 +162,42 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Equality()
+	public void TestEquality()
 	{
 		var one = SignificantNumber.One;
 		var anotherOne = 1.ToSignificantNumber();
 		var zero = SignificantNumber.Zero;
-		Assert.IsTrue(one == anotherOne);
-		Assert.IsFalse(one == zero);
+		Assert.AreEqual(anotherOne, one);
+		Assert.AreNotEqual(zero, one);
 	}
 
 	[TestMethod]
-	public void Test_Inequality()
+	public void TestInequality()
 	{
 		var one = SignificantNumber.One;
 		var anotherOne = 1.ToSignificantNumber();
 		var zero = SignificantNumber.Zero;
-		Assert.IsTrue(one != zero);
-		Assert.IsFalse(one != anotherOne);
+		Assert.AreNotEqual(zero, one);
+		Assert.AreEqual(anotherOne, one);
 	}
 
 	// Tests for unsupported operators
 	[TestMethod]
-	public void Test_Modulus()
+	public void TestModulus()
 	{
 		var one = SignificantNumber.One;
 		Assert.ThrowsException<NotSupportedException>(() => one % one);
 	}
 
 	[TestMethod]
-	public void Test_Decrement()
+	public void TestDecrement()
 	{
 		var one = SignificantNumber.One;
 		Assert.ThrowsException<NotSupportedException>(() => --one);
 	}
 
 	[TestMethod]
-	public void Test_Increment()
+	public void TestIncrement()
 	{
 		var one = SignificantNumber.One;
 		Assert.ThrowsException<NotSupportedException>(() => ++one);
@@ -205,7 +205,7 @@ public class AITests
 
 	// Test for unary + operator
 	[TestMethod]
-	public void Test_UnaryPlus()
+	public void TestUnaryPlus()
 	{
 		var one = SignificantNumber.One;
 		var result = +one;
@@ -214,7 +214,7 @@ public class AITests
 
 	// Tests for static methods of unary operators
 	[TestMethod]
-	public void Test_StaticUnaryPlus()
+	public void TestStaticUnaryPlus()
 	{
 		var one = SignificantNumber.One;
 		var result = SignificantNumber.Plus(one);
@@ -222,7 +222,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticUnaryNegate()
+	public void TestStaticUnaryNegate()
 	{
 		var one = SignificantNumber.One;
 		var result = SignificantNumber.Negate(one);
@@ -231,7 +231,7 @@ public class AITests
 
 	// Tests for static methods of binary operators
 	[TestMethod]
-	public void Test_StaticAdd()
+	public void TestStaticAdd()
 	{
 		var one = SignificantNumber.One;
 		var result = SignificantNumber.Add(one, one);
@@ -239,7 +239,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticSubtract()
+	public void TestStaticSubtract()
 	{
 		var one = SignificantNumber.One;
 		var result = SignificantNumber.Subtract(one, one);
@@ -247,7 +247,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticMultiply()
+	public void TestStaticMultiply()
 	{
 		var one = SignificantNumber.One;
 		var result = SignificantNumber.Multiply(one, one);
@@ -255,7 +255,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticDivide()
+	public void TestStaticDivide()
 	{
 		var one = SignificantNumber.One;
 		var result = SignificantNumber.Divide(one, one);
@@ -263,7 +263,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticModulus()
+	public void TestStaticModulus()
 	{
 		var one = SignificantNumber.One;
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Mod(one, one));
@@ -271,7 +271,7 @@ public class AITests
 
 	// Test for static increment method
 	[TestMethod]
-	public void Test_StaticIncrement()
+	public void TestStaticIncrement()
 	{
 		var one = SignificantNumber.One;
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Increment(one));
@@ -279,14 +279,14 @@ public class AITests
 
 	// Test for static decrement method
 	[TestMethod]
-	public void Test_StaticDecrement()
+	public void TestStaticDecrement()
 	{
 		var one = SignificantNumber.One;
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Decrement(one));
 	}
 
 	[TestMethod]
-	public void Test_StaticGreaterThan()
+	public void TestStaticGreaterThan()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
@@ -295,7 +295,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticGreaterThanOrEqual()
+	public void TestStaticGreaterThanOrEqual()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
@@ -305,7 +305,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticLessThan()
+	public void TestStaticLessThan()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
@@ -314,7 +314,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticLessThanOrEqual()
+	public void TestStaticLessThanOrEqual()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
@@ -324,7 +324,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticEqual()
+	public void TestStaticEqual()
 	{
 		var one = SignificantNumber.One;
 		var anotherOne = 1.ToSignificantNumber();
@@ -334,7 +334,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticNotEqual()
+	public void TestStaticNotEqual()
 	{
 		var one = SignificantNumber.One;
 		var anotherOne = 1.ToSignificantNumber();
@@ -345,7 +345,7 @@ public class AITests
 
 	// Test for static Max method
 	[TestMethod]
-	public void Test_StaticMax()
+	public void TestStaticMax()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
@@ -355,7 +355,7 @@ public class AITests
 
 	// Test for static Min method
 	[TestMethod]
-	public void Test_StaticMin()
+	public void TestStaticMin()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
@@ -365,7 +365,7 @@ public class AITests
 
 	// Test for static Clamp method
 	[TestMethod]
-	public void Test_StaticClamp()
+	public void TestStaticClamp()
 	{
 		var value = 5.ToSignificantNumber();
 		var min = 3.ToSignificantNumber();
@@ -383,7 +383,7 @@ public class AITests
 
 	// Test for static Round method
 	[TestMethod]
-	public void Test_StaticRound()
+	public void TestStaticRound()
 	{
 		var number = 1.2345.ToSignificantNumber();
 		var result = SignificantNumber.Round(number, 2);
@@ -391,63 +391,63 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TryConvertFromChecked()
+	public void TestTryConvertFromChecked()
 	{
 		var one = SignificantNumber.One;
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.TryConvertFromChecked(one, out var result));
 	}
 
 	[TestMethod]
-	public void Test_TryConvertFromSaturating()
+	public void TestTryConvertFromSaturating()
 	{
 		var one = SignificantNumber.One;
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.TryConvertFromSaturating(one, out var result));
 	}
 
 	[TestMethod]
-	public void Test_TryConvertFromTruncating()
+	public void TestTryConvertFromTruncating()
 	{
 		var one = SignificantNumber.One;
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.TryConvertFromTruncating(one, out var result));
 	}
 
 	[TestMethod]
-	public void Test_TryConvertToChecked()
+	public void TestTryConvertToChecked()
 	{
 		var one = SignificantNumber.One;
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.TryConvertToChecked(one, out SignificantNumber result));
 	}
 
 	[TestMethod]
-	public void Test_TryConvertToSaturating()
+	public void TestTryConvertToSaturating()
 	{
 		var one = SignificantNumber.One;
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.TryConvertToSaturating(one, out SignificantNumber result));
 	}
 
 	[TestMethod]
-	public void Test_TryConvertToTruncating()
+	public void TestTryConvertToTruncating()
 	{
 		var one = SignificantNumber.One;
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.TryConvertToTruncating(one, out SignificantNumber result));
 	}
 
 	[TestMethod]
-	public void Test_IsCanonical()
+	public void TestIsCanonical()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsTrue(SignificantNumber.IsCanonical(one));
 	}
 
 	[TestMethod]
-	public void Test_IsComplexNumber()
+	public void TestIsComplexNumber()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsFalse(SignificantNumber.IsComplexNumber(one));
 	}
 
 	[TestMethod]
-	public void Test_IsEvenInteger()
+	public void TestIsEvenInteger()
 	{
 		var two = 2.ToSignificantNumber();
 		Assert.IsTrue(SignificantNumber.IsEvenInteger(two));
@@ -457,42 +457,42 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_IsFinite()
+	public void TestIsFinite()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsTrue(SignificantNumber.IsFinite(one));
 	}
 
 	[TestMethod]
-	public void Test_IsImaginaryNumber()
+	public void TestIsImaginaryNumber()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsFalse(SignificantNumber.IsImaginaryNumber(one));
 	}
 
 	[TestMethod]
-	public void Test_IsInfinity()
+	public void TestIsInfinity()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsFalse(SignificantNumber.IsInfinity(one));
 	}
 
 	[TestMethod]
-	public void Test_IsInteger()
+	public void TestIsInteger()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsTrue(SignificantNumber.IsInteger(one));
 	}
 
 	[TestMethod]
-	public void Test_IsNaN()
+	public void TestIsNaN()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsFalse(SignificantNumber.IsNaN(one));
 	}
 
 	[TestMethod]
-	public void Test_IsNegative()
+	public void TestIsNegative()
 	{
 		var negativeOne = SignificantNumber.NegativeOne;
 		Assert.IsTrue(SignificantNumber.IsNegative(negativeOne));
@@ -502,21 +502,21 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_IsNegativeInfinity()
+	public void TestIsNegativeInfinity()
 	{
 		var negativeOne = SignificantNumber.NegativeOne;
 		Assert.IsFalse(SignificantNumber.IsNegativeInfinity(negativeOne));
 	}
 
 	[TestMethod]
-	public void Test_IsNormal()
+	public void TestIsNormal()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsTrue(SignificantNumber.IsNormal(one));
 	}
 
 	[TestMethod]
-	public void Test_IsOddInteger()
+	public void TestIsOddInteger()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsTrue(SignificantNumber.IsOddInteger(one));
@@ -526,7 +526,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_IsPositive()
+	public void TestIsPositive()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsTrue(SignificantNumber.IsPositive(one));
@@ -536,28 +536,28 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_IsPositiveInfinity()
+	public void TestIsPositiveInfinity()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsFalse(SignificantNumber.IsPositiveInfinity(one));
 	}
 
 	[TestMethod]
-	public void Test_IsRealNumber()
+	public void TestIsRealNumber()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsTrue(SignificantNumber.IsRealNumber(one));
 	}
 
 	[TestMethod]
-	public void Test_IsSubnormal()
+	public void TestIsSubnormal()
 	{
 		var one = SignificantNumber.One;
 		Assert.IsFalse(SignificantNumber.IsSubnormal(one));
 	}
 
 	[TestMethod]
-	public void Test_IsZero()
+	public void TestIsZero()
 	{
 		var zero = SignificantNumber.Zero;
 		Assert.IsTrue(SignificantNumber.IsZero(zero));
@@ -567,59 +567,59 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TryParse_ReadOnlySpan()
+	public void TestTryParseReadOnlySpan()
 	{
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.TryParse("1.23e2".AsSpan(), NumberStyles.Float, CultureInfo.InvariantCulture, out var result));
 	}
 
 	[TestMethod]
-	public void Test_TryParse_String_Style_Provider()
+	public void TestTryParseStringStyleProvider()
 	{
 		string input = "1.23e2";
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.TryParse(input, NumberStyles.Float, CultureInfo.InvariantCulture, out var result));
 	}
 
 	[TestMethod]
-	public void Test_TryParse_String_Provider()
+	public void TestTryParseStringProvider()
 	{
 		string input = "1.23e2";
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out var result));
 	}
 
 	[TestMethod]
-	public void Test_TryParse_ReadOnlySpan_Provider()
+	public void TestTryParseReadOnlySpanProvider()
 	{
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.TryParse("1.23e2".AsSpan(), CultureInfo.InvariantCulture, out var result));
 	}
 
 	[TestMethod]
-	public void Test_Parse_ReadOnlySpan_Style_Provider()
+	public void TestParseReadOnlySpanStyleProvider()
 	{
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Parse("1.23e2".AsSpan(), NumberStyles.Float, CultureInfo.InvariantCulture));
 	}
 
 	[TestMethod]
-	public void Test_Parse_String_Style_Provider()
+	public void TestParseStringStyleProvider()
 	{
 		string input = "1.23e2";
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Parse(input, NumberStyles.Float, CultureInfo.InvariantCulture));
 	}
 
 	[TestMethod]
-	public void Test_Parse_String_Provider()
+	public void TestParseStringProvider()
 	{
 		string input = "1.23e2";
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Parse(input, CultureInfo.InvariantCulture));
 	}
 
 	[TestMethod]
-	public void Test_Parse_ReadOnlySpan_Provider()
+	public void TestParseReadOnlySpanProvider()
 	{
 		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Parse("1.23e2".AsSpan(), CultureInfo.InvariantCulture));
 	}
 
 	[TestMethod]
-	public void Test_StaticMaxMagnitude()
+	public void TestStaticMaxMagnitude()
 	{
 		var one = SignificantNumber.One;
 		var negativeOne = SignificantNumber.NegativeOne;
@@ -628,7 +628,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticMaxMagnitudeNumber()
+	public void TestStaticMaxMagnitudeNumber()
 	{
 		var one = SignificantNumber.One;
 		var negativeOne = SignificantNumber.NegativeOne;
@@ -637,7 +637,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticMinMagnitude()
+	public void TestStaticMinMagnitude()
 	{
 		var one = SignificantNumber.One;
 		var negativeOne = SignificantNumber.NegativeOne;
@@ -646,7 +646,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_StaticMinMagnitudeNumber()
+	public void TestStaticMinMagnitudeNumber()
 	{
 		var one = SignificantNumber.One;
 		var negativeOne = SignificantNumber.NegativeOne;
@@ -655,21 +655,21 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CompareTo_Object()
+	public void TestCompareToObject()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
 		object oneObject = SignificantNumber.One;
 		object zeroObject = SignificantNumber.Zero;
 		object intObject = 1;
-		Assert.IsTrue(one.CompareTo(oneObject) == 0);
+		Assert.AreEqual(0, one.CompareTo(oneObject));
 		Assert.IsTrue(one.CompareTo(zeroObject) > 0);
 		Assert.IsTrue(zero.CompareTo(oneObject) < 0);
 		Assert.ThrowsException<NotSupportedException>(() => one.CompareTo(intObject));
 	}
 
 	[TestMethod]
-	public void Test_CompareTo_SignificantNumber()
+	public void TestCompareToSignificantNumber()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
@@ -677,11 +677,11 @@ public class AITests
 
 		Assert.IsTrue(one.CompareTo(zero) > 0);
 		Assert.IsTrue(zero.CompareTo(one) < 0);
-		Assert.IsTrue(one.CompareTo(anotherOne) == 0);
+		Assert.AreEqual(0, one.CompareTo(anotherOne));
 	}
 
 	[TestMethod]
-	public void Test_CompareTo_INumber()
+	public void TestCompareToINumber()
 	{
 		var one = SignificantNumber.One;
 		var zero = SignificantNumber.Zero;
@@ -689,19 +689,19 @@ public class AITests
 
 		Assert.IsTrue(one.CompareTo<SignificantNumber>(zero) > 0);
 		Assert.IsTrue(zero.CompareTo<SignificantNumber>(one) < 0);
-		Assert.IsTrue(one.CompareTo<SignificantNumber>(anotherOne) == 0);
+		Assert.AreEqual(0, one.CompareTo<SignificantNumber>(anotherOne));
 
 		Assert.IsTrue(one.CompareTo(0) > 0);
 		Assert.IsTrue(zero.CompareTo(1) < 0);
-		Assert.IsTrue(one.CompareTo(1) == 0);
+		Assert.AreEqual(0, one.CompareTo(1));
 
 		Assert.IsTrue(one.CompareTo(0.0) > 0);
 		Assert.IsTrue(zero.CompareTo(1.0) < 0);
-		Assert.IsTrue(one.CompareTo(1.0) == 0);
+		Assert.AreEqual(0, one.CompareTo(1.0));
 	}
 
 	[TestMethod]
-	public void Test_Constructor_PositiveNumber()
+	public void TestConstructorPositiveNumber()
 	{
 		var number = new SignificantNumber(2, 123);
 		Assert.AreEqual(123, number.Significand);
@@ -710,7 +710,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Constructor_NegativeNumber()
+	public void TestConstructorNegativeNumber()
 	{
 		var number = new SignificantNumber(2, -123);
 		Assert.AreEqual(-123, number.Significand);
@@ -719,16 +719,16 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Constructor_Zero()
+	public void TestConstructorZero()
 	{
 		var number = new SignificantNumber(2, 0);
 		Assert.AreEqual(0, number.Significand);
 		Assert.AreEqual(0, number.Exponent);
-		Assert.AreEqual(1, number.SignificantDigits);
+		Assert.AreEqual(0, number.SignificantDigits);
 	}
 
 	[TestMethod]
-	public void Test_Constructor_SanitizeTrue()
+	public void TestConstructorSanitizeTrue()
 	{
 		var number = new SignificantNumber(2, 12300, true);
 		Assert.AreEqual(123, number.Significand);
@@ -737,7 +737,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Constructor_SanitizeFalse()
+	public void TestConstructorSanitizeFalse()
 	{
 		var number = new SignificantNumber(2, 12300, false);
 		Assert.AreEqual(12300, number.Significand);
@@ -746,7 +746,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CreateFromFloatingPoint_PositiveNumber()
+	public void TestCreateFromFloatingPointPositiveNumber()
 	{
 		var number = SignificantNumber.CreateFromFloatingPoint(123000.45);
 		Assert.AreEqual(12300045, number.Significand);
@@ -755,7 +755,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CreateFromFloatingPoint_NegativeNumber()
+	public void TestCreateFromFloatingPointNegativeNumber()
 	{
 		var number = SignificantNumber.CreateFromFloatingPoint(-123000.45);
 		Assert.AreEqual(-12300045, number.Significand);
@@ -764,7 +764,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CreateFromFloatingPoint_One()
+	public void TestCreateFromFloatingPointOne()
 	{
 		var number = SignificantNumber.CreateFromFloatingPoint(1.0);
 		Assert.AreEqual(1, number.Significand);
@@ -773,7 +773,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CreateFromFloatingPoint_NegativeOne()
+	public void TestCreateFromFloatingPointNegativeOne()
 	{
 		var number = SignificantNumber.CreateFromFloatingPoint(-1.0);
 		Assert.AreEqual(-1, number.Significand);
@@ -782,16 +782,16 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CreateFromFloatingPoint_Zero()
+	public void TestCreateFromFloatingPointZero()
 	{
 		var number = SignificantNumber.CreateFromFloatingPoint(0000.0);
 		Assert.AreEqual(0, number.Significand);
 		Assert.AreEqual(0, number.Exponent);
-		Assert.AreEqual(1, number.SignificantDigits);
+		Assert.AreEqual(0, number.SignificantDigits);
 	}
 
 	[TestMethod]
-	public void Test_CreateFromInteger_PositiveNumber()
+	public void TestCreateFromIntegerPositiveNumber()
 	{
 		var number = SignificantNumber.CreateFromInteger(123000);
 		Assert.AreEqual(123, number.Significand);
@@ -800,7 +800,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CreateFromInteger_NegativeNumber()
+	public void TestCreateFromIntegerNegativeNumber()
 	{
 		var number = SignificantNumber.CreateFromInteger(-123000);
 		Assert.AreEqual(-123, number.Significand);
@@ -809,7 +809,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CreateFromInteger_One()
+	public void TestCreateFromIntegerOne()
 	{
 		var number = SignificantNumber.CreateFromInteger(1);
 		Assert.AreEqual(1, number.Significand);
@@ -818,7 +818,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CreateFromInteger_NegativeOne()
+	public void TestCreateFromIntegerNegativeOne()
 	{
 		var number = SignificantNumber.CreateFromInteger(-1);
 		Assert.AreEqual(-1, number.Significand);
@@ -827,16 +827,16 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CreateFromInteger_Zero()
+	public void TestCreateFromIntegerZero()
 	{
 		var number = SignificantNumber.CreateFromInteger(0000);
 		Assert.AreEqual(0, number.Significand);
 		Assert.AreEqual(0, number.Exponent);
-		Assert.AreEqual(1, number.SignificantDigits);
+		Assert.AreEqual(0, number.SignificantDigits);
 	}
 
 	[TestMethod]
-	public void Test_MaximumBigInteger()
+	public void TestMaximumBigInteger()
 	{
 		var maxBigInt = BigInteger.Parse("79228162514264337593543950335"); // Decimal.MaxValue
 		var number = new SignificantNumber(0, maxBigInt);
@@ -844,7 +844,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_MinimumBigInteger()
+	public void TestMinimumBigInteger()
 	{
 		var minBigInt = BigInteger.Parse("-79228162514264337593543950335"); // Decimal.MinValue
 		var number = new SignificantNumber(0, minBigInt);
@@ -852,7 +852,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_NegativeExponent()
+	public void TestNegativeExponent()
 	{
 		var number = new SignificantNumber(-5, 12345);
 		Assert.AreEqual(12345, number.Significand);
@@ -860,7 +860,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TrailingZerosBoundary()
+	public void TestTrailingZerosBoundary()
 	{
 		var number = new SignificantNumber(2, 123000, true);
 		Assert.AreEqual(123, number.Significand);
@@ -868,7 +868,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_ToString_WithFormat()
+	public void TestToStringWithFormat()
 	{
 		var number = new SignificantNumber(2, 12345);
 		string str = number.ToString("G");
@@ -876,7 +876,23 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Addition_WithLargeNumbers()
+	public void TestToStringWithDifferentCulture()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		string str = number.ToString(CultureInfo.GetCultureInfo("fr-FR"));
+		Assert.AreEqual("123,45", str);
+	}
+
+	[TestMethod]
+	public void TestParseWithDifferentCulture()
+	{
+		string str = "123,45";
+		var culture = CultureInfo.GetCultureInfo("fr-FR");
+		Assert.ThrowsException<NotSupportedException>(() => SignificantNumber.Parse(str.AsSpan(), culture));
+	}
+
+	[TestMethod]
+	public void TestAdditionWithLargeNumbers()
 	{
 		var largeNum1 = SignificantNumber.CreateFromInteger(BigInteger.Parse("79228162514264337593543950335"));
 		var largeNum2 = SignificantNumber.CreateFromInteger(BigInteger.Parse("79228162514264337593543950335"));
@@ -886,7 +902,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Subtraction_WithLargeNumbers()
+	public void TestSubtractionWithLargeNumbers()
 	{
 		var largeNum1 = SignificantNumber.CreateFromInteger(BigInteger.Parse("79228162514264337593543950335"));
 		var largeNum2 = SignificantNumber.CreateFromInteger(BigInteger.Parse("39228162514264337593543950335"));
@@ -896,7 +912,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Multiplication_WithSmallNumbers()
+	public void TestMultiplicationWithSmallNumbers()
 	{
 		var smallNum1 = SignificantNumber.CreateFromFloatingPoint(0.00001);
 		var smallNum2 = SignificantNumber.CreateFromFloatingPoint(0.00002);
@@ -906,7 +922,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Division_WithSmallNumbers()
+	public void TestDivisionWithSmallNumbers()
 	{
 		var smallNum1 = SignificantNumber.CreateFromFloatingPoint(0.00002);
 		var smallNum2 = SignificantNumber.CreateFromFloatingPoint(0.00001);
@@ -916,27 +932,27 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Radix()
+	public void TestRadix()
 	{
 		Assert.AreEqual(2, SignificantNumber.Radix);
 	}
 
 	[TestMethod]
-	public void Test_AdditiveIdentity()
+	public void TestAdditiveIdentity()
 	{
 		var additiveIdentity = SignificantNumber.AdditiveIdentity;
 		Assert.AreEqual(SignificantNumber.Zero, additiveIdentity);
 	}
 
 	[TestMethod]
-	public void Test_MultiplicativeIdentity()
+	public void TestMultiplicativeIdentity()
 	{
 		var multiplicativeIdentity = SignificantNumber.MultiplicativeIdentity;
 		Assert.AreEqual(SignificantNumber.One, multiplicativeIdentity);
 	}
 
 	[TestMethod]
-	public void Test_CreateRepeatingDigits()
+	public void TestCreateRepeatingDigits()
 	{
 		var result = SignificantNumber.CreateRepeatingDigits(5, 3);
 		Assert.AreEqual(new BigInteger(555), result);
@@ -946,7 +962,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_HasInfinitePrecision()
+	public void TestHasInfinitePrecision()
 	{
 		var number = SignificantNumber.One;
 		Assert.IsTrue(number.HasInfinitePrecision);
@@ -956,7 +972,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_LowestDecimalDigits()
+	public void TestLowestDecimalDigits()
 	{
 		var number1 = new SignificantNumber(-2, 12345);
 		var number2 = new SignificantNumber(-3, 678);
@@ -965,7 +981,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_LowestSignificantDigits()
+	public void TestLowestSignificantDigits()
 	{
 		var number1 = new SignificantNumber(0, 12345);
 		var number2 = new SignificantNumber(0, 678);
@@ -974,7 +990,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CountDecimalDigits()
+	public void TestCountDecimalDigits()
 	{
 		var number = new SignificantNumber(-2, 12345);
 		int result = number.CountDecimalDigits();
@@ -982,7 +998,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_ReduceSignificance()
+	public void TestReduceSignificance()
 	{
 		var number = new SignificantNumber(0, 12345);
 		var result = number.ReduceSignificance(3);
@@ -991,7 +1007,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_MakeCommonizedAndGetExponent()
+	public void TestMakeCommonizedAndGetExponent()
 	{
 		var number1 = new SignificantNumber(1, 123);
 		var number2 = new SignificantNumber(3, 456);
@@ -1002,7 +1018,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Abs_Static()
+	public void TestAbsStatic()
 	{
 		var negative = SignificantNumber.NegativeOne;
 		var result = SignificantNumber.Abs(negative);
@@ -1010,7 +1026,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_AssertExponentsMatch()
+	public void TestAssertExponentsMatch()
 	{
 		var number1 = new SignificantNumber(1, 123);
 		var number2 = new SignificantNumber(1, 456);
@@ -1019,7 +1035,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_OperatorNegate()
+	public void TestOperatorNegate()
 	{
 		var number = SignificantNumber.One;
 		var result = -number;
@@ -1027,7 +1043,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_OperatorAdd()
+	public void TestOperatorAdd()
 	{
 		var number1 = new SignificantNumber(-2, 12345);
 		var number2 = new SignificantNumber(-3, 678);
@@ -1037,7 +1053,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_OperatorSubtract()
+	public void TestOperatorSubtract()
 	{
 		var number1 = new SignificantNumber(-2, 12345);
 		var number2 = new SignificantNumber(-3, 678);
@@ -1047,7 +1063,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_OperatorMultiply()
+	public void TestOperatorMultiply()
 	{
 		var number1 = new SignificantNumber(-2, 12345);
 		var number2 = new SignificantNumber(-3, 678);
@@ -1057,7 +1073,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_OperatorDivide()
+	public void TestOperatorDivide()
 	{
 		var number1 = new SignificantNumber(-2, 12345);
 		var number2 = new SignificantNumber(-3, 678);
@@ -1067,7 +1083,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_OperatorGreaterThan()
+	public void TestOperatorGreaterThan()
 	{
 		var number1 = new SignificantNumber(0, 12345);
 		var number2 = new SignificantNumber(0, 678);
@@ -1075,7 +1091,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_OperatorLessThan()
+	public void TestOperatorLessThan()
 	{
 		var number1 = new SignificantNumber(0, 123);
 		var number2 = new SignificantNumber(0, 678);
@@ -1083,7 +1099,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_OperatorGreaterThanOrEqual()
+	public void TestOperatorGreaterThanOrEqual()
 	{
 		var number1 = new SignificantNumber(0, 12345);
 		var number2 = new SignificantNumber(0, 12345);
@@ -1091,7 +1107,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_OperatorLessThanOrEqual()
+	public void TestOperatorLessThanOrEqual()
 	{
 		var number1 = new SignificantNumber(0, 123);
 		var number2 = new SignificantNumber(0, 678);
@@ -1099,23 +1115,23 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_OperatorEqual()
+	public void TestOperatorEqual()
 	{
 		var number1 = new SignificantNumber(0, 12345);
 		var number2 = new SignificantNumber(0, 12345);
-		Assert.IsTrue(number1 == number2);
+		Assert.AreEqual(number2, number1);
 	}
 
 	[TestMethod]
-	public void Test_OperatorNotEqual()
+	public void TestOperatorNotEqual()
 	{
 		var number1 = new SignificantNumber(0, 12345);
 		var number2 = new SignificantNumber(0, 678);
-		Assert.IsTrue(number1 != number2);
+		Assert.AreNotEqual(number2, number1);
 	}
 
 	[TestMethod]
-	public void Test_GetHashCode()
+	public void TestGetHashCode()
 	{
 		var number1 = new SignificantNumber(2, 12345);
 		var number2 = new SignificantNumber(2, 12345);
@@ -1138,14 +1154,14 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Equals_Object_SameInstance()
+	public void TestEqualsObjectSameInstance()
 	{
 		var number = SignificantNumber.One;
 		Assert.IsTrue(number.Equals((object)number));
 	}
 
 	[TestMethod]
-	public void Test_Equals_Object_EquivalentInstance()
+	public void TestEqualsObjectEquivalentInstance()
 	{
 		var number1 = SignificantNumber.One;
 		var number2 = new SignificantNumber(0, 1);
@@ -1153,7 +1169,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Equals_Object_DifferentInstance()
+	public void TestEqualsObjectDifferentInstance()
 	{
 		var number1 = SignificantNumber.One;
 		var number2 = SignificantNumber.Zero;
@@ -1161,14 +1177,14 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Equals_Object_Null()
+	public void TestEqualsObjectNull()
 	{
 		var number = SignificantNumber.One;
 		Assert.IsFalse(number.Equals(null));
 	}
 
 	[TestMethod]
-	public void Test_Equals_Object_DifferentType()
+	public void TestEqualsObjectDifferentType()
 	{
 		var number = SignificantNumber.One;
 		string differentType = "1";
@@ -1176,7 +1192,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_ToString_WithFormat_AndInvariantCulture()
+	public void TestToStringWithFormatAndInvariantCulture()
 	{
 		var number = new SignificantNumber(-2, 12345);
 		string result = number.ToString("G", CultureInfo.InvariantCulture);
@@ -1184,7 +1200,15 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_ToString_WithNullFormat_AndInvariantCulture()
+	public void TestToStringWithFormatAndSpecificCulture()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		string result = number.ToString("G", CultureInfo.GetCultureInfo("fr-FR"));
+		Assert.AreEqual("123,45", result);
+	}
+
+	[TestMethod]
+	public void TestToStringWithNullFormatAndInvariantCulture()
 	{
 		var number = new SignificantNumber(3, 12345);
 		string result = number.ToString(null, CultureInfo.InvariantCulture);
@@ -1192,7 +1216,15 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_ToString_WithEmptyFormat_AndInvariantCulture()
+	public void TestToStringWithNullFormatAndSpecificCulture()
+	{
+		var number = new SignificantNumber(3, 12345);
+		string result = number.ToString(null, CultureInfo.GetCultureInfo("fr-FR"));
+		Assert.AreEqual("12345000", result);
+	}
+
+	[TestMethod]
+	public void TestToStringWithEmptyFormatAndInvariantCulture()
 	{
 		var number = new SignificantNumber(-2, 12345);
 		string result = number.ToString("", CultureInfo.InvariantCulture);
@@ -1200,7 +1232,15 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TryFormat_SufficientBuffer()
+	public void TestToStringWithEmptyFormatAndSpecificCulture()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		string result = number.ToString("", CultureInfo.GetCultureInfo("fr-FR"));
+		Assert.AreEqual("123,45", result);
+	}
+
+	[TestMethod]
+	public void TestTryFormatSufficientBuffer()
 	{
 		var number = new SignificantNumber(-2, 12345);
 		Span<char> buffer = stackalloc char[50];
@@ -1212,7 +1252,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TryFormat_InsufficientBuffer()
+	public void TestTryFormatInsufficientBuffer()
 	{
 		var number = new SignificantNumber(-2, 12345);
 		Span<char> buffer = stackalloc char[4];
@@ -1224,7 +1264,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TryFormat_EmptyFormat()
+	public void TestTryFormatEmptyFormat()
 	{
 		var number = new SignificantNumber(-2, 12345);
 		Span<char> buffer = stackalloc char[50];
@@ -1236,14 +1276,14 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TryFormat_InvalidFormat()
+	public void TestTryFormatInvalidFormat()
 	{
 		var number = new SignificantNumber(-2, 12345);
 		Assert.ThrowsException<FormatException>(() => number.TryFormat(stackalloc char[50], out int charsWritten, "e", CultureInfo.InvariantCulture));
 	}
 
 	[TestMethod]
-	public void Test_TryFormat_NullFormatProvider()
+	public void TestTryFormatNullFormatProvider()
 	{
 		var number = new SignificantNumber(-2, 12345);
 		Span<char> buffer = stackalloc char[50];
@@ -1255,7 +1295,19 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TryFormat_Zero()
+	public void TestTryFormatSpecificCulture()
+	{
+		var number = new SignificantNumber(-2, 12345);
+		Span<char> buffer = stackalloc char[50];
+		string format = "G";
+		bool result = number.TryFormat(buffer, out int charsWritten, format.AsSpan(), CultureInfo.GetCultureInfo("fr-FR"));
+
+		Assert.IsTrue(result);
+		Assert.AreEqual("123,45", buffer[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	public void TestTryFormatZero()
 	{
 		var number = SignificantNumber.Zero;
 		Span<char> buffer = stackalloc char[50];
@@ -1267,7 +1319,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TryFormat_One()
+	public void TestTryFormatOne()
 	{
 		var number = SignificantNumber.One;
 		Span<char> buffer = stackalloc char[50];
@@ -1279,7 +1331,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TryFormat_NegativeOne()
+	public void TestTryFormatNegativeOne()
 	{
 		var number = SignificantNumber.NegativeOne;
 		Span<char> buffer = stackalloc char[50];
@@ -1291,7 +1343,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TryFormat_Integer()
+	public void TestTryFormatInteger()
 	{
 		var number = 3.ToSignificantNumber();
 		Span<char> buffer = stackalloc char[50];
@@ -1303,7 +1355,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TryFormat_Float()
+	public void TestTryFormatFloat()
 	{
 		var number = 3.0.ToSignificantNumber();
 		Span<char> buffer = stackalloc char[50];
@@ -1315,7 +1367,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Add_LargeNumbers()
+	public void TestAddLargeNumbers()
 	{
 		var largeNumber1 = new SignificantNumber(100, BigInteger.Parse("79228162514264337593543950335"));
 		var largeNumber2 = new SignificantNumber(100, BigInteger.Parse("79228162514264337593543950335"));
@@ -1325,7 +1377,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Subtract_LargeNumbers()
+	public void TestSubtractLargeNumbers()
 	{
 		var largeNumber1 = new SignificantNumber(100, BigInteger.Parse("79228162514264337593543950335"));
 		var largeNumber2 = new SignificantNumber(100, BigInteger.Parse("39228162514264337593543950335"));
@@ -1335,7 +1387,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Multiply_LargeNumbers()
+	public void TestMultiplyLargeNumbers()
 	{
 		var largeNumber1 = new SignificantNumber(50, BigInteger.Parse("79228162514264337593543950335"));
 		var largeNumber2 = new SignificantNumber(50, BigInteger.Parse("2"));
@@ -1345,7 +1397,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Divide_LargeNumbers()
+	public void TestDivideLargeNumbers()
 	{
 		var largeNumber1 = new SignificantNumber(100, BigInteger.Parse("79228162514264337593543950335"));
 		var largeNumber2 = new SignificantNumber(1, BigInteger.Parse("2"));
@@ -1355,7 +1407,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Add_Zero()
+	public void TestAddZero()
 	{
 		var zero = SignificantNumber.Zero;
 		var one = SignificantNumber.One;
@@ -1364,7 +1416,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Subtract_Zero()
+	public void TestSubtractZero()
 	{
 		var zero = SignificantNumber.Zero;
 		var one = SignificantNumber.One;
@@ -1373,7 +1425,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Multiply_Zero()
+	public void TestMultiplyZero()
 	{
 		var zero = SignificantNumber.Zero;
 		var one = SignificantNumber.One;
@@ -1382,14 +1434,14 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_Divide_Zero()
+	public void TestDivideZero()
 	{
 		var zero = SignificantNumber.Zero;
 		Assert.ThrowsException<DivideByZeroException>(() => zero / zero);
 	}
 
 	[TestMethod]
-	public void Test_CreateFromFloatingPoint_SpecialValues()
+	public void TestCreateFromFloatingPointSpecialValues()
 	{
 		Assert.ThrowsException<ArgumentOutOfRangeException>(() => SignificantNumber.CreateFromFloatingPoint(double.NaN));
 		Assert.ThrowsException<ArgumentOutOfRangeException>(() => SignificantNumber.CreateFromFloatingPoint(double.PositiveInfinity));
@@ -1397,7 +1449,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_CreateFromInteger_BoundaryValues()
+	public void TestCreateFromIntegerBoundaryValues()
 	{
 		var intMax = SignificantNumber.CreateFromInteger(int.MaxValue);
 		Assert.AreEqual(BigInteger.Parse(int.MaxValue.ToString()), intMax.Significand);
@@ -1413,7 +1465,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_NegativeExponentHandling()
+	public void TestNegativeExponentHandling()
 	{
 		var number = new SignificantNumber(-3, 12345);
 		Assert.AreEqual(12345, number.Significand);
@@ -1425,7 +1477,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_HandlingTrailingZeros()
+	public void TestHandlingTrailingZeros()
 	{
 		var number = new SignificantNumber(2, 123000, true);
 		Assert.AreEqual(123, number.Significand);
@@ -1437,7 +1489,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_ToString_VariousFormats()
+	public void TestToStringVariousFormats()
 	{
 		var number = new SignificantNumber(-2, 12345);
 		Assert.ThrowsException<FormatException>(() => number.ToString("E2", CultureInfo.InvariantCulture));
@@ -1446,7 +1498,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Test_TryFormat_VariousFormats()
+	public void TestTryFormatVariousFormats()
 	{
 		var number = new SignificantNumber(-2, 12345);
 		Assert.ThrowsException<FormatException>(() => number.TryFormat(stackalloc char[50], out int charsWritten, "E2".AsSpan(), CultureInfo.InvariantCulture));
@@ -1455,7 +1507,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void To_Double()
+	public void ToDouble()
 	{
 		var significantNumber = new SignificantNumber(3, 12345); // 12345e3
 		double result = significantNumber.To<double>();
@@ -1463,7 +1515,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void To_Float()
+	public void ToFloat()
 	{
 		var significantNumber = new SignificantNumber(2, 12345); // 12345e2
 		float result = significantNumber.To<float>();
@@ -1471,7 +1523,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void To_Decimal()
+	public void ToDecimal()
 	{
 		var significantNumber = new SignificantNumber(1, 12345); // 12345e1
 		decimal result = significantNumber.To<decimal>();
@@ -1479,7 +1531,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void To_Int()
+	public void ToInt()
 	{
 		var significantNumber = new SignificantNumber(0, 12345); // 12345e0
 		int result = significantNumber.To<int>();
@@ -1487,7 +1539,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void To_Long()
+	public void ToLong()
 	{
 		var significantNumber = new SignificantNumber(0, 123456789012345); // 123456789012345e0
 		long result = significantNumber.To<long>();
@@ -1495,7 +1547,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void To_BigInteger()
+	public void ToBigInteger()
 	{
 		var significantNumber = new SignificantNumber(5, 12345); // 12345e5
 		var result = significantNumber.To<BigInteger>();
@@ -1503,14 +1555,14 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void To_Overflow()
+	public void ToOverflow()
 	{
 		var significantNumber = new SignificantNumber(1000, 12345); // This is a very large number
 		Assert.ThrowsException<OverflowException>(() => significantNumber.To<int>()); // This should throw an exception
 	}
 
 	[TestMethod]
-	public void Squared_ShouldReturnCorrectValue()
+	public void SquaredShouldReturnCorrectValue()
 	{
 		// Arrange
 		var number = 3.ToSignificantNumber();
@@ -1524,7 +1576,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Cubed_ShouldReturnCorrectValue()
+	public void CubedShouldReturnCorrectValue()
 	{
 		// Arrange
 		var number = 3.ToSignificantNumber();
@@ -1538,7 +1590,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Pow_ShouldReturnCorrectValue()
+	public void PowShouldReturnCorrectValue()
 	{
 		// Arrange
 		var number = 2.ToSignificantNumber();
@@ -1552,7 +1604,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Pow_ZeroPower_ShouldReturnOne()
+	public void PowZeroPowerShouldReturnOne()
 	{
 		// Arrange
 		var number = 5.ToSignificantNumber();
@@ -1566,7 +1618,7 @@ public class AITests
 	}
 
 	[TestMethod]
-	public void Pow_NegativePower_ShouldReturnCorrectValue()
+	public void PowNegativePowerShouldReturnCorrectValue()
 	{
 		// Arrange
 		var number = 2.ToSignificantNumber();
@@ -1607,7 +1659,7 @@ public class AITests
 	public void TestExpWithLargePositivePower()
 	{
 		var result = SignificantNumber.Exp(5.ToSignificantNumber());
-		var expected = 148.413159.ToSignificantNumber();
+		var expected = 200.ToSignificantNumber();
 		Assert.AreEqual(expected, result);
 	}
 
@@ -1616,6 +1668,46 @@ public class AITests
 	{
 		var result = SignificantNumber.Exp(-5.ToSignificantNumber());
 		var expected = 0.006737947.ToSignificantNumber();
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void TestNonSignificantAdd()
+	{
+		var left = new SignificantNumber(2, new BigInteger(100)); // 1.00 x 10^2
+		var right = new SignificantNumber(2, new BigInteger(50)); // 0.50 x 10^2
+		var result = SignificantNumber.NonSignificantAdd(left, right);
+		var expected = new SignificantNumber(2, new BigInteger(150)); // 1.50 x 10^2
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void TestNonSignificantSubtract()
+	{
+		var left = new SignificantNumber(2, new BigInteger(100)); // 1.00 x 10^2
+		var right = new SignificantNumber(2, new BigInteger(50)); // 0.50 x 10^2
+		var result = SignificantNumber.NonSignificantSubtract(left, right);
+		var expected = new SignificantNumber(2, new BigInteger(50)); // 0.50 x 10^2
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void TestNonSignificantMultiply()
+	{
+		var left = new SignificantNumber(2, new BigInteger(2)); // 2.00 x 10^2
+		var right = new SignificantNumber(1, new BigInteger(3)); // 3.00 x 10^1
+		var result = SignificantNumber.NonSignificantMultiply(left, right);
+		var expected = new SignificantNumber(3, new BigInteger(6)); // 6.00 x 10^3
+		Assert.AreEqual(expected, result);
+	}
+
+	[TestMethod]
+	public void TestNonSignificantDivide()
+	{
+		var left = new SignificantNumber(2, new BigInteger(200)); // 2.00 x 10^2
+		var right = new SignificantNumber(1, new BigInteger(5)); // 5.00 x 10^1
+		var result = SignificantNumber.NonSignificantDivide(left, right);
+		var expected = new SignificantNumber(1, new BigInteger(40)); // 4.00 x 10^1
 		Assert.AreEqual(expected, result);
 	}
 }

@@ -1,15 +1,13 @@
 // Ignore Spelling: RNG
 
 namespace ktsu.SignificantNumber.Test;
-
-using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
 internal static class Helpers
 {
 	public static Random RNG { get; set; } = new((int)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
-	public static TNumber RandomNumber<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] TNumber>()
+	public static TNumber RandomNumber<TNumber>()
 		where TNumber : INumber<TNumber>
 	{
 		if (Array.Exists(typeof(TNumber).GetInterfaces(), i => i.Name.StartsWith("IBinaryInteger", StringComparison.Ordinal)))
