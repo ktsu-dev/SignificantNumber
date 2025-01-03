@@ -1,31 +1,31 @@
-## v1.2.8 (patch)
+## v1.2.8-pre.1 (patch)
 
 Changes since v1.2.7:
 
-- Add automation scripts for metadata management and versioning ([@Matthew Edmondson](https://github.com/Matthew Edmondson))
-- Renamed metadata files ([@Matthew Edmondson](https://github.com/Matthew Edmondson))
+- Add automation scripts for metadata management and versioning ([@matt-edmondson](https://github.com/matt-edmondson))
+- Renamed metadata files ([@matt-edmondson](https://github.com/matt-edmondson))
 
 ## v1.2.4 (patch)
 
 Changes since v1.2.3:
 
-- Add package references for ILCompiler and ILLink.Tasks in test project ([@Matthew Edmondson](https://github.com/Matthew Edmondson))
+- Add package references for ILCompiler and ILLink.Tasks in test project ([@matt-edmondson](https://github.com/matt-edmondson))
 
 ## v1.2.3 (patch)
 
 Changes since v1.2.2:
 
-- Add MakeCommonized method call for significand comparison ([@Matthew Edmondson](https://github.com/Matthew Edmondson))
-- Add test project and new test cases for ToSignificantNumber ([@Matthew Edmondson](https://github.com/Matthew Edmondson))
+- Add MakeCommonized method call for significand comparison ([@matt-edmondson](https://github.com/matt-edmondson))
+- Add test project and new test cases for ToSignificantNumber ([@matt-edmondson](https://github.com/matt-edmondson))
 
 ## v1.2.2 (patch)
 
 Changes since v1.2.1:
 
-- Fix SignificantNumber handling of zero significand ([@Matthew Edmondson](https://github.com/Matthew Edmondson))
-- Migrate to ktsu namespace ([@Matthew Edmondson](https://github.com/Matthew Edmondson))
-- Remove culture-specific tests from AITests.cs ([@Matthew Edmondson](https://github.com/Matthew Edmondson))
-- Update dotnet.yml ([@Matthew Edmondson](https://github.com/Matthew Edmondson))
+- Fix SignificantNumber handling of zero significand ([@matt-edmondson](https://github.com/matt-edmondson))
+- Migrate to ktsu namespace ([@matt-edmondson](https://github.com/matt-edmondson))
+- Remove culture-specific tests from AITests.cs ([@matt-edmondson](https://github.com/matt-edmondson))
+- Update dotnet.yml ([@matt-edmondson](https://github.com/matt-edmondson))
 
 ## v1.2.1 (minor)
 
