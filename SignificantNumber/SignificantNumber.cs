@@ -10,7 +10,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 
-
 /// <summary>
 /// Represents a significant number.
 /// </summary>
@@ -275,7 +274,6 @@ public readonly struct SignificantNumber
 
 		return new(exponentValue, significandValue);
 	}
-
 
 	internal static string GetStringFormatForFloatType<TFloat>()
 		where TFloat : INumber<TFloat>
@@ -653,7 +651,6 @@ public readonly struct SignificantNumber
 		return $"{sign}{integralComponent}{numberFormat.NumberDecimalSeparator}{fractionalComponent}";
 	}
 
-
 	/// <inheritdoc/>
 	public static bool TryConvertFromChecked<TOther>(TOther value, out SignificantNumber result)
 		where TOther : INumberBase<TOther>
@@ -943,6 +940,7 @@ public readonly struct SignificantNumber
 			rightSignificant = rightSignificant.ReduceSignificance(sigDigits);
 			MakeCommonized(ref leftSignificant, ref rightSignificant);
 		}
+
 		return leftSignificant.Significand == rightSignificant.Significand;
 	}
 

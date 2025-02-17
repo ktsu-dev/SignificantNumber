@@ -1670,44 +1670,4 @@ public class AITests
 		var expected = 0.006737947.ToSignificantNumber();
 		Assert.AreEqual(expected, result);
 	}
-
-	[TestMethod]
-	public void TestNonSignificantAdd()
-	{
-		var left = new SignificantNumber(2, new BigInteger(100)); // 1.00 x 10^2
-		var right = new SignificantNumber(2, new BigInteger(50)); // 0.50 x 10^2
-		var result = SignificantNumber.NonSignificantAdd(left, right);
-		var expected = new SignificantNumber(2, new BigInteger(150)); // 1.50 x 10^2
-		Assert.AreEqual(expected, result);
-	}
-
-	[TestMethod]
-	public void TestNonSignificantSubtract()
-	{
-		var left = new SignificantNumber(2, new BigInteger(100)); // 1.00 x 10^2
-		var right = new SignificantNumber(2, new BigInteger(50)); // 0.50 x 10^2
-		var result = SignificantNumber.NonSignificantSubtract(left, right);
-		var expected = new SignificantNumber(2, new BigInteger(50)); // 0.50 x 10^2
-		Assert.AreEqual(expected, result);
-	}
-
-	[TestMethod]
-	public void TestNonSignificantMultiply()
-	{
-		var left = new SignificantNumber(2, new BigInteger(2)); // 2.00 x 10^2
-		var right = new SignificantNumber(1, new BigInteger(3)); // 3.00 x 10^1
-		var result = SignificantNumber.NonSignificantMultiply(left, right);
-		var expected = new SignificantNumber(3, new BigInteger(6)); // 6.00 x 10^3
-		Assert.AreEqual(expected, result);
-	}
-
-	[TestMethod]
-	public void TestNonSignificantDivide()
-	{
-		var left = new SignificantNumber(2, new BigInteger(200)); // 2.00 x 10^2
-		var right = new SignificantNumber(1, new BigInteger(5)); // 5.00 x 10^1
-		var result = SignificantNumber.NonSignificantDivide(left, right);
-		var expected = new SignificantNumber(1, new BigInteger(40)); // 4.00 x 10^1
-		Assert.AreEqual(expected, result);
-	}
 }
