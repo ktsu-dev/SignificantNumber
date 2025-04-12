@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Numerics;
 using ktsu.PreciseNumber;
 
-
 /// <summary>
 /// Represents a significant number.
 /// </summary>
@@ -77,6 +76,7 @@ public record SignificantNumber
 	/// <summary>
 	/// Divides one number by another.
 	/// </summary>
+
 	/// <param name="left">The number to divide.</param>
 	/// <param name="right">The number to divide by.</param>
 	/// <returns>The result of the division.</returns>

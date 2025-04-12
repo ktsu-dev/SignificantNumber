@@ -1,10 +1,3 @@
-## v1.2.8-pre.1 (patch)
-
-Changes since v1.2.7:
-
-- Add automation scripts for metadata management and versioning ([@matt-edmondson](https://github.com/matt-edmondson))
-- Renamed metadata files ([@matt-edmondson](https://github.com/matt-edmondson))
-
 ## v1.2.4 (patch)
 
 Changes since v1.2.3:

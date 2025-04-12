@@ -100,7 +100,7 @@ public sealed class InvalidNumber : INumber<InvalidNumber>
 	static bool INumberBase<InvalidNumber>.TryConvertToTruncating<TOther>(InvalidNumber value, out TOther result) => throw new NotSupportedException();
 	static bool INumberBase<InvalidNumber>.TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, out InvalidNumber result) => throw new NotSupportedException();
 	static bool INumberBase<InvalidNumber>.TryParse(string? s, NumberStyles style, IFormatProvider? provider, out InvalidNumber result) => throw new NotSupportedException();
-	bool IEquatable<InvalidNumber>.Equals(InvalidNumber? other) => throw new NotSupportedException();
+	bool IEquatable<InvalidNumber>.Equals(InvalidNumber? other) => false;
 	bool ISpanFormattable.TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider) => throw new NotSupportedException();
 	string IFormattable.ToString(string? format, IFormatProvider? formatProvider) => throw new NotSupportedException();
 	static InvalidNumber ISpanParsable<InvalidNumber>.Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => throw new NotSupportedException();

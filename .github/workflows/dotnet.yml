@@ -7,7 +7,7 @@ on:
       - develop
   pull_request:
   schedule:
-    - cron: "0 14 * * *"
+    - cron: "0 23 * * *"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,6 +30,8 @@ jobs:
       with:
         submodules: recursive
         persist-credentials: true
+        lfs: true
+        fetch-tags: true
 
     - name: Fetch tags
       shell: pwsh
@@ -40,11 +42,13 @@ jobs:
 
     - name: Configure Environment
       shell: pwsh
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
-        
+        $IS_FORK = (gh repo view --json isFork | ConvertFrom-Json).isFork
         $IS_MAIN = "${{ github.ref }}" -eq "refs/heads/main"
         $IS_TAGGED = (git show-ref --tags -d | Out-String).Contains("${{ github.sha }}")
-        $SHOULD_RELEASE = ($IS_MAIN -AND -NOT $IS_TAGGED)
+        $SHOULD_RELEASE = ($IS_MAIN -AND -NOT $IS_TAGGED -AND -NOT $IS_FORK)
         $USE_DOTNET_SCRIPT = (Get-ChildItem -Recurse -Filter *.csx).Count -gt 0
         $PACKAGE_PATTERN = Join-Path -Path "${{ github.workspace }}" -ChildPath "${{ env.STAGING_PATH }}" -AdditionalChildPath "*.nupkg"
         $SYMBOLS_PATTERN = Join-Path -Path "${{ github.workspace }}" -ChildPath "${{ env.STAGING_PATH }}" -AdditionalChildPath "*.snupkg"
@@ -53,6 +57,7 @@ jobs:
         $BUILD_ARGS = ""
         $BUILD_ARGS += $USE_DOTNET_SCRIPT ? "-maxCpuCount:1" : ""
 
+        "IS_FORK=$IS_FORK" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
         "IS_MAIN=$IS_MAIN" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
         "IS_TAGGED=$IS_TAGGED" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
         "SHOULD_RELEASE=$SHOULD_RELEASE" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
@@ -62,6 +67,7 @@ jobs:
         "APPLICATION_PATTERN=$APPLICATION_PATTERN" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
         "BUILD_ARGS=$BUILD_ARGS" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
 
+        Write-Host "IS_FORK: $IS_FORK"
         Write-Host "IS_MAIN: $IS_MAIN"
         Write-Host "IS_TAGGED: $IS_TAGGED"
         Write-Host "SHOULD_RELEASE: $SHOULD_RELEASE"
@@ -70,22 +76,26 @@ jobs:
         Write-Host "SYMBOLS_PATTERN: $SYMBOLS_PATTERN"
         Write-Host "APPLICATION_PATTERN: $APPLICATION_PATTERN"
         Write-Host "BUILD_ARGS: $BUILD_ARGS"
-        
+
         $global:LASTEXITCODE = 0
-        
+
     - name: Make Version
+      if: ${{ env.SHOULD_RELEASE == 'True' }}
       shell: pwsh
       run: scripts/make-version.ps1 "${{ github.sha }}"
 
     - name: Make License
+      if: ${{ env.SHOULD_RELEASE == 'True' }}
       shell: pwsh
       run: scripts/make-license.ps1 "${{ github.server_url }}" "${{ github.repository_owner }}" "${{ github.repository }}"
-        
+
     - name: Make Changelog
+      if: ${{ env.SHOULD_RELEASE == 'True' }}
       shell: pwsh
       run: scripts/make-changelog.ps1 "${{ env.VERSION }}" "${{ github.sha }}"
 
     - name: Commit Metadata
+      if: ${{ env.SHOULD_RELEASE == 'True' }}
       shell: pwsh
       run: scripts/commit-metadata.ps1
 
@@ -94,7 +104,7 @@ jobs:
       with:
         dotnet-version: |
           ${{ env.DOTNET_VERSION }}.x
-    
+
     - name: Install dotnet-script
       if: ${{ env.USE_DOTNET_SCRIPT == 'True' }}
       shell: pwsh
@@ -106,12 +116,12 @@ jobs:
 
     - name: Test
       shell: pwsh
-      run: dotnet test --configuration Release --verbosity normal --no-build 
+      run: dotnet test --configuration Release --verbosity normal --no-build
 
     - name: Detect Dependencies
       if: ${{ env.SHOULD_RELEASE == 'True' }}
       uses: advanced-security/component-detection-dependency-submission-action@v0.0.2
-      
+
     - name: Package Libraries
       if: ${{ env.SHOULD_RELEASE == 'True' }}
       shell: pwsh
@@ -140,7 +150,7 @@ jobs:
       if: ${{ env.SHOULD_RELEASE == 'True' && hashFiles(env.PACKAGE_PATTERN) != '' }}
       shell: pwsh
       run: dotnet nuget push ${{ env.PACKAGE_PATTERN }} --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
-    
+
     - name: Publish Libraries to NuGet
       if: ${{ env.SHOULD_RELEASE == 'True' && hashFiles(env.PACKAGE_PATTERN) != '' }}
       shell: pwsh
