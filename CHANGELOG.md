@@ -1,3 +1,15 @@
+## v1.3.0 (minor)
+
+Changes since v1.2.7:
+
+- Add automation scripts for metadata management and versioning ([@matt-edmondson](https://github.com/matt-edmondson))
+- Add LICENSE template ([@matt-edmondson](https://github.com/matt-edmondson))
+- Apply new editorconfig ([@matt-edmondson](https://github.com/matt-edmondson))
+- Inherit from precise number ([@matt-edmondson](https://github.com/matt-edmondson))
+- Refactor SignificantNumber tests and implementation ([@matt-edmondson](https://github.com/matt-edmondson))
+- Renamed metadata files ([@matt-edmondson](https://github.com/matt-edmondson))
+- Update packages ([@matt-edmondson](https://github.com/matt-edmondson))
+
 ## v1.2.4 (patch)
 
 Changes since v1.2.3:
