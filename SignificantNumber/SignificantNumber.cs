@@ -38,6 +38,12 @@ public record SignificantNumber
 	public static new SignificantNumber MultiplicativeIdentity => One;
 
 	/// <summary>
+	/// Initializes a new instance of the <see cref="SignificantNumber"/> record using a <see cref="PreciseNumber"/> value.
+	/// </summary>
+	/// <param name="value">The <see cref="PreciseNumber"/> value to initialize the <see cref="SignificantNumber"/> with.</param>
+	public SignificantNumber(PreciseNumber value) : base(value) { }
+
+	/// <summary>
 	/// Initializes a new instance of the <see cref="SignificantNumber"/> record.
 	/// </summary>
 	/// <param name="exponent">The exponent of the number.</param>
