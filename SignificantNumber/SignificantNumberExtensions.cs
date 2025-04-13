@@ -1,7 +1,8 @@
 namespace ktsu.SignificantNumber;
 
-using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+
+using ktsu.PreciseNumber;
 
 /// <summary>
 /// Provides extension methods for converting numbers to <see cref="SignificantNumber"/>.
@@ -14,51 +15,51 @@ public static class SignificantNumberExtensions
 	/// <typeparam name="TInput">The type of the input number.</typeparam>
 	/// <param name="input">The input number to convert.</param>
 	/// <returns>The converted <see cref="SignificantNumber"/>.</returns>
+	/// <remarks>
+	/// If the input number is already a <see cref="SignificantNumber"/>, it is returned as-is.
+	/// Otherwise, the input is converted to a <see cref="PreciseNumber"/> and then to a <see cref="SignificantNumber"/>.
+	/// </remarks>
 	public static SignificantNumber ToSignificantNumber<TInput>(this INumber<TInput> input)
 		where TInput : INumber<TInput>
 	{
-		// if TInput is already a SignificantNumber then just return it
-		SignificantNumber significantNumber;
-		bool success = typeof(TInput) == typeof(SignificantNumber);
+		ArgumentNullException.ThrowIfNull(input);
 
-		if (success)
+		var inputType = input.GetType();
+		var significantNumberType = typeof(SignificantNumber);
+		bool isSignificantNumber = inputType == significantNumberType || inputType.IsSubclassOf(significantNumberType);
+
+		if (isSignificantNumber)
 		{
-			significantNumber = (SignificantNumber)(object)input;
-		}
-		else
-		{
-			success = TryCreate((TInput)input, out significantNumber);
+			return (SignificantNumber)(object)input;
 		}
 
-		return success
-			? significantNumber
-			: throw new NotSupportedException();
+		var preciseNumber = input.ToPreciseNumber();
+
+		return SignificantNumber.CreateFromComponents(preciseNumber.Exponent, preciseNumber.Significand);
 	}
 
 	/// <summary>
-	/// Tries to create a <see cref="SignificantNumber"/> from the input.
+	/// Converts the input number to a <see cref="SignificantNumber"/> with a specified number of significant digits.
 	/// </summary>
 	/// <typeparam name="TInput">The type of the input number.</typeparam>
-	/// <param name="input">The input number to create a <see cref="SignificantNumber"/> from.</param>
-	/// <param name="significantNumber">The created <see cref="SignificantNumber"/> if successful, otherwise null.</param>
-	/// <returns>True if the creation was successful, otherwise false.</returns>
-	internal static bool TryCreate<TInput>([NotNullWhen(true)] TInput input, [MaybeNullWhen(false)] out SignificantNumber significantNumber)
+	/// <param name="input">The input number to convert.</param>
+	/// <param name="significantDigits">The number of significant digits to retain in the resulting <see cref="SignificantNumber"/>.</param>
+	/// <returns>The converted <see cref="SignificantNumber"/> with the specified number of significant digits.</returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// Thrown if <paramref name="significantDigits"/> is less than or equal to zero.
+	/// </exception>
+	public static SignificantNumber ToSignificantNumber<TInput>(this INumber<TInput> input, int significantDigits)
 		where TInput : INumber<TInput>
 	{
-		var type = typeof(TInput);
-		if (Array.Exists(type.GetInterfaces(), i => i.Name.StartsWith("IBinaryInteger", StringComparison.Ordinal)))
+		if (significantDigits <= 0)
 		{
-			significantNumber = SignificantNumber.CreateFromInteger(input);
-			return true;
+			throw new ArgumentOutOfRangeException(nameof(significantDigits), "Significant digits must be greater than zero.");
 		}
 
-		if (Array.Exists(type.GetInterfaces(), i => i.Name.StartsWith("IFloatingPoint", StringComparison.Ordinal)))
-		{
-			significantNumber = SignificantNumber.CreateFromFloatingPoint(input);
-			return true;
-		}
+		var preciseNumber = input
+			.ToPreciseNumber()
+			.ReduceSignificance(significantDigits);
 
-		significantNumber = default;
-		return false;
+		return SignificantNumber.CreateFromComponents(preciseNumber.Exponent, preciseNumber.Significand);
 	}
 }

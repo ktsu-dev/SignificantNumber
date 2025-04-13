@@ -1,5 +1,3 @@
-// Ignore Spelling: Commonized
-
 [assembly: CLSCompliant(true)]
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 namespace ktsu.SignificantNumber;
@@ -10,1000 +8,411 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 
+using ktsu.PreciseNumber;
+
 /// <summary>
 /// Represents a significant number.
 /// </summary>
 [DebuggerDisplay("{Significand}e{Exponent}")]
-public readonly struct SignificantNumber
-	: INumber<SignificantNumber>
+public record SignificantNumber
+	: PreciseNumber, INumber<SignificantNumber>
 {
-	private const int Base10 = 10;
+	/// <summary>
+	/// Gets the significant number representing one.
+	/// </summary>
+	public static new SignificantNumber One => PreciseNumber.One.ToSignificantNumber();
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="SignificantNumber"/> struct.
+	/// Gets the significant number representing zero.
+	/// </summary>
+	public static new SignificantNumber Zero => PreciseNumber.Zero.ToSignificantNumber();
+
+	/// <summary>
+	/// Gets the additive identity for significant numbers, which is zero.
+	/// </summary>
+	public static new SignificantNumber AdditiveIdentity => Zero;
+
+	/// <summary>
+	/// Gets the multiplicative identity for significant numbers, which is one.
+	/// </summary>
+	public static new SignificantNumber MultiplicativeIdentity => One;
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref="SignificantNumber"/> record.
 	/// </summary>
 	/// <param name="exponent">The exponent of the number.</param>
 	/// <param name="significand">The significand of the number.</param>
 	/// <param name="sanitize">If true, trailing zeros in the significand will be removed.</param>
-	internal SignificantNumber(int exponent, BigInteger significand, bool sanitize = true)
-	{
-		if (sanitize)
-		{
-			if (significand == 0)
-			{
-				Exponent = 0;
-				Significand = 0;
-				SignificantDigits = 1;
-				return;
-			}
-
-			// remove trailing zeros
-			while (significand != 0 && significand % Base10 == 0)
-			{
-				significand /= Base10;
-				exponent++;
-			}
-		}
-
-		// count digits
-		int significantDigits = 0;
-		var number = significand;
-		while (number != 0)
-		{
-			significantDigits++;
-			number /= Base10;
-		}
-
-		SignificantDigits = significantDigits;
-		Exponent = exponent;
-		Significand = significand;
-	}
+	protected SignificantNumber(int exponent, BigInteger significand, bool sanitize)
+		: base(exponent, significand, sanitize)
+	{ }
 
 	/// <summary>
-	/// Gets the value -1 for the type.
+	/// Initializes a new instance of the <see cref="SignificantNumber"/> record.
 	/// </summary>
-	public static SignificantNumber NegativeOne { get; } = new(0, -1);
+	/// <param name="exponent">The exponent of the number.</param>
+	/// <param name="significand">The significand of the number.</param>
+	protected SignificantNumber(int exponent, BigInteger significand)
+		: this(exponent, significand, sanitize: true)
+	{ }
 
-	/// <inheritdoc/>
-	public static SignificantNumber One { get; } = new(0, 1);
+	internal static SignificantNumber CreateFromComponents(int exponent, BigInteger significand) =>
+		new(exponent, significand);
 
-	/// <inheritdoc/>
-	public static SignificantNumber Zero { get; } = new(0, 0);
-
-	private const int EExponent = -40;
+	internal static SignificantNumber CreateFromComponents(int exponent, BigInteger significand, bool sanitize) =>
+		new(exponent, significand, sanitize);
 
 	/// <summary>
-	/// Gets the value of e for the type.
+	/// Subtracts one number from another.
 	/// </summary>
-	public static SignificantNumber E { get; } = new(EExponent, BigInteger.Parse("27182818284590452353602874713526624977572", InvariantCulture));
-
-	/// <summary>
-	/// Gets the exponent of the significant number.
-	/// </summary>
-	internal int Exponent { get; }
-
-	/// <summary>
-	/// Gets the significand of the significant number.
-	/// </summary>
-	internal BigInteger Significand { get; }
-
-	/// <summary>
-	/// Gets the number of significant digits in the significant number.
-	/// </summary>
-	internal int SignificantDigits { get; }
-
-	private static CultureInfo InvariantCulture { get; } = CultureInfo.InvariantCulture;
-
-	private const int BinaryRadix = 2;
-
-	/// <inheritdoc/>
-	public static int Radix => BinaryRadix;
-
-	/// <inheritdoc/>
-	public static SignificantNumber AdditiveIdentity => Zero;
-
-	/// <inheritdoc/>
-	public static SignificantNumber MultiplicativeIdentity => One;
-
-	/// <inheritdoc/>
-	public override bool Equals(object? obj) => obj is SignificantNumber number && this == number;
-
-	/// <summary>
-	/// Determines whether the specified object is equal to the current object.
-	/// </summary>
-	/// <param name="other">The object to compare with the current object.</param>
-	/// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-	public bool Equals(SignificantNumber other) => this == other;
-
-	/// <inheritdoc/>
-	public override int GetHashCode() => HashCode.Combine(Exponent, Significand);
-
-	/// <inheritdoc/>
-	public override string ToString() => ToString(this, null, null);
-
-	/// <inheritdoc/>
-	public string ToString(IFormatProvider? formatProvider) => ToString(this, null, formatProvider);
-
-	/// <inheritdoc/>
-	public string ToString(string format) => ToString(this, format, null);
-
-	/// <summary>
-	/// Converts the current instance to its equivalent string representation using the specified format and format provider.
-	/// </summary>
-	/// <param name="number">The significant number to convert.</param>
-	/// <param name="format">A numeric format string.</param>
-	/// <param name="formatProvider">An object that supplies culture-specific formatting information.</param>
-	/// <returns>A string representation of the current instance.</returns>
-	public static string ToString(SignificantNumber number, string? format, IFormatProvider? formatProvider)
-	{
-		int desiredAlloc = int.Abs(number.Exponent) + number.SignificantDigits + 2; // +2 is for negative symbol and decimal symbol
-		int stackAlloc = Math.Min(desiredAlloc, 128);
-		Span<char> buffer = stackAlloc == desiredAlloc
-			? stackalloc char[stackAlloc]
-			: new char[desiredAlloc];
-
-		return number.TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider)
-			? buffer[..charsWritten].ToString()
-			: string.Empty;
-	}
-
-	/// <inheritdoc/>
-	public string ToString(string? format, IFormatProvider? formatProvider) => ToString(this, format, formatProvider);
-
-	/// <summary>
-	/// Returns the absolute value of the current instance.
-	/// </summary>
-	/// <returns>The absolute value of the current instance.</returns>
-	public SignificantNumber Abs() => Abs(this);
-
-	/// <summary>
-	/// Rounds the current instance to the specified number of decimal digits.
-	/// </summary>
-	/// <param name="decimalDigits">The number of decimal digits to round to.</param>
-	/// <returns>A new instance of <see cref="SignificantNumber"/> rounded to the specified number of decimal digits.</returns>
-	public SignificantNumber Round(int decimalDigits)
-	{
-		int currentDecimalDigits = CountDecimalDigits();
-		int decimalDifference = int.Abs(decimalDigits - currentDecimalDigits);
-		if (currentDecimalDigits > decimalDigits && decimalDifference > 0)
-		{
-			var roundingFactor = BigInteger.CopySign(CreateRepeatingDigits(5, decimalDifference), Significand);
-			var newSignificand = (Significand + roundingFactor) / BigInteger.Pow(Base10, decimalDifference);
-			int newExponent = Exponent - int.CopySign(decimalDifference, Exponent);
-			return new SignificantNumber(newExponent, newSignificand);
-		}
-
-		return this;
-	}
-
-	/// <summary>
-	/// Clamps the specified value between the minimum and maximum values.
-	/// </summary>
-	/// <typeparam name="TNumber">The type of the value to clamp.</typeparam>
-	/// <param name="min">The minimum value.</param>
-	/// <param name="max">The maximum value.</param>
-	/// <returns>The clamped value.</returns>
-	public SignificantNumber Clamp<TNumber>(TNumber min, TNumber max)
-		where TNumber : INumber<TNumber>
-	{
-		var sigMin = min.ToSignificantNumber();
-		var sigMax = max.ToSignificantNumber();
-		var clampedToMax = this > sigMax ? sigMax : this;
-		return this < sigMin ? sigMin : clampedToMax;
-	}
-
-	/// <summary>
-	/// Creates a significant number from a floating point value.
-	/// </summary>
-	/// <typeparam name="TFloat">The type of the floating point value.</typeparam>
-	/// <param name="input">The floating point value.</param>
-	/// <returns>A significant number representing the floating point value.</returns>
-	/// <exception cref="ArgumentOutOfRangeException">Thrown when the input is infinite or NaN.</exception>
-	internal static SignificantNumber CreateFromFloatingPoint<TFloat>(TFloat input)
-		where TFloat : INumber<TFloat>
-	{
-		ArgumentNullException.ThrowIfNull(input);
-
-		if (TFloat.IsInfinity(input))
-		{
-			throw new ArgumentOutOfRangeException(nameof(input), "Infinite values are not supported");
-		}
-		else if (TFloat.IsNaN(input))
-		{
-			throw new ArgumentOutOfRangeException(nameof(input), "NaN values are not supported");
-		}
-
-		AssertDoesImplementGenericInterface(typeof(TFloat), typeof(IFloatingPoint<>));
-
-		if (TFloat.IsZero(input))
-		{
-			return Zero;
-		}
-		else if (input == TFloat.One)
-		{
-			return One;
-		}
-		else if (input == -TFloat.One)
-		{
-			return NegativeOne;
-		}
-
-		return CreateSignificantNumberFromNonSpecialFloat(input);
-
-	}
-
-	private static SignificantNumber CreateSignificantNumberFromNonSpecialFloat<TFloat>(TFloat input)
-		where TFloat : INumber<TFloat>
-	{
-		string format = GetStringFormatForFloatType<TFloat>();
-		string significandString = input.ToString(format, InvariantCulture).ToUpperInvariant();
-		var significandSpan = significandString.AsSpan();
-
-		int exponentValue = 0;
-		if (significandString.Contains('E', StringComparison.OrdinalIgnoreCase))
-		{
-			string[] expComponents = significandString.Split('E');
-			Debug.Assert(expComponents.Length == 2, $"Unexpected format: {significandString}");
-			significandSpan = expComponents[0].AsSpan();
-			exponentValue = int.Parse(expComponents[1], InvariantCulture);
-		}
-
-		bool isInteger = !significandSpan.Contains('.');
-
-		while (significandSpan.Length > 2 && significandSpan[^1] == '0')
-		{
-			significandSpan = significandSpan[..^1];
-			if (isInteger)
-			{
-				++exponentValue;
-			}
-		}
-
-		string[] components = significandSpan.ToString().Split('.');
-		Debug.Assert(components.Length <= 2, $"Invalid format: {significandSpan}");
-
-		var integerComponent = components[0].AsSpan();
-		var fractionalComponent = components.Length == 2 ? components[1].AsSpan() : "0".AsSpan();
-		int fractionalLength = fractionalComponent.Length;
-		exponentValue -= fractionalLength;
-
-		Debug.Assert(fractionalLength != 0 || integerComponent.TrimStart("-").Length == 1, $"Unexpected format: {integerComponent}.{fractionalComponent}");
-
-		string significandStrWithoutDecimal = $"{integerComponent}{fractionalComponent}";
-		var significandValue = BigInteger.Parse(significandStrWithoutDecimal, InvariantCulture);
-
-		return new(exponentValue, significandValue);
-	}
-
-	internal static string GetStringFormatForFloatType<TFloat>()
-		where TFloat : INumber<TFloat>
-	{
-		return typeof(TFloat) switch
-		{
-			_ when typeof(TFloat) == typeof(float) => "E7",
-			_ when typeof(TFloat) == typeof(double) => "E15",
-			_ => "R",
-		};
-	}
-
-	/// <summary>
-	/// Creates a significant number from an integer value.
-	/// </summary>
-	/// <typeparam name="TInteger">The type of the integer value.</typeparam>
-	/// <param name="input">The integer value.</param>
-	/// <returns>A significant number representing the integer value.</returns>
-	internal static SignificantNumber CreateFromInteger<TInteger>(TInteger input)
-		where TInteger : INumber<TInteger>
-	{
-		ArgumentNullException.ThrowIfNull(input);
-		AssertDoesImplementGenericInterface(typeof(TInteger), typeof(IBinaryInteger<>));
-
-		bool isOne = input == TInteger.One;
-		bool isNegativeOne = TInteger.IsNegative(input) && input == -TInteger.One;
-		bool isZero = TInteger.IsZero(input);
-
-		if (isZero)
-		{
-			return Zero;
-		}
-
-		if (isOne)
-		{
-			return One;
-		}
-
-		if (isNegativeOne)
-		{
-			return NegativeOne;
-		}
-
-		int exponentValue = 0;
-		var significandValue = BigInteger.CreateChecked(input);
-		while (significandValue != 0 && significandValue % Base10 == 0)
-		{
-			significandValue /= Base10;
-			exponentValue++;
-		}
-
-		return new(exponentValue, significandValue);
-	}
-
-	/// <summary>
-	/// Creates a repeating digit sequence of a specified length.
-	/// </summary>
-	/// <param name="digit">The digit to repeat.</param>
-	/// <param name="numberOfRepeats">The number of times to repeat the digit.</param>
-	/// <returns>A <see cref="BigInteger"/> representing the repeating digit sequence.</returns>
-	internal static BigInteger CreateRepeatingDigits(int digit, int numberOfRepeats)
-	{
-		if (numberOfRepeats <= 0)
-		{
-			return 0;
-		}
-
-		BigInteger repeatingDigit = digit;
-		for (int i = 1; i < numberOfRepeats; i++)
-		{
-			repeatingDigit = (repeatingDigit * Base10) + digit;
-		}
-
-		return repeatingDigit;
-	}
-
-	/// <summary>
-	/// Gets a value indicating whether the current instance has infinite precision.
-	/// </summary>
-	internal bool HasInfinitePrecision =>
-		Exponent == 0
-		&& (Significand == BigInteger.One || Significand == BigInteger.Zero || Significand == BigInteger.MinusOne);
-
-	/// <summary>
-	/// Gets the lower of the decimal digit counts of two significant numbers.
-	/// </summary>
-	/// <param name="left">The first significant number.</param>
-	/// <param name="right">The second significant number.</param>
-	/// <returns>The lower of the decimal digit counts of the two significant numbers.</returns>
-	internal static int LowestDecimalDigits(SignificantNumber left, SignificantNumber right)
-	{
-		int leftDecimalDigits = left.CountDecimalDigits();
-		int rightDecimalDigits = right.CountDecimalDigits();
-
-		leftDecimalDigits = left.HasInfinitePrecision ? rightDecimalDigits : leftDecimalDigits;
-		rightDecimalDigits = right.HasInfinitePrecision ? leftDecimalDigits : rightDecimalDigits;
-
-		return leftDecimalDigits < rightDecimalDigits
-			? leftDecimalDigits
-			: rightDecimalDigits;
-	}
-
-	/// <summary>
-	/// Gets the lower of the significant digit counts of two significant numbers.
-	/// </summary>
-	/// <param name="left">The first significant number.</param>
-	/// <param name="right">The second significant number.</param>
-	/// <returns>The lower of the significant digit counts of the two significant numbers.</returns>
-	internal static int LowestSignificantDigits(SignificantNumber left, SignificantNumber right)
-	{
-		int leftSignificantDigits = left.SignificantDigits;
-		int rightSignificantDigits = right.SignificantDigits;
-
-		leftSignificantDigits = left.HasInfinitePrecision ? rightSignificantDigits : leftSignificantDigits;
-		rightSignificantDigits = right.HasInfinitePrecision ? leftSignificantDigits : rightSignificantDigits;
-
-		return leftSignificantDigits < rightSignificantDigits
-		? leftSignificantDigits
-		: rightSignificantDigits;
-	}
-
-	/// <summary>
-	/// Counts the number of decimal digits in the current instance.
-	/// </summary>
-	/// <returns>The number of decimal digits in the current instance.</returns>
-	internal int CountDecimalDigits() =>
-		Exponent > 0
-		? 0
-		: int.Abs(Exponent);
-
-	/// <summary>
-	/// Reduces the significance of the current instance to a specified number of significant digits.
-	/// </summary>
-	/// <param name="significantDigits">The number of significant digits to reduce to.</param>
-	/// <returns>A new instance of <see cref="SignificantNumber"/> reduced to the specified number of significant digits.</returns>
-	internal SignificantNumber ReduceSignificance(int significantDigits)
-	{
-		int significantDifference = significantDigits < SignificantDigits
-			? SignificantDigits - significantDigits
-			: 0;
-
-		if (significantDifference == 0)
-		{
-			return this;
-		}
-
-		int newExponent = Exponent == 0
-			? significantDifference
-			: Exponent + significantDifference;
-		var roundingFactor = BigInteger.CopySign(CreateRepeatingDigits(5, significantDifference), Significand);
-		var newSignificand = (Significand + roundingFactor) / BigInteger.Pow(Base10, significantDifference);
-		return new(newExponent, newSignificand);
-	}
-
-	/// <summary>
-	/// Makes two significant numbers have a common exponent.
-	/// </summary>
-	/// <param name="left">The first significant number.</param>
-	/// <param name="right">The second significant number.</param>
-	internal static void MakeCommonized(ref SignificantNumber left, ref SignificantNumber right) =>
-		_ = MakeCommonizedAndGetExponent(ref left, ref right);
-
-	/// <summary>
-	/// Makes two significant numbers have a common exponent and returns the common exponent.
-	/// </summary>
-	/// <param name="left">The first significant number.</param>
-	/// <param name="right">The second significant number.</param>
-	/// <returns>The common exponent.</returns>
-	internal static int MakeCommonizedAndGetExponent(ref SignificantNumber left, ref SignificantNumber right)
-	{
-		int smallestExponent = left.Exponent < right.Exponent ? left.Exponent : right.Exponent;
-		int exponentDifferenceLeft = Math.Abs(left.Exponent - smallestExponent);
-		int exponentDifferenceRight = Math.Abs(right.Exponent - smallestExponent);
-		var newSignificandLeft = left.Significand * BigInteger.Pow(Base10, exponentDifferenceLeft);
-		var newSignificandRight = right.Significand * BigInteger.Pow(Base10, exponentDifferenceRight);
-
-		left = new(smallestExponent, newSignificandLeft, sanitize: false);
-		right = new(smallestExponent, newSignificandRight, sanitize: false);
-
-		return smallestExponent;
-	}
-
-	/// <inheritdoc/>
-	public int CompareTo(object? obj)
-	{
-		return obj is SignificantNumber significantNumber
-			? CompareTo(significantNumber)
-			: throw new NotSupportedException();
-	}
-
-	/// <summary>
-	/// Compares the current instance with another significant number.
-	/// </summary>
-	/// <param name="other">The significant number to compare with the current instance.</param>
-	/// <returns>A value indicating whether the current instance is less than, equal to, or greater than the other instance.</returns>
-	public int CompareTo(SignificantNumber other)
-	{
-		int greaterOrEqual = this > other ? 1 : 0;
-		return this < other ? -1 : greaterOrEqual;
-	}
-
-	/// <summary>
-	/// Compares the current instance with another number.
-	/// </summary>
-	/// <typeparam name="TInput">The type of the other number.</typeparam>
-	/// <param name="other">The number to compare with the current instance.</param>
-	/// <returns>A value indicating whether the current instance is less than, equal to, or greater than the other number.</returns>
-	public int CompareTo<TInput>(TInput other)
-		where TInput : INumber<TInput>
-	{
-		var significantOther = other.ToSignificantNumber();
-		int greaterOrEqual = this > significantOther ? 1 : 0;
-		return this < significantOther ? -1 : greaterOrEqual;
-	}
-
-	/// <inheritdoc/>
-	public static SignificantNumber Abs(SignificantNumber value) => value.Significand < 0 ? -value : value;
-
-	/// <inheritdoc/>
-	public static bool IsCanonical(SignificantNumber value) => true;
-
-	/// <inheritdoc/>
-	public static bool IsComplexNumber(SignificantNumber value) => !IsRealNumber(value);
-
-	/// <inheritdoc/>
-	public static bool IsEvenInteger(SignificantNumber value) => IsInteger(value) && value.Significand.IsEven;
-
-	/// <inheritdoc/>
-	public static bool IsFinite(SignificantNumber value) => true;
-
-	/// <inheritdoc/>
-	public static bool IsImaginaryNumber(SignificantNumber value) => !IsRealNumber(value);
-
-	/// <inheritdoc/>
-	public static bool IsInfinity(SignificantNumber value) => !IsFinite(value);
-
-	/// <inheritdoc/>
-	public static bool IsInteger(SignificantNumber value) => value.Exponent >= 0;
-
-	/// <inheritdoc/>
-	public static bool IsNaN(SignificantNumber value) => false;
-
-	/// <inheritdoc/>
-	public static bool IsNegative(SignificantNumber value) => !IsPositive(value);
-
-	/// <inheritdoc/>
-	public static bool IsNegativeInfinity(SignificantNumber value) => IsInfinity(value) && IsNegative(value);
-
-	/// <summary>
-	/// Determines whether the specified value is normal.
-	/// </summary>
-	/// <param name="value">The significant number.</param>
-	/// <returns><c>true</c> if the specified value is normal; otherwise, <c>false</c>.</returns>
-	public static bool IsNormal(SignificantNumber value) => true;
-
-	/// <inheritdoc/>
-	public static bool IsOddInteger(SignificantNumber value) => IsInteger(value) && !value.Significand.IsEven;
-
-	/// <inheritdoc/>
-	public static bool IsPositive(SignificantNumber value) => value.Significand >= 0;
-
-	/// <inheritdoc/>
-	public static bool IsPositiveInfinity(SignificantNumber value) => IsInfinity(value) && IsPositive(value);
-
-	/// <inheritdoc/>
-	public static bool IsRealNumber(SignificantNumber value) => true;
-
-	/// <inheritdoc/>
-	public static bool IsSubnormal(SignificantNumber value) => !IsNormal(value);
-
-	/// <inheritdoc/>
-	public static bool IsZero(SignificantNumber value) => value.Significand == 0;
-
-	/// <inheritdoc/>
-	public static SignificantNumber MaxMagnitude(SignificantNumber x, SignificantNumber y) => x.Abs() >= y.Abs() ? x : y;
-
-	/// <inheritdoc/>
-	public static SignificantNumber MaxMagnitudeNumber(SignificantNumber x, SignificantNumber y) => MaxMagnitude(x, y);
-
-	/// <inheritdoc/>
-	public static SignificantNumber MinMagnitude(SignificantNumber x, SignificantNumber y) => x.Abs() <= y.Abs() ? x : y;
-
-	/// <inheritdoc/>
-	public static SignificantNumber MinMagnitudeNumber(SignificantNumber x, SignificantNumber y) => MinMagnitude(x, y);
-
-	/// <inheritdoc/>
-	public static SignificantNumber Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) => throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public static SignificantNumber Parse(string s, NumberStyles style, IFormatProvider? provider) => throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public static SignificantNumber Parse(string s, IFormatProvider? provider) => throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public static SignificantNumber Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public static bool TryParse([NotNullWhen(true)] string? s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result) => throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
-	{
-		int requiredLength = SignificantDigits + Exponent + 2;
-
-		if (destination.Length < requiredLength)
-		{
-			charsWritten = 0;
-			return false;
-		}
-
-		if (!format.IsEmpty && !format.Equals("G", StringComparison.OrdinalIgnoreCase))
-		{
-			throw new FormatException();
-		}
-
-		destination.Clear();
-
-		string output = FormatOutput(provider);
-
-		bool success = output.TryCopyTo(destination);
-		charsWritten = success ? output.Length : 0;
-		return success;
-	}
-
-	private string FormatOutput(IFormatProvider? provider)
-	{
-		if (this == Zero)
-		{
-			return "0";
-		}
-		else if (this == One)
-		{
-			return "1";
-		}
-		else if (this == NegativeOne)
-		{
-			return $"{NumberFormatInfo.GetInstance(provider).NegativeSign}1";
-		}
-
-		provider ??= InvariantCulture;
-		var numberFormat = NumberFormatInfo.GetInstance(provider);
-		string sign = Significand < 0 ? numberFormat.NegativeSign : string.Empty;
-		string significandStr = BigInteger.Abs(Significand).ToString(InvariantCulture);
-
-		if (Exponent == 0)
-		{
-			return $"{sign}{significandStr}";
-		}
-		else if (Exponent > 0)
-		{
-			return $"{sign}{significandStr}{new string('0', Exponent)}";
-		}
-
-		return FormatNegativeExponent(sign, significandStr, numberFormat);
-	}
-
-	private string FormatNegativeExponent(string sign, string significandStr, NumberFormatInfo numberFormat)
-	{
-		int absExponent = -Exponent;
-		string integralComponent = absExponent >= significandStr.Length ? "0" : significandStr[..^absExponent];
-		string fractionalComponent = absExponent >= significandStr.Length
-			? $"{new string('0', absExponent - significandStr.Length)}{BigInteger.Abs(Significand)}"
-			: significandStr[^absExponent..];
-
-		return $"{sign}{integralComponent}{numberFormat.NumberDecimalSeparator}{fractionalComponent}";
-	}
-
-	/// <inheritdoc/>
-	public static bool TryConvertFromChecked<TOther>(TOther value, out SignificantNumber result)
-		where TOther : INumberBase<TOther>
-		=> throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public static bool TryConvertFromSaturating<TOther>(TOther value, out SignificantNumber result)
-		where TOther : INumberBase<TOther>
-		=> throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public static bool TryConvertFromTruncating<TOther>(TOther value, out SignificantNumber result)
-		where TOther : INumberBase<TOther>
-		=> throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public static bool TryConvertToChecked<TOther>(SignificantNumber value, out TOther result)
-		where TOther : INumberBase<TOther>
-		=> throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public static bool TryConvertToSaturating<TOther>(SignificantNumber value, out TOther result)
-		where TOther : INumberBase<TOther>
-		=> throw new NotSupportedException();
-
-	/// <inheritdoc/>
-	public static bool TryConvertToTruncating<TOther>(SignificantNumber value, out TOther result)
-		where TOther : INumberBase<TOther>
-		=> throw new NotSupportedException();
-
-	/// <summary>
-	/// Asserts that the exponents of two significant numbers match.
-	/// </summary>
-	/// <param name="left">The first significant number.</param>
-	/// <param name="right">The second significant number.</param>
-	internal static void AssertExponentsMatch(SignificantNumber left, SignificantNumber right) =>
-		Debug.Assert(left.Exponent == right.Exponent, $"{nameof(AssertExponentsMatch)}: {left.Exponent} == {right.Exponent}");
-
-	/// <summary>
-	/// Negates a significant number.
-	/// </summary>
-	/// <param name="value">The significant number to negate.</param>
-	/// <returns>The negated significant number.</returns>
-	public static SignificantNumber Negate(SignificantNumber value) => -value;
-
-	/// <summary>
-	/// Subtracts one significant number from another.
-	/// </summary>
-	/// <param name="left">The significant number to subtract from.</param>
-	/// <param name="right">The significant number to subtract.</param>
+	/// <param name="left">The number to subtract from.</param>
+	/// <param name="right">The number to subtract.</param>
 	/// <returns>The result of the subtraction.</returns>
-	public static SignificantNumber Subtract(SignificantNumber left, SignificantNumber right) => left - right;
+	public static new SignificantNumber Subtract(PreciseNumber left, PreciseNumber right)
+	{
+		int lowestDecimalDigits = LowestDecimalDigits(left, right);
+		return PreciseNumber.Subtract(left, right)
+			.Round(lowestDecimalDigits)
+			.ToSignificantNumber();
+	}
 
 	/// <summary>
-	/// Adds two significant numbers.
+	/// Adds two numbers.
 	/// </summary>
-	/// <param name="left">The first significant number to add.</param>
-	/// <param name="right">The second significant number to add.</param>
+	/// <param name="left">The first number to add.</param>
+	/// <param name="right">The second number to add.</param>
 	/// <returns>The result of the addition.</returns>
-	public static SignificantNumber Add(SignificantNumber left, SignificantNumber right) => left + right;
+	public static new SignificantNumber Add(PreciseNumber left, PreciseNumber right)
+	{
+		int lowestDecimalDigits = LowestDecimalDigits(left, right);
+		return PreciseNumber.Add(left, right)
+			.Round(lowestDecimalDigits)
+			.ToSignificantNumber();
+	}
 
 	/// <summary>
-	/// Multiplies two significant numbers.
+	/// Multiplies two numbers.
 	/// </summary>
-	/// <param name="left">The first significant number to multiply.</param>
-	/// <param name="right">The second significant number to multiply.</param>
+	/// <param name="left">The first number to multiply.</param>
+	/// <param name="right">The second number to multiply.</param>
 	/// <returns>The result of the multiplication.</returns>
-	public static SignificantNumber Multiply(SignificantNumber left, SignificantNumber right) => left * right;
+	public static new SignificantNumber Multiply(PreciseNumber left, PreciseNumber right)
+	{
+		int lowestSignificantDigits = LowestSignificantDigits(left, right);
+		return PreciseNumber.Multiply(left, right)
+			.ToSignificantNumber(lowestSignificantDigits);
+	}
 
 	/// <summary>
-	/// Divides one significant number by another.
+	/// Divides one number by another.
 	/// </summary>
-	/// <param name="left">The significant number to divide.</param>
-	/// <param name="right">The significant number to divide by.</param>
+
+	/// <param name="left">The number to divide.</param>
+	/// <param name="right">The number to divide by.</param>
 	/// <returns>The result of the division.</returns>
-	public static SignificantNumber Divide(SignificantNumber left, SignificantNumber right) => left / right;
+	public static new SignificantNumber Divide(PreciseNumber left, PreciseNumber right)
+	{
+		int lowestSignificantDigits = LowestSignificantDigits(left, right);
+		return PreciseNumber.Divide(left, right)
+			.ToSignificantNumber(lowestSignificantDigits);
+	}
 
 	/// <summary>
-	/// Increments a significant number.
+	/// Computes the modulus of two numbers.
+	/// </summary>
+	/// <param name="left">The number to divide.</param>
+	/// <param name="right">The number to divide by.</param>
+	/// <returns>The modulus of the two numbers.</returns>
+	public static new SignificantNumber Mod(PreciseNumber left, PreciseNumber right)
+	{
+		int lowestSignificantDigits = LowestSignificantDigits(left, right);
+		return PreciseNumber.Mod(left, right)
+			.ToSignificantNumber(lowestSignificantDigits);
+	}
+
+	/// <summary>
+	/// Increments the specified significant number by one.
 	/// </summary>
 	/// <param name="value">The significant number to increment.</param>
-	/// <returns>The incremented significant number.</returns>
-	/// <exception cref="NotSupportedException">Incrementing is not supported.</exception>
-	public static SignificantNumber Increment(SignificantNumber value) => throw new NotSupportedException();
+	/// <returns>A new instance of <see cref="SignificantNumber"/> representing the incremented value.</returns>
+	public static SignificantNumber Increment(SignificantNumber value) =>
+		PreciseNumber.Increment(value)
+		.ToSignificantNumber();
 
 	/// <summary>
-	/// Decrements a significant number.
+	/// Decrements the specified significant number by one.
 	/// </summary>
 	/// <param name="value">The significant number to decrement.</param>
-	/// <returns>The decremented significant number.</returns>
-	/// <exception cref="NotSupportedException">Decrementing is not supported.</exception>
-	public static SignificantNumber Decrement(SignificantNumber value) => throw new NotSupportedException();
+	/// <returns>A new instance of <see cref="SignificantNumber"/> representing the decremented value.</returns>
+	public static SignificantNumber Decrement(SignificantNumber value) =>
+		PreciseNumber.Decrement(value)
+		.ToSignificantNumber();
 
 	/// <summary>
-	/// Returns the unary plus of a significant number.
+	/// Returns the unary plus of a number.
 	/// </summary>
-	/// <param name="value">The significant number.</param>
-	/// <returns>The unary plus of the significant number.</returns>
-	public static SignificantNumber Plus(SignificantNumber value) => +value;
+	/// <param name="value">The number.</param>
+	/// <returns>The unary plus of the number.</returns>
+	public static SignificantNumber Plus(SignificantNumber value) =>
+		PreciseNumber.Plus(value)
+		.ToSignificantNumber();
 
 	/// <summary>
-	/// Computes the modulus of two significant numbers.
+	/// Negates the specified significant number.
 	/// </summary>
-	/// <param name="left">The significant number to divide.</param>
-	/// <param name="right">The significant number to divide by.</param>
-	/// <returns>The modulus of the two significant numbers.</returns>
-	/// <exception cref="NotSupportedException">Modulus operation is not supported.</exception>
-	public static SignificantNumber Mod(SignificantNumber left, SignificantNumber right) => throw new NotSupportedException();
+	/// <param name="value">The significant number to negate.</param>
+	/// <returns>A new instance of <see cref="SignificantNumber"/> representing the negated value.</returns>
+	public static SignificantNumber Negate(SignificantNumber value) =>
+		PreciseNumber.Negate(value)
+		.ToSignificantNumber();
 
 	/// <summary>
-	/// Determines whether one significant number is greater than another.
+	/// Determines whether one number is greater than another.
 	/// </summary>
-	/// <param name="left">The first significant number.</param>
-	/// <param name="right">The second significant number.</param>
-	/// <returns><c>true</c> if the first significant number is greater than the second; otherwise, <c>false</c>.</returns>
-	public static bool GreaterThan(SignificantNumber left, SignificantNumber right) => left > right;
-
-	/// <summary>
-	/// Determines whether one significant number is greater than or equal to another.
-	/// </summary>
-	/// <param name="left">The first significant number.</param>
-	/// <param name="right">The second significant number.</param>
-	/// <returns><c>true</c> if the first significant number is greater than or equal to the second; otherwise, <c>false</c>.</returns>
-	public static bool GreaterThanOrEqual(SignificantNumber left, SignificantNumber right) => left >= right;
-
-	/// <summary>
-	/// Determines whether one significant number is less than another.
-	/// </summary>
-	/// <param name="left">The first significant number.</param>
-	/// <param name="right">The second significant number.</param>
-	/// <returns><c>true</c> if the first significant number is less than the second; otherwise, <c>false</c>.</returns>
-	public static bool LessThan(SignificantNumber left, SignificantNumber right) => left < right;
-
-	/// <summary>
-	/// Determines whether one significant number is less than or equal to another.
-	/// </summary>
-	/// <param name="left">The first significant number.</param>
-	/// <param name="right">The second significant number.</param>
-	/// <returns><c>true</c> if the first significant number is less than or equal to the second; otherwise, <c>false</c>.</returns>
-	public static bool LessThanOrEqual(SignificantNumber left, SignificantNumber right) => left <= right;
-
-	/// <summary>
-	/// Determines whether two significant numbers are equal.
-	/// </summary>
-	/// <param name="left">The first significant number.</param>
-	/// <param name="right">The second significant number.</param>
-	/// <returns><c>true</c> if the two significant numbers are equal; otherwise, <c>false</c>.</returns>
-	public static bool Equal(SignificantNumber left, SignificantNumber right) => left == right;
-
-	/// <summary>
-	/// Determines whether two significant numbers are not equal.
-	/// </summary>
-	/// <param name="left">The first significant number.</param>
-	/// <param name="right">The second significant number.</param>
-	/// <returns><c>true</c> if the two significant numbers are not equal; otherwise, <c>false</c>.</returns>
-	public static bool NotEqual(SignificantNumber left, SignificantNumber right) => left != right;
-
-	/// <summary>
-	/// Returns the larger of two significant numbers.
-	/// </summary>
-	/// <param name="x">The first significant number.</param>
-	/// <param name="y">The second significant number.</param>
-	/// <returns>The larger of the two significant numbers.</returns>
-	public static SignificantNumber Max(SignificantNumber x, SignificantNumber y) => x > y ? x : y;
-
-	/// <summary>
-	/// Returns the smaller of two significant numbers.
-	/// </summary>
-	/// <param name="x">The first significant number.</param>
-	/// <param name="y">The second significant number.</param>
-	/// <returns>The smaller of the two significant numbers.</returns>
-	public static SignificantNumber Min(SignificantNumber x, SignificantNumber y) => x < y ? x : y;
-
-	/// <summary>
-	/// Clamps a significant number to the specified minimum and maximum values.
-	/// </summary>
-	/// <param name="value">The significant number to clamp.</param>
-	/// <param name="min">The minimum value.</param>
-	/// <param name="max">The maximum value.</param>
-	/// <returns>The clamped significant number.</returns>
-	public static SignificantNumber Clamp(SignificantNumber value, SignificantNumber min, SignificantNumber max) => value.Clamp(min, max);
-
-	/// <summary>
-	/// Rounds a significant number to the specified number of decimal digits.
-	/// </summary>
-	/// <param name="value">The significant number to round.</param>
-	/// <param name="decimalDigits">The number of decimal digits to round to.</param>
-	/// <returns>The rounded significant number.</returns>
-	public static SignificantNumber Round(SignificantNumber value, int decimalDigits) => value.Round(decimalDigits);
-
-	/// <inheritdoc/>
-	public static SignificantNumber operator -(SignificantNumber value)
+	/// <param name="left">The first number.</param>
+	/// <param name="right">The second number.</param>
+	/// <returns><c>true</c> if the first number is greater than the second; otherwise, <c>false</c>.</returns>
+	public static new bool GreaterThan(PreciseNumber left, PreciseNumber right)
 	{
-		return value == Zero
-			? value
-			: new(value.Exponent, -value.Significand);
+		ArgumentNullException.ThrowIfNull(left);
+		ArgumentNullException.ThrowIfNull(right);
+		return left.CompareTo(right) > 0;
+	}
+
+	/// <summary>
+	/// Determines whether one number is greater than or equal to another.
+	/// </summary>
+	/// <param name="left">The first number.</param>
+	/// <param name="right">The second number.</param>
+	/// <returns><c>true</c> if the first number is greater than or equal to the second; otherwise, <c>false</c>.</returns>
+	public static new bool GreaterThanOrEqual(PreciseNumber left, PreciseNumber right)
+	{
+		ArgumentNullException.ThrowIfNull(left);
+		ArgumentNullException.ThrowIfNull(right);
+		return left.CompareTo(right) >= 0;
+	}
+
+	/// <summary>
+	/// Determines whether one number is less than another.
+	/// </summary>
+	/// <param name="left">The first number.</param>
+	/// <param name="right">The second number.</param>
+	/// <returns><c>true</c> if the first number is less than the second; otherwise, <c>false</c>.</returns>
+	public static new bool LessThan(PreciseNumber left, PreciseNumber right)
+	{
+		ArgumentNullException.ThrowIfNull(left);
+		ArgumentNullException.ThrowIfNull(right);
+		return left.CompareTo(right) < 0;
+	}
+
+	/// <summary>
+	/// Determines whether one number is less than or equal to another.
+	/// </summary>
+	/// <param name="left">The first number.</param>
+	/// <param name="right">The second number.</param>
+	/// <returns><c>true</c> if the first number is less than or equal to the second; otherwise, <c>false</c>.</returns>
+	public static new bool LessThanOrEqual(PreciseNumber left, PreciseNumber right)
+	{
+		ArgumentNullException.ThrowIfNull(left);
+		ArgumentNullException.ThrowIfNull(right);
+		return left.CompareTo(right) <= 0;
+	}
+
+	/// <summary>
+	/// Determines whether two numbers are equal.
+	/// </summary>
+	/// <param name="left">The first number.</param>
+	/// <param name="right">The second number.</param>
+	/// <returns><c>true</c> if the two numbers are equal; otherwise, <c>false</c>.</returns>
+	public static new bool Equal(PreciseNumber left, PreciseNumber right)
+	{
+		ArgumentNullException.ThrowIfNull(left);
+		ArgumentNullException.ThrowIfNull(right);
+		return left.CompareTo(right) == 0;
+	}
+
+	/// <summary>
+	/// Determines whether two numbers are not equal.
+	/// </summary>
+	/// <param name="left">The first number.</param>
+	/// <param name="right">The second number.</param>
+	/// <returns><c>true</c> if the two numbers are not equal; otherwise, <c>false</c>.</returns>
+	public static new bool NotEqual(PreciseNumber left, PreciseNumber right)
+	{
+		ArgumentNullException.ThrowIfNull(left);
+		ArgumentNullException.ThrowIfNull(right);
+		return left.CompareTo(right) != 0;
+	}
+
+	/// <summary>
+	/// Compares two numbers and returns an integer that indicates their relative position in the sort order.
+	/// </summary>
+	/// <param name="left">The first number to compare.</param>
+	/// <param name="right">The second number to compare.</param>
+	/// <returns>
+	/// A signed integer that indicates the relative values of <paramref name="left"/> and <paramref name="right"/>:
+	/// <list type="bullet">
+	/// <item>
+	/// <description>Less than zero: <paramref name="left"/> is less than <paramref name="right"/>.</description>
+	/// </item>
+	/// <item>
+	/// <description>Zero: <paramref name="left"/> is equal to <paramref name="right"/>.</description>
+	/// </item>
+	/// <item>
+	/// <description>Greater than zero: <paramref name="left"/> is greater than <paramref name="right"/>.</description>
+	/// </item>
+	/// </list>
+	/// </returns>
+	/// <exception cref="ArgumentNullException">
+	/// Thrown when <paramref name="left"/> or <paramref name="right"/> is <c>null</c>.
+	/// </exception>
+	public static int CompareTo(PreciseNumber left, PreciseNumber right)
+	{
+		ArgumentNullException.ThrowIfNull(left);
+		ArgumentNullException.ThrowIfNull(right);
+		int lowestSignificantDigits = LowestSignificantDigits(left, right);
+		return left.ReduceSignificance(lowestSignificantDigits).CompareTo(right.ReduceSignificance(lowestSignificantDigits));
 	}
 
 	/// <inheritdoc/>
-	public static SignificantNumber operator -(SignificantNumber left, SignificantNumber right)
-	{
-		int decimalDigits = LowestDecimalDigits(left, right);
-		int commonExponent = MakeCommonizedAndGetExponent(ref left, ref right);
-		AssertExponentsMatch(left, left);
-
-		var newSignificand = left.Significand - right.Significand;
-		return new SignificantNumber(commonExponent, newSignificand).Round(decimalDigits);
-	}
+	public static SignificantNumber operator -(SignificantNumber value) =>
+		Negate(value);
 
 	/// <inheritdoc/>
-	public static bool operator !=(SignificantNumber left, SignificantNumber right) => !(left == right);
+	public static SignificantNumber operator -(SignificantNumber left, PreciseNumber right) =>
+		Subtract(left, right);
 
 	/// <inheritdoc/>
-	public static SignificantNumber operator *(SignificantNumber left, SignificantNumber right)
-	{
-		if (left == Zero || right == Zero)
-		{
-			return Zero;
-		}
-
-		int significantDigits = LowestSignificantDigits(left, right);
-		int commonExponent = MakeCommonizedAndGetExponent(ref left, ref right);
-		AssertExponentsMatch(left, right);
-
-		var newSignificand = left.Significand * right.Significand;
-		int newExponent = commonExponent * 2;
-		var result = new SignificantNumber(newExponent, newSignificand);
-		return newExponent == 0
-			? result
-			: result.ReduceSignificance(significantDigits);
-	}
+	public static SignificantNumber operator -(PreciseNumber left, SignificantNumber right) =>
+		Subtract(left, right);
 
 	/// <inheritdoc/>
-	public static SignificantNumber operator /(SignificantNumber left, SignificantNumber right)
-	{
-		if (right == Zero)
-		{
-			throw new DivideByZeroException();
-		}
-
-		if (left == right)
-		{
-			return One;
-		}
-
-		int significantDigits = LowestSignificantDigits(left, right);
-		int commonExponent = MakeCommonizedAndGetExponent(ref left, ref right);
-		AssertExponentsMatch(left, right);
-
-		var integerComponent = left.Significand / right.Significand;
-		double remainder = double.CreateTruncating(left.Significand % right.Significand) * double.Pow(Base10, commonExponent);
-		double fractionalComponent = remainder / (double.CreateTruncating(right.Significand) * double.Pow(Base10, commonExponent));
-
-		var result = new SignificantNumber(0, integerComponent) + fractionalComponent.ToSignificantNumber();
-
-		return result.ReduceSignificance(significantDigits);
-	}
+	public static SignificantNumber operator -(SignificantNumber left, SignificantNumber right) =>
+		Subtract(left, right);
 
 	/// <inheritdoc/>
-	public static SignificantNumber operator +(SignificantNumber value) => value;
+	public static SignificantNumber operator *(SignificantNumber left, PreciseNumber right) =>
+		Multiply(left, right);
 
 	/// <inheritdoc/>
-	public static SignificantNumber operator +(SignificantNumber left, SignificantNumber right)
-	{
-		int decimalDigits = LowestDecimalDigits(left, right);
-		int commonExponent = MakeCommonizedAndGetExponent(ref left, ref right);
-		AssertExponentsMatch(left, right);
-
-		var newSignificand = left.Significand + right.Significand;
-		return new SignificantNumber(commonExponent, newSignificand).Round(decimalDigits);
-	}
+	public static SignificantNumber operator *(PreciseNumber left, SignificantNumber right) =>
+		Multiply(left, right);
 
 	/// <inheritdoc/>
-	public static bool operator ==(SignificantNumber left, SignificantNumber right)
-	{
-		int decimalDigits = LowestDecimalDigits(left, right);
-		int sigDigits = LowestSignificantDigits(left, right);
-		MakeCommonized(ref left, ref right);
-		AssertExponentsMatch(left, right);
-		var leftSignificant = left.Round(decimalDigits);
-		var rightSignificant = right.Round(decimalDigits);
-		MakeCommonized(ref leftSignificant, ref rightSignificant);
-		AssertExponentsMatch(leftSignificant, rightSignificant);
-		if (decimalDigits == 0)
-		{
-			leftSignificant = leftSignificant.ReduceSignificance(sigDigits);
-			rightSignificant = rightSignificant.ReduceSignificance(sigDigits);
-			MakeCommonized(ref leftSignificant, ref rightSignificant);
-		}
-
-		return leftSignificant.Significand == rightSignificant.Significand;
-	}
+	public static SignificantNumber operator *(SignificantNumber left, SignificantNumber right) =>
+		Multiply(left, right);
 
 	/// <inheritdoc/>
-	public static bool operator >(SignificantNumber left, SignificantNumber right)
-	{
-		int decimalDigits = LowestDecimalDigits(left, right);
-		MakeCommonized(ref left, ref right);
-		AssertExponentsMatch(left, right);
-		var leftSignificant = left.Round(decimalDigits);
-		var rightSignificant = right.Round(decimalDigits);
-		MakeCommonized(ref leftSignificant, ref rightSignificant);
-		AssertExponentsMatch(leftSignificant, rightSignificant);
-		return leftSignificant.Significand > rightSignificant.Significand;
-	}
+	public static SignificantNumber operator /(SignificantNumber left, PreciseNumber right) =>
+		Divide(left, right);
 
 	/// <inheritdoc/>
-	public static bool operator <(SignificantNumber left, SignificantNumber right)
-	{
-		int decimalDigits = LowestDecimalDigits(left, right);
-		MakeCommonized(ref left, ref right);
-		AssertExponentsMatch(left, right);
-		var leftSignificant = left.Round(decimalDigits);
-		var rightSignificant = right.Round(decimalDigits);
-		MakeCommonized(ref leftSignificant, ref rightSignificant);
-		AssertExponentsMatch(leftSignificant, rightSignificant);
-		return leftSignificant.Significand < rightSignificant.Significand;
-	}
+	public static SignificantNumber operator /(PreciseNumber left, SignificantNumber right) =>
+		Divide(left, right);
 
 	/// <inheritdoc/>
-	public static bool operator >=(SignificantNumber left, SignificantNumber right)
-	{
-		int decimalDigits = LowestDecimalDigits(left, right);
-		MakeCommonized(ref left, ref right);
-		AssertExponentsMatch(left, right);
-		var leftSignificant = left.Round(decimalDigits);
-		var rightSignificant = right.Round(decimalDigits);
-		MakeCommonized(ref leftSignificant, ref rightSignificant);
-		AssertExponentsMatch(leftSignificant, rightSignificant);
-		return leftSignificant.Significand >= rightSignificant.Significand;
-	}
+	public static SignificantNumber operator /(SignificantNumber left, SignificantNumber right) =>
+		Divide(left, right);
 
 	/// <inheritdoc/>
-	public static bool operator <=(SignificantNumber left, SignificantNumber right)
-	{
-		int decimalDigits = LowestDecimalDigits(left, right);
-		MakeCommonized(ref left, ref right);
-		AssertExponentsMatch(left, right);
-		var leftSignificant = left.Round(decimalDigits);
-		var rightSignificant = right.Round(decimalDigits);
-		MakeCommonized(ref leftSignificant, ref rightSignificant);
-		AssertExponentsMatch(leftSignificant, rightSignificant);
-		return leftSignificant.Significand <= rightSignificant.Significand;
-	}
+	public static SignificantNumber operator +(SignificantNumber value) =>
+		Plus(value);
 
 	/// <inheritdoc/>
-	public static SignificantNumber operator %(SignificantNumber left, SignificantNumber right) => throw new NotSupportedException();
+	public static SignificantNumber operator +(SignificantNumber left, PreciseNumber right) =>
+		Add(left, right);
 
 	/// <inheritdoc/>
-	public static SignificantNumber operator --(SignificantNumber value) => throw new NotSupportedException();
+	public static SignificantNumber operator +(PreciseNumber left, SignificantNumber right) =>
+		Add(left, right);
 
 	/// <inheritdoc/>
-	public static SignificantNumber operator ++(SignificantNumber value) => throw new NotSupportedException();
+	public static SignificantNumber operator +(SignificantNumber left, SignificantNumber right) =>
+		Add(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator ==(SignificantNumber left, PreciseNumber right) =>
+		Equal(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator ==(PreciseNumber left, SignificantNumber right) =>
+		Equal(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator !=(SignificantNumber left, PreciseNumber right) =>
+		NotEqual(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator !=(PreciseNumber left, SignificantNumber right) =>
+		NotEqual(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator >(SignificantNumber left, PreciseNumber right) =>
+		GreaterThan(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator >(PreciseNumber left, SignificantNumber right) =>
+		GreaterThan(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator >(SignificantNumber left, SignificantNumber right) =>
+		GreaterThan(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator <(SignificantNumber left, PreciseNumber right) =>
+		LessThan(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator <(PreciseNumber left, SignificantNumber right) =>
+		LessThan(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator <(SignificantNumber left, SignificantNumber right) =>
+		LessThan(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator >=(SignificantNumber left, PreciseNumber right) =>
+		GreaterThanOrEqual(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator >=(PreciseNumber left, SignificantNumber right) =>
+		GreaterThanOrEqual(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator >=(SignificantNumber left, SignificantNumber right) =>
+		GreaterThanOrEqual(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator <=(SignificantNumber left, PreciseNumber right) =>
+		LessThanOrEqual(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator <=(PreciseNumber left, SignificantNumber right) =>
+		LessThanOrEqual(left, right);
+
+	/// <inheritdoc/>
+	public static bool operator <=(SignificantNumber left, SignificantNumber right) =>
+		LessThanOrEqual(left, right);
+
+	/// <inheritdoc/>
+	public static SignificantNumber operator %(SignificantNumber left, PreciseNumber right) =>
+		Mod(left, right);
+
+	/// <inheritdoc/>
+	public static SignificantNumber operator %(PreciseNumber left, SignificantNumber right) =>
+		Mod(left, right);
+
+	/// <inheritdoc/>
+	public static SignificantNumber operator %(SignificantNumber left, SignificantNumber right) =>
+		Mod(left, right);
+
+	/// <inheritdoc/>
+	public static SignificantNumber operator --(SignificantNumber value) =>
+		Decrement(value);
+
+	/// <inheritdoc/>
+	public static SignificantNumber operator ++(SignificantNumber value) =>
+		Increment(value);
 
 	/// <summary>
 	/// Asserts that a type implements a specified generic interface.
@@ -1011,8 +420,13 @@ public readonly struct SignificantNumber
 	/// <param name="type">The type to check.</param>
 	/// <param name="genericInterface">The generic interface to check for.</param>
 	/// <exception cref="ArgumentException">Thrown when the specified type does not implement the generic interface.</exception>
-	internal static void AssertDoesImplementGenericInterface(Type type, Type genericInterface) =>
-		Debug.Assert(DoesImplementGenericInterface(type, genericInterface), $"{type.Name} does not implement {genericInterface.Name}");
+	internal static void AssertDoesImplementGenericInterface(Type type, Type genericInterface)
+	{
+		if (!DoesImplementGenericInterface(type, genericInterface))
+		{
+			throw new ArgumentException($"{type.Name} does not implement {genericInterface.Name}", nameof(type));
+		}
+	}
 
 	/// <summary>
 	/// Determines whether a type implements a specified generic interface.
@@ -1031,48 +445,23 @@ public readonly struct SignificantNumber
 	}
 
 	/// <summary>
-	/// Converts the current significant number to the specified numeric type.
-	/// </summary>
-	/// <typeparam name="TOutput">The type to convert to. Must implement <see cref="INumber{TOutput}"/>.</typeparam>
-	/// <returns>The converted value of the significant number as type <typeparamref name="TOutput"/>.</returns>
-	/// <exception cref="OverflowException">
-	/// Thrown if the conversion cannot be performed. This may occur if the target type cannot represent
-	/// the value of the significant number.
-	/// </exception>
-	public TOutput To<TOutput>()
-		where TOutput : INumber<TOutput> =>
-		typeof(TOutput) == typeof(SignificantNumber)
-		? (TOutput)(object)this
-		: TOutput.CreateChecked(Significand) * TOutput.CreateChecked(Math.Pow(Base10, Exponent));
-
-	/// <summary>
-	/// Returns the square of the current significant number.
-	/// </summary>
-	/// <returns>A new instance of <see cref="SignificantNumber"/> that is the square of the current instance.</returns>
-	public SignificantNumber Squared() => this * this;
-
-	/// <summary>
-	/// Returns the cube of the current significant number.
-	/// </summary>
-	/// <returns>A new instance of <see cref="SignificantNumber"/> that is the cube of the current instance.</returns>
-	public SignificantNumber Cubed() => Squared() * this;
-
-	/// <summary>
 	/// Returns the result of raising the current significant number to the specified power.
 	/// </summary>
 	/// <param name="power">The power to raise the significant number to.</param>
 	/// <returns>A new instance of <see cref="SignificantNumber"/> that is the result of raising the current instance to the specified power.</returns>
-	public SignificantNumber Pow(SignificantNumber power)
+	public new SignificantNumber Pow(PreciseNumber power)
 	{
-		if (power == Zero)
+		ArgumentNullException.ThrowIfNull(power);
+
+		if (Equal(power, Zero))
 		{
 			return One;
 		}
-		else if (this == Zero)
+		else if (Equal(this, Zero))
 		{
 			return Zero;
 		}
-		else if (this == One)
+		else if (Equal(this, One))
 		{
 			return One;
 		}
@@ -1080,8 +469,8 @@ public readonly struct SignificantNumber
 		int significantDigits = LowestSignificantDigits(this, power);
 
 		// Use logarithm and exponential to support decimal powers
-		double logValue = Math.Log(To<double>());
-		return Math.Exp(logValue * power.To<double>()).ToSignificantNumber().ReduceSignificance(significantDigits);
+		double logValue = Math.Log(Math.Abs(To<double>()));
+		return Math.Exp(logValue * power.To<double>()).ToSignificantNumber(significantDigits);
 	}
 
 	/// <summary>
@@ -1089,19 +478,416 @@ public readonly struct SignificantNumber
 	/// </summary>
 	/// <param name="power">The power to raise e to.</param>
 	/// <returns>A new instance of <see cref="SignificantNumber"/> that is the result of raising e to the specified power.</returns>
-	public static SignificantNumber Exp(SignificantNumber power)
+	public static new SignificantNumber Exp(PreciseNumber power)
 	{
-		if (power == Zero)
+		ArgumentNullException.ThrowIfNull(power);
+
+		if (Equal(power, Zero))
 		{
 			return One;
 		}
-		else if (power == One)
+		else if (Equal(power, One))
 		{
-			return E;
+			return E.ToSignificantNumber();
 		}
 
 		int significantDigits = LowestSignificantDigits(E, power);
 
-		return Math.Exp(power.To<double>()).ToSignificantNumber().ReduceSignificance(significantDigits);
+		return Math.Exp(power.To<double>())
+			.ToSignificantNumber(significantDigits);
 	}
+
+	/// <summary>
+	/// Compares the current instance with another <see cref="SignificantNumber"/> and returns an integer that indicates their relative position in the sort order.
+	/// </summary>
+	/// <param name="other">The <see cref="SignificantNumber"/> to compare with the current instance.</param>
+	/// <returns>
+	/// A signed integer that indicates the relative values of the current instance and <paramref name="other"/>:
+	/// <list type="bullet">
+	/// <item>
+	/// <description>Less than zero: The current instance is less than <paramref name="other"/>.</description>
+	/// </item>
+	/// <item>
+	/// <description>Zero: The current instance is equal to <paramref name="other"/>.</description>
+	/// </item>
+	/// <item>
+	/// <description>Greater than zero: The current instance is greater than <paramref name="other"/>.</description>
+	/// </item>
+	/// </list>
+	/// </returns>
+	public int CompareTo(SignificantNumber? other) =>
+	other is null ? 1 : CompareTo(this, other);
+
+	/// <summary>
+	/// Returns the absolute value of the specified <see cref="SignificantNumber"/>.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to compute the absolute value for.</param>
+	/// <returns>A new <see cref="SignificantNumber"/> representing the absolute value of <paramref name="value"/>.</returns>
+	public static SignificantNumber Abs(SignificantNumber value) =>
+		PreciseNumber.Abs(value).ToSignificantNumber();
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is canonical.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is canonical; otherwise, <c>false</c>.</returns>
+	public static bool IsCanonical(SignificantNumber value) =>
+		PreciseNumber.IsCanonical(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is a complex number.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is a complex number; otherwise, <c>false</c>.</returns>
+	public static bool IsComplexNumber(SignificantNumber value) =>
+		PreciseNumber.IsComplexNumber(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is an even integer.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is an even integer; otherwise, <c>false</c>.</returns>
+	public static bool IsEvenInteger(SignificantNumber value) =>
+		PreciseNumber.IsEvenInteger(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is finite.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is finite; otherwise, <c>false</c>.</returns>
+	public static bool IsFinite(SignificantNumber value) =>
+		PreciseNumber.IsFinite(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is an imaginary number.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is an imaginary number; otherwise, <c>false</c>.</returns>
+	public static bool IsImaginaryNumber(SignificantNumber value) =>
+		PreciseNumber.IsImaginaryNumber(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> represents infinity.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> represents infinity; otherwise, <c>false</c>.</returns>
+	public static bool IsInfinity(SignificantNumber value) =>
+		PreciseNumber.IsInfinity(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is an integer.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is an integer; otherwise, <c>false</c>.</returns>
+	public static bool IsInteger(SignificantNumber value) =>
+		PreciseNumber.IsInteger(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is not a number (NaN).
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is NaN; otherwise, <c>false</c>.</returns>
+	public static bool IsNaN(SignificantNumber value) =>
+		PreciseNumber.IsNaN(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is negative.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is negative; otherwise, <c>false</c>.</returns>
+	public static bool IsNegative(SignificantNumber value) =>
+		PreciseNumber.IsNegative(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> represents negative infinity.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> represents negative infinity; otherwise, <c>false</c>.</returns>
+	public static bool IsNegativeInfinity(SignificantNumber value) =>
+		PreciseNumber.IsNegativeInfinity(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is a normal number.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is a normal number; otherwise, <c>false</c>.</returns>
+	public static bool IsNormal(SignificantNumber value) =>
+		PreciseNumber.IsNormal(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is an odd integer.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is an odd integer; otherwise, <c>false</c>.</returns>
+	public static bool IsOddInteger(SignificantNumber value) =>
+		PreciseNumber.IsOddInteger(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is positive.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is positive; otherwise, <c>false</c>.</returns>
+	public static bool IsPositive(SignificantNumber value) =>
+		PreciseNumber.IsPositive(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> represents positive infinity.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> represents positive infinity; otherwise, <c>false</c>.</returns>
+	public static bool IsPositiveInfinity(SignificantNumber value) =>
+		PreciseNumber.IsPositiveInfinity(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is a real number.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is a real number; otherwise, <c>false</c>.</returns>
+	public static bool IsRealNumber(SignificantNumber value) =>
+		PreciseNumber.IsRealNumber(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is subnormal.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is subnormal; otherwise, <c>false</c>.</returns>
+	public static bool IsSubnormal(SignificantNumber value) =>
+		PreciseNumber.IsSubnormal(value);
+
+	/// <summary>
+	/// Determines whether the specified <see cref="SignificantNumber"/> is zero.
+	/// </summary>
+	/// <param name="value">The <see cref="SignificantNumber"/> to check.</param>
+	/// <returns><c>true</c> if the <paramref name="value"/> is zero; otherwise, <c>false</c>.</returns>
+	public static bool IsZero(SignificantNumber value) =>
+		PreciseNumber.IsZero(value);
+
+	/// <summary>
+	/// Returns the larger magnitude of two <see cref="SignificantNumber"/> instances.
+	/// </summary>
+	/// <param name="x">The first <see cref="SignificantNumber"/> to compare.</param>
+	/// <param name="y">The second <see cref="SignificantNumber"/> to compare.</param>
+	/// <returns>The <see cref="SignificantNumber"/> with the larger magnitude.</returns>
+	public static SignificantNumber MaxMagnitude(SignificantNumber x, SignificantNumber y) =>
+		PreciseNumber.MaxMagnitude(x, y).ToSignificantNumber();
+
+	/// <summary>
+	/// Returns the larger magnitude of two <see cref="SignificantNumber"/> instances, or the first one if both have the same magnitude.
+	/// </summary>
+	/// <param name="x">The first <see cref="SignificantNumber"/> to compare.</param>
+	/// <param name="y">The second <see cref="SignificantNumber"/> to compare.</param>
+	/// <returns>The <see cref="SignificantNumber"/> with the larger magnitude, or <paramref name="x"/> if both have the same magnitude.</returns>
+	public static SignificantNumber MaxMagnitudeNumber(SignificantNumber x, SignificantNumber y) =>
+		PreciseNumber.MaxMagnitudeNumber(x, y).ToSignificantNumber();
+
+	/// <summary>
+	/// Returns the smaller magnitude of two <see cref="SignificantNumber"/> instances.
+	/// </summary>
+	/// <param name="x">The first <see cref="SignificantNumber"/> to compare.</param>
+	/// <param name="y">The second <see cref="SignificantNumber"/> to compare.</param>
+	/// <returns>The <see cref="SignificantNumber"/> with the smaller magnitude.</returns>
+	public static SignificantNumber MinMagnitude(SignificantNumber x, SignificantNumber y) =>
+		PreciseNumber.MinMagnitude(x, y).ToSignificantNumber();
+
+	/// <summary>
+	/// Returns the smaller magnitude of two <see cref="SignificantNumber"/> instances, or the first one if both have the same magnitude.
+	/// </summary>
+	/// <param name="x">The first <see cref="SignificantNumber"/> to compare.</param>
+	/// <param name="y">The second <see cref="SignificantNumber"/> to compare.</param>
+	/// <returns>The <see cref="SignificantNumber"/> with the smaller magnitude, or <paramref name="x"/> if both have the same magnitude.</returns>
+	public static SignificantNumber MinMagnitudeNumber(SignificantNumber x, SignificantNumber y) =>
+		PreciseNumber.MinMagnitudeNumber(x, y).ToSignificantNumber();
+
+	/// <summary>
+	/// Parses a span of characters into a <see cref="SignificantNumber"/> using the specified style and format provider.
+	/// </summary>
+	/// <param name="s">The span of characters to parse.</param>
+	/// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of <paramref name="s"/>.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <returns>A <see cref="SignificantNumber"/> parsed from the input span.</returns>
+	public static new SignificantNumber Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) =>
+		PreciseNumber.Parse(s, style, provider).ToSignificantNumber();
+
+	/// <summary>
+	/// Parses a string into a <see cref="SignificantNumber"/> using the specified style and format provider.
+	/// </summary>
+	/// <param name="s">The string to parse.</param>
+	/// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of <paramref name="s"/>.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <returns>A <see cref="SignificantNumber"/> parsed from the input string.</returns>
+	public static new SignificantNumber Parse(string s, NumberStyles style, IFormatProvider? provider) =>
+		PreciseNumber.Parse(s, style, provider).ToSignificantNumber();
+
+	/// <summary>
+	/// Attempts to convert a value of type <typeparamref name="TOther"/> to a <see cref="SignificantNumber"/> using a checked conversion.
+	/// </summary>
+	/// <typeparam name="TOther">The type of the value to convert.</typeparam>
+	/// <param name="value">The value to convert.</param>
+	/// <param name="result">When this method returns, contains the converted <see cref="SignificantNumber"/>, if the conversion succeeded; otherwise, <c>null</c>.</param>
+	/// <returns><c>true</c> if the conversion succeeded; otherwise, <c>false</c>.</returns>
+	public static bool TryConvertFromChecked<TOther>(TOther value, [NotNullWhen(true)] out SignificantNumber? result) where TOther : INumberBase<TOther>
+	{
+		bool tryResult = PreciseNumber.TryConvertFromChecked(value, out var preciseResult);
+		result = tryResult ? preciseResult.ToSignificantNumber() : null;
+		return tryResult;
+	}
+
+	/// <summary>
+	/// Attempts to convert a value of type <typeparamref name="TOther"/> to a <see cref="SignificantNumber"/> using a saturating conversion.
+	/// </summary>
+	/// <typeparam name="TOther">The type of the value to convert.</typeparam>
+	/// <param name="value">The value to convert.</param>
+	/// <param name="result">When this method returns, contains the converted <see cref="SignificantNumber"/>, if the conversion succeeded; otherwise, <c>null</c>.</param>
+	/// <returns><c>true</c> if the conversion succeeded; otherwise, <c>false</c>.</returns>
+	public static bool TryConvertFromSaturating<TOther>(TOther value, [NotNullWhen(true)] out SignificantNumber? result) where TOther : INumberBase<TOther>
+	{
+		bool tryResult = PreciseNumber.TryConvertFromSaturating(value, out var preciseResult);
+		result = tryResult ? preciseResult.ToSignificantNumber() : null;
+		return tryResult;
+	}
+
+	/// <summary>
+	/// Attempts to convert a value of type <typeparamref name="TOther"/> to a <see cref="SignificantNumber"/> using a truncating conversion.
+	/// </summary>
+	/// <typeparam name="TOther">The type of the value to convert.</typeparam>
+	/// <param name="value">The value to convert.</param>
+	/// <param name="result">When this method returns, contains the converted <see cref="SignificantNumber"/>, if the conversion succeeded; otherwise, <c>null</c>.</param>
+	/// <returns><c>true</c> if the conversion succeeded; otherwise, <c>false</c>.</returns>
+	public static bool TryConvertFromTruncating<TOther>(TOther value, [NotNullWhen(true)] out SignificantNumber? result) where TOther : INumberBase<TOther>
+	{
+		bool tryResult = PreciseNumber.TryConvertFromTruncating(value, out var preciseResult);
+		result = tryResult ? preciseResult.ToSignificantNumber() : null;
+		return tryResult;
+	}
+
+	/// <summary>
+	/// Attempts to convert a <see cref="SignificantNumber"/> to a value of type <typeparamref name="TOther"/> using a checked conversion.
+	/// </summary>
+	/// <typeparam name="TOther">The type to convert to.</typeparam>
+	/// <param name="value">The <see cref="SignificantNumber"/> to convert.</param>
+	/// <param name="result">When this method returns, contains the converted value of type <typeparamref name="TOther"/>, if the conversion succeeded; otherwise, <c>null</c>.</param>
+	/// <returns><c>true</c> if the conversion succeeded; otherwise, <c>false</c>.</returns>
+	public static bool TryConvertToChecked<TOther>(SignificantNumber value, [MaybeNullWhen(false)] out TOther result) where TOther : INumberBase<TOther> =>
+		PreciseNumber.TryConvertToChecked(value, out result);
+
+	/// <summary>
+	/// Attempts to convert a <see cref="SignificantNumber"/> to a value of type <typeparamref name="TOther"/> using a saturating conversion.
+	/// </summary>
+	/// <typeparam name="TOther">The type to convert to.</typeparam>
+	/// <param name="value">The <see cref="SignificantNumber"/> to convert.</param>
+	/// <param name="result">When this method returns, contains the converted value of type <typeparamref name="TOther"/>, if the conversion succeeded; otherwise, <c>null</c>.</param>
+	/// <returns><c>true</c> if the conversion succeeded; otherwise, <c>false</c>.</returns>
+	public static bool TryConvertToSaturating<TOther>(SignificantNumber value, [MaybeNullWhen(false)] out TOther result) where TOther : INumberBase<TOther> =>
+		PreciseNumber.TryConvertToSaturating(value, out result);
+
+	/// <summary>
+	/// Attempts to convert a <see cref="SignificantNumber"/> to a value of type <typeparamref name="TOther"/> using a truncating conversion.
+	/// </summary>
+	/// <typeparam name="TOther">The type to convert to.</typeparam>
+	/// <param name="value">The <see cref="SignificantNumber"/> to convert.</param>
+	/// <param name="result">When this method returns, contains the converted value of type <typeparamref name="TOther"/>, if the conversion succeeded; otherwise, <c>null</c>.</param>
+	/// <returns><c>true</c> if the conversion succeeded; otherwise, <c>false</c>.</returns>
+	public static bool TryConvertToTruncating<TOther>(SignificantNumber value, [MaybeNullWhen(false)] out TOther result) where TOther : INumberBase<TOther> =>
+		PreciseNumber.TryConvertToTruncating(value, out result);
+
+	/// <summary>
+	/// Attempts to parse a span of characters into a <see cref="SignificantNumber"/> using the specified style and format provider.
+	/// </summary>
+	/// <param name="s">The span of characters to parse.</param>
+	/// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of <paramref name="s"/>.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <param name="result">
+	/// When this method returns, contains the parsed <see cref="SignificantNumber"/>, if the parsing succeeded; otherwise, <c>null</c>.
+	/// </param>
+	/// <returns><c>true</c> if the parsing succeeded; otherwise, <c>false</c>.</returns>
+	/// <exception cref="ArgumentNullException">Thrown when <paramref name="s"/> is null.</exception>
+	/// <exception cref="FormatException">Thrown when <paramref name="s"/> is not in a valid format.</exception>
+	public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, [NotNullWhen(true)] out SignificantNumber? result)
+	{
+		bool tryResult = PreciseNumber.TryParse(s, style, provider, out var preciseResult);
+		result = tryResult ? preciseResult?.ToSignificantNumber() : null;
+		return tryResult;
+	}
+
+	/// <summary>
+	/// Parses a span of characters into a <see cref="SignificantNumber"/> using the specified format provider.
+	/// </summary>
+	/// <param name="s">The span of characters to parse.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <returns>A <see cref="SignificantNumber"/> parsed from the input span.</returns>
+	/// <exception cref="FormatException">Thrown when the input span is not in a valid format.</exception>
+	/// <exception cref="ArgumentNullException">Thrown when the input span is null.</exception>
+	public static new SignificantNumber Parse(ReadOnlySpan<char> s, IFormatProvider? provider) =>
+		PreciseNumber.Parse(s, provider).ToSignificantNumber();
+
+	/// <summary>
+	/// Attempts to parse a span of characters into a <see cref="SignificantNumber"/> using the specified format provider.
+	/// </summary>
+	/// <param name="s">The span of characters to parse.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <param name="result">When this method returns, contains the parsed <see cref="SignificantNumber"/>, if the parsing succeeded; otherwise, <c>null</c>.</param>
+	/// <returns><c>true</c> if the parsing succeeded; otherwise, <c>false</c>.</returns>
+	public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [NotNullWhen(true)] out SignificantNumber? result)
+	{
+		bool tryResult = PreciseNumber.TryParse(s, provider, out var preciseResult);
+		result = tryResult ? preciseResult?.ToSignificantNumber() : null;
+		return tryResult;
+	}
+
+	/// <summary>
+	/// Parses a string into a <see cref="SignificantNumber"/> using the specified format provider.
+	/// </summary>
+	/// <param name="s">The string to parse.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <returns>A <see cref="SignificantNumber"/> parsed from the input string.</returns>
+	/// <exception cref="FormatException">Thrown when the input string is not in a valid format.</exception>
+	/// <exception cref="ArgumentNullException">Thrown when the input string is null.</exception>
+	public static new SignificantNumber Parse(string s, IFormatProvider? provider) =>
+		PreciseNumber.Parse(s, provider).ToSignificantNumber();
+
+	/// <summary>
+	/// Attempts to parse a string into a <see cref="SignificantNumber"/> using the specified format provider.
+	/// </summary>
+	/// <param name="s">The string to parse.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <param name="result">When this method returns, contains the parsed <see cref="SignificantNumber"/>, if the parsing succeeded; otherwise, <c>null</c>.</param>
+	/// <returns><c>true</c> if the parsing succeeded; otherwise, <c>false</c>.</returns>
+	public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [NotNullWhen(true)] out SignificantNumber? result)
+	{
+		bool tryResult = PreciseNumber.TryParse(s, provider, out var preciseResult);
+		result = tryResult ? preciseResult?.ToSignificantNumber() : null;
+		return tryResult;
+	}
+
+	/// <summary>
+	/// Attempts to parse a string into a <see cref="SignificantNumber"/> using the specified style and format provider.
+	/// </summary>
+	/// <param name="s">The string to parse.</param>
+	/// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of <paramref name="s"/>.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <param name="result">
+	/// When this method returns, contains the parsed <see cref="SignificantNumber"/>, if the parsing succeeded; otherwise, <see cref="Zero"/>.
+	/// </param>
+	/// <returns><c>true</c> if the parsing succeeded; otherwise, <c>false</c>.</returns>
+	/// <exception cref="ArgumentNullException">Thrown when <paramref name="s"/> is null.</exception>
+	/// <exception cref="FormatException">Thrown when <paramref name="s"/> is not in a valid format.</exception>
+	public static bool TryParse([NotNullWhen(true)] string? s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result)
+	{
+		bool tryResult = PreciseNumber.TryParse(s, provider, out var preciseResult);
+		result = tryResult ? preciseResult?.ToSignificantNumber() : Zero;
+		return tryResult;
+	}
+
+	/// <summary>
+	/// Provides a specific implementation of the IUtf8SpanFormattable.TryFormat method
+	/// to resolve ambiguity.
+	/// <param name="utf8Destination">The destination span for the UTF-8 formatted output.</param>
+	/// <param name="bytesWritten">The number of bytes written to the destination span.</param>
+	/// <param name="format">The format specifier.</param>
+	/// <param name="formatProvider">The format provider.</param>
+	/// <returns><c>true</c> if the formatting was successful; otherwise, <c>false</c>.</returns>
+	/// </summary>
+	bool IUtf8SpanFormattable.TryFormat(Span<byte> utf8Destination, out int bytesWritten, ReadOnlySpan<char> format, IFormatProvider? formatProvider) =>
+		 // Explicitly delegate to the base implementation to resolve ambiguity.
+		 ((IUtf8SpanFormattable)this).TryFormat(utf8Destination, out bytesWritten, format, formatProvider);
 }
