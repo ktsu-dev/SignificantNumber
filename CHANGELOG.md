@@ -1,3 +1,8 @@
+## v1.4.2-pre.1 (prerelease)
+
+Changes since v1.4.1:
+
+- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
 ## v1.4.1 (patch)
 
 Changes since v1.4.0:
@@ -6,11 +11,7 @@ Changes since v1.4.0:
 - Remove obsolete build configuration files and update SignificantNumber class for improved variable declarations and copyright information. ([@matt-edmondson](https://github.com/matt-edmondson))
 ## v1.4.1-pre.1 (prerelease)
 
-Changes since v1.4.0:
-
-- Sync .editorconfig ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .runsettings ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
+Incremental prerelease update.
 ## v1.4.0 (minor)
 
 Changes since v1.3.0:
