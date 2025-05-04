@@ -19,8 +19,8 @@ The `SignificantNumber` class represents a number with a significand and an expo
 - [Installation](#installation)
 - [Usage](#usage)
   - [Creating a SignificantNumber](#creating-a-significantnumber)
-      - [Supported Numeric Types](#supported-numeric-types)
-      - [Examples](#examples)
+    - [Supported Numeric Types](#supported-numeric-types)
+    - [Examples](#examples)
   - [Arithmetic Operations](#arithmetic-operations)
   - [Comparison Operations](#comparison-operations)
   - [Formatting and Parsing](#formatting-and-parsing)
@@ -58,7 +58,7 @@ You can create a `SignificantNumber` from various numeric types using the `ToSig
 
 The `SignificantNumber` class supports a wide range of numeric types through the `ToSignificantNumber` extension method, leveraging the `INumber` interface for conversions. The following types are supported:
 
-- **Integer Types**: 
+- **Integer Types**:
   - `int`
   - `long`
   - `short`
@@ -69,7 +69,7 @@ The `SignificantNumber` class supports a wide range of numeric types through the
   - `byte`
   - `BigInteger`
 
-- **Floating-Point Types**: 
+- **Floating-Point Types**:
   - `double`
   - `float`
   - `Half`
@@ -166,22 +166,22 @@ SignificantNumber significantNumberFromDouble = parsedDouble.ToSignificantNumber
 
 Converts various numeric types to a `SignificantNumber`.
 
-#### Usage:
+#### Usage
 
 ```csharp
 public static SignificantNumber ToSignificantNumber<TInput>(this INumber<TInput> input)
     where TInput : INumber<TInput>
 ```
 
-#### Parameters:
+#### Parameters
 
 - `input`: The input number to convert.
 
-#### Returns:
+#### Returns
 
 - `SignificantNumber`: The converted `SignificantNumber`.
 
-#### Example:
+#### Example
 
 ```csharp
 double floatingPointValue = 123.45;
@@ -200,22 +200,22 @@ SignificantNumber result = significantNumberFromFloat + significantNumberFromInt
 
 Converts a `SignificantNumber` to the specified numeric type.
 
-#### Usage:
+#### Usage
 
 ```csharp
 public TOutput To<TOutput>()
     where TOutput : INumber<TOutput>
 ```
 
-#### Parameters:
+#### Parameters
 
 - None
 
-#### Returns:
+#### Returns
 
 - `TOutput`: The converted value of the `SignificantNumber`.
 
-#### Example:
+#### Example
 
 ```csharp
 SignificantNumber significantNumber = new SignificantNumber(3, 12345); // 12345e3
@@ -232,6 +232,7 @@ Here's how it ensures precision:
 ### Significand and Exponent
 
 A `SignificantNumber` consists of two main components:
+
 - **Significand**: This is the significant part of the number, stored as a `BigInteger` to accommodate a wide range of values with high precision.
 - **Exponent**: This is the exponent part of the number, which scales the significand by a power of ten.
 
@@ -244,6 +245,7 @@ A `SignificantNumber` consists of two main components:
 ### Example of Precision
 
 Consider the number `123.456000`:
+
 - When stored as a `SignificantNumber`, it will be represented as `123456e-3` after removing the trailing zeros and adjusting the exponent accordingly.
 - This ensures that the number is represented with the exact precision required for your calculations, without unnecessary trailing zeros.
 
