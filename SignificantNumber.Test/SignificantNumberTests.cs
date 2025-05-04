@@ -1,10 +1,13 @@
+// Copyright (c) ktsu.dev
+// All rights reserved.
+// Licensed under the MIT license.
+
 namespace SignificantNumber.Test;
 
-using System.Numerics;
-
-using ktsu.SignificantNumber;
-using ktsu.PreciseNumber;
 using System.Globalization;
+using System.Numerics;
+using ktsu.PreciseNumber;
+using ktsu.SignificantNumber;
 
 [TestClass]
 public class SignificantNumberTests
@@ -82,7 +85,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
-		bool result = SignificantNumber.GreaterThan(left, right);
+		var result = SignificantNumber.GreaterThan(left, right);
 
 		Assert.IsTrue(result);
 	}
@@ -92,7 +95,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
-		bool result = SignificantNumber.LessThan(left, right);
+		var result = SignificantNumber.LessThan(left, right);
 
 		Assert.IsTrue(result);
 	}
@@ -102,7 +105,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
-		bool result = SignificantNumber.Equal(left, right);
+		var result = SignificantNumber.Equal(left, right);
 
 		Assert.IsTrue(result);
 	}
@@ -149,7 +152,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
-		bool result = SignificantNumber.GreaterThanOrEqual(left, right);
+		var result = SignificantNumber.GreaterThanOrEqual(left, right);
 
 		Assert.IsTrue(result);
 	}
@@ -159,7 +162,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
-		bool result = SignificantNumber.LessThanOrEqual(left, right);
+		var result = SignificantNumber.LessThanOrEqual(left, right);
 
 		Assert.IsTrue(result);
 	}
@@ -169,7 +172,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
-		bool result = SignificantNumber.NotEqual(left, right);
+		var result = SignificantNumber.NotEqual(left, right);
 
 		Assert.IsTrue(result);
 	}
@@ -179,7 +182,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
-		int result = SignificantNumber.CompareTo(left, right);
+		var result = SignificantNumber.CompareTo(left, right);
 
 		Assert.IsTrue(result > 0);
 	}
@@ -239,7 +242,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
-		bool result = left == right;
+		var result = left == right;
 
 		Assert.IsTrue(result);
 	}
@@ -249,7 +252,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
-		bool result = left != right;
+		var result = left != right;
 
 		Assert.IsTrue(result);
 	}
@@ -259,7 +262,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
-		bool result = left > right;
+		var result = left > right;
 
 		Assert.IsTrue(result);
 	}
@@ -269,7 +272,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
-		bool result = left < right;
+		var result = left < right;
 
 		Assert.IsTrue(result);
 	}
@@ -279,7 +282,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
-		bool result = left >= right;
+		var result = left >= right;
 
 		Assert.IsTrue(result);
 	}
@@ -289,7 +292,7 @@ public class SignificantNumberTests
 	{
 		var left = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
 		var right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
-		bool result = left <= right;
+		var result = left <= right;
 
 		Assert.IsTrue(result);
 	}
@@ -388,7 +391,7 @@ public class SignificantNumberTests
 		// Dummy type that implements ITest<int>
 		var type = typeof(DummyTestClass);
 		var genericInterface = typeof(ITest<>);
-		bool result = SignificantNumber.DoesImplementGenericInterface(type, genericInterface);
+		var result = SignificantNumber.DoesImplementGenericInterface(type, genericInterface);
 		Assert.IsTrue(result);
 	}
 
@@ -398,7 +401,7 @@ public class SignificantNumberTests
 		// Dummy type that does not implement ITest<>
 		var type = typeof(DummyNonTestClass);
 		var genericInterface = typeof(ITest<>);
-		bool result = SignificantNumber.DoesImplementGenericInterface(type, genericInterface);
+		var result = SignificantNumber.DoesImplementGenericInterface(type, genericInterface);
 		Assert.IsFalse(result);
 	}
 
@@ -510,8 +513,8 @@ public class SignificantNumberTests
 		var leftSN = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		var rightPN = 100.ToPreciseNumber();
 
-		bool result1 = leftSN == rightPN;
-		bool result2 = rightPN == leftSN;
+		var result1 = leftSN == rightPN;
+		var result2 = rightPN == leftSN;
 
 		Assert.IsTrue(result1);
 		Assert.IsTrue(result2);
@@ -524,12 +527,12 @@ public class SignificantNumberTests
 		var largerPN = 100.ToPreciseNumber();
 
 		// Test greater than
-		bool gtResult1 = largerPN > smallerSN;
-		bool gtResult2 = smallerSN < largerPN;
+		var gtResult1 = largerPN > smallerSN;
+		var gtResult2 = smallerSN < largerPN;
 
 		// Test greater than or equal
-		bool gteResult1 = largerPN >= smallerSN;
-		bool gteResult2 = smallerSN <= largerPN;
+		var gteResult1 = largerPN >= smallerSN;
+		var gteResult2 = smallerSN <= largerPN;
 
 		Assert.IsTrue(gtResult1);
 		Assert.IsTrue(gtResult2);
@@ -565,7 +568,7 @@ public class SignificantNumberTests
 	public void IsCanonical_ValidNumber_ReturnsTrue()
 	{
 		var number = SignificantNumber.CreateFromComponents(0, new BigInteger(5));
-		bool result = SignificantNumber.IsCanonical(number);
+		var result = SignificantNumber.IsCanonical(number);
 		Assert.IsTrue(result);
 	}
 
@@ -573,7 +576,7 @@ public class SignificantNumberTests
 	public void IsEvenInteger_EvenNumber_ReturnsTrue()
 	{
 		var number = SignificantNumber.CreateFromComponents(0, new BigInteger(4));
-		bool result = SignificantNumber.IsEvenInteger(number);
+		var result = SignificantNumber.IsEvenInteger(number);
 		Assert.IsTrue(result);
 	}
 
@@ -581,7 +584,7 @@ public class SignificantNumberTests
 	public void IsEvenInteger_OddNumber_ReturnsFalse()
 	{
 		var number = SignificantNumber.CreateFromComponents(0, new BigInteger(5));
-		bool result = SignificantNumber.IsEvenInteger(number);
+		var result = SignificantNumber.IsEvenInteger(number);
 		Assert.IsFalse(result);
 	}
 
@@ -589,7 +592,7 @@ public class SignificantNumberTests
 	public void IsOddInteger_OddNumber_ReturnsTrue()
 	{
 		var number = SignificantNumber.CreateFromComponents(0, new BigInteger(5));
-		bool result = SignificantNumber.IsOddInteger(number);
+		var result = SignificantNumber.IsOddInteger(number);
 		Assert.IsTrue(result);
 	}
 
@@ -597,7 +600,7 @@ public class SignificantNumberTests
 	public void IsOddInteger_EvenNumber_ReturnsFalse()
 	{
 		var number = SignificantNumber.CreateFromComponents(0, new BigInteger(4));
-		bool result = SignificantNumber.IsOddInteger(number);
+		var result = SignificantNumber.IsOddInteger(number);
 		Assert.IsFalse(result);
 	}
 
@@ -605,7 +608,7 @@ public class SignificantNumberTests
 	public void IsZero_ZeroNumber_ReturnsTrue()
 	{
 		var number = SignificantNumber.Zero;
-		bool result = SignificantNumber.IsZero(number);
+		var result = SignificantNumber.IsZero(number);
 		Assert.IsTrue(result);
 	}
 
@@ -613,7 +616,7 @@ public class SignificantNumberTests
 	public void IsZero_NonZeroNumber_ReturnsFalse()
 	{
 		var number = SignificantNumber.CreateFromComponents(0, new BigInteger(5));
-		bool result = SignificantNumber.IsZero(number);
+		var result = SignificantNumber.IsZero(number);
 		Assert.IsFalse(result);
 	}
 
@@ -638,7 +641,7 @@ public class SignificantNumberTests
 	[TestMethod]
 	public void Parse_ValidString_ReturnsCorrectNumber()
 	{
-		string input = "5";
+		var input = "5";
 		var result = SignificantNumber.Parse(input, CultureInfo.InvariantCulture);
 		Assert.AreEqual(SignificantNumber.CreateFromComponents(0, new BigInteger(5)), result);
 	}
@@ -646,8 +649,8 @@ public class SignificantNumberTests
 	[TestMethod]
 	public void TryParse_ValidString_ReturnsTrueAndCorrectNumber()
 	{
-		string input = "5";
-		bool success = SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out var result);
+		var input = "5";
+		var success = SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out var result);
 		Assert.IsTrue(success);
 		Assert.AreEqual(SignificantNumber.CreateFromComponents(0, new BigInteger(5)), result);
 	}
@@ -655,8 +658,8 @@ public class SignificantNumberTests
 	[TestMethod]
 	public void TryParse_InvalidString_ReturnsFalse()
 	{
-		string input = "invalid";
-		bool success = SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out var result);
+		var input = "invalid";
+		var success = SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out var result);
 		Assert.IsFalse(success);
 		Assert.IsNull(result);
 	}
@@ -764,8 +767,8 @@ public class SignificantNumberTests
 	[TestMethod]
 	public void TryParse_InvalidInput_ReturnsFalse()
 	{
-		string input = "invalid";
-		bool success = SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out var result);
+		var input = "invalid";
+		var success = SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out var result);
 
 		Assert.IsFalse(success);
 		Assert.IsNull(result);

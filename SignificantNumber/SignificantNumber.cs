@@ -1,3 +1,7 @@
+// Copyright (c) ktsu.dev
+// All rights reserved.
+// Licensed under the MIT license.
+
 [assembly: CLSCompliant(true)]
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 namespace ktsu.SignificantNumber;
@@ -76,7 +80,7 @@ public record SignificantNumber
 	/// <returns>The result of the subtraction.</returns>
 	public static new SignificantNumber Subtract(PreciseNumber left, PreciseNumber right)
 	{
-		int lowestDecimalDigits = LowestDecimalDigits(left, right);
+		var lowestDecimalDigits = LowestDecimalDigits(left, right);
 		return PreciseNumber.Subtract(left, right)
 			.Round(lowestDecimalDigits)
 			.ToSignificantNumber();
@@ -90,7 +94,7 @@ public record SignificantNumber
 	/// <returns>The result of the addition.</returns>
 	public static new SignificantNumber Add(PreciseNumber left, PreciseNumber right)
 	{
-		int lowestDecimalDigits = LowestDecimalDigits(left, right);
+		var lowestDecimalDigits = LowestDecimalDigits(left, right);
 		return PreciseNumber.Add(left, right)
 			.Round(lowestDecimalDigits)
 			.ToSignificantNumber();
@@ -104,7 +108,7 @@ public record SignificantNumber
 	/// <returns>The result of the multiplication.</returns>
 	public static new SignificantNumber Multiply(PreciseNumber left, PreciseNumber right)
 	{
-		int lowestSignificantDigits = LowestSignificantDigits(left, right);
+		var lowestSignificantDigits = LowestSignificantDigits(left, right);
 		return PreciseNumber.Multiply(left, right)
 			.ToSignificantNumber(lowestSignificantDigits);
 	}
@@ -118,7 +122,7 @@ public record SignificantNumber
 	/// <returns>The result of the division.</returns>
 	public static new SignificantNumber Divide(PreciseNumber left, PreciseNumber right)
 	{
-		int lowestSignificantDigits = LowestSignificantDigits(left, right);
+		var lowestSignificantDigits = LowestSignificantDigits(left, right);
 		return PreciseNumber.Divide(left, right)
 			.ToSignificantNumber(lowestSignificantDigits);
 	}
@@ -131,7 +135,7 @@ public record SignificantNumber
 	/// <returns>The modulus of the two numbers.</returns>
 	public static new SignificantNumber Mod(PreciseNumber left, PreciseNumber right)
 	{
-		int lowestSignificantDigits = LowestSignificantDigits(left, right);
+		var lowestSignificantDigits = LowestSignificantDigits(left, right);
 		return PreciseNumber.Mod(left, right)
 			.ToSignificantNumber(lowestSignificantDigits);
 	}
@@ -276,7 +280,7 @@ public record SignificantNumber
 	{
 		ArgumentNullException.ThrowIfNull(left);
 		ArgumentNullException.ThrowIfNull(right);
-		int lowestSignificantDigits = LowestSignificantDigits(left, right);
+		var lowestSignificantDigits = LowestSignificantDigits(left, right);
 		return left.ReduceSignificance(lowestSignificantDigits).CompareTo(right.ReduceSignificance(lowestSignificantDigits));
 	}
 
@@ -443,7 +447,7 @@ public record SignificantNumber
 	/// <exception cref="ArgumentException">Thrown when the specified type is not a valid generic interface.</exception>
 	internal static bool DoesImplementGenericInterface(Type type, Type genericInterface)
 	{
-		bool genericInterfaceIsValid = genericInterface.IsInterface && genericInterface.IsGenericType;
+		var genericInterfaceIsValid = genericInterface.IsInterface && genericInterface.IsGenericType;
 
 		return genericInterfaceIsValid
 			? Array.Exists(type.GetInterfaces(), x => x.IsGenericType && x.GetGenericTypeDefinition() == genericInterface)
@@ -472,10 +476,10 @@ public record SignificantNumber
 			return One;
 		}
 
-		int significantDigits = LowestSignificantDigits(this, power);
+		var significantDigits = LowestSignificantDigits(this, power);
 
 		// Use logarithm and exponential to support decimal powers
-		double logValue = Math.Log(Math.Abs(To<double>()));
+		var logValue = Math.Log(Math.Abs(To<double>()));
 		return Math.Exp(logValue * power.To<double>()).ToSignificantNumber(significantDigits);
 	}
 
@@ -497,7 +501,7 @@ public record SignificantNumber
 			return E.ToSignificantNumber();
 		}
 
-		int significantDigits = LowestSignificantDigits(E, power);
+		var significantDigits = LowestSignificantDigits(E, power);
 
 		return Math.Exp(power.To<double>())
 			.ToSignificantNumber(significantDigits);
@@ -733,7 +737,7 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the conversion succeeded; otherwise, <c>false</c>.</returns>
 	public static bool TryConvertFromChecked<TOther>(TOther value, [NotNullWhen(true)] out SignificantNumber? result) where TOther : INumberBase<TOther>
 	{
-		bool tryResult = PreciseNumber.TryConvertFromChecked(value, out var preciseResult);
+		var tryResult = PreciseNumber.TryConvertFromChecked(value, out var preciseResult);
 		result = tryResult ? preciseResult.ToSignificantNumber() : null;
 		return tryResult;
 	}
@@ -747,7 +751,7 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the conversion succeeded; otherwise, <c>false</c>.</returns>
 	public static bool TryConvertFromSaturating<TOther>(TOther value, [NotNullWhen(true)] out SignificantNumber? result) where TOther : INumberBase<TOther>
 	{
-		bool tryResult = PreciseNumber.TryConvertFromSaturating(value, out var preciseResult);
+		var tryResult = PreciseNumber.TryConvertFromSaturating(value, out var preciseResult);
 		result = tryResult ? preciseResult.ToSignificantNumber() : null;
 		return tryResult;
 	}
@@ -761,7 +765,7 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the conversion succeeded; otherwise, <c>false</c>.</returns>
 	public static bool TryConvertFromTruncating<TOther>(TOther value, [NotNullWhen(true)] out SignificantNumber? result) where TOther : INumberBase<TOther>
 	{
-		bool tryResult = PreciseNumber.TryConvertFromTruncating(value, out var preciseResult);
+		var tryResult = PreciseNumber.TryConvertFromTruncating(value, out var preciseResult);
 		result = tryResult ? preciseResult.ToSignificantNumber() : null;
 		return tryResult;
 	}
@@ -810,7 +814,7 @@ public record SignificantNumber
 	/// <exception cref="FormatException">Thrown when <paramref name="s"/> is not in a valid format.</exception>
 	public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, [NotNullWhen(true)] out SignificantNumber? result)
 	{
-		bool tryResult = PreciseNumber.TryParse(s, style, provider, out var preciseResult);
+		var tryResult = PreciseNumber.TryParse(s, style, provider, out var preciseResult);
 		result = tryResult ? preciseResult?.ToSignificantNumber() : null;
 		return tryResult;
 	}
@@ -835,7 +839,7 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the parsing succeeded; otherwise, <c>false</c>.</returns>
 	public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [NotNullWhen(true)] out SignificantNumber? result)
 	{
-		bool tryResult = PreciseNumber.TryParse(s, provider, out var preciseResult);
+		var tryResult = PreciseNumber.TryParse(s, provider, out var preciseResult);
 		result = tryResult ? preciseResult?.ToSignificantNumber() : null;
 		return tryResult;
 	}
@@ -860,7 +864,7 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the parsing succeeded; otherwise, <c>false</c>.</returns>
 	public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [NotNullWhen(true)] out SignificantNumber? result)
 	{
-		bool tryResult = PreciseNumber.TryParse(s, provider, out var preciseResult);
+		var tryResult = PreciseNumber.TryParse(s, provider, out var preciseResult);
 		result = tryResult ? preciseResult?.ToSignificantNumber() : null;
 		return tryResult;
 	}
@@ -879,7 +883,7 @@ public record SignificantNumber
 	/// <exception cref="FormatException">Thrown when <paramref name="s"/> is not in a valid format.</exception>
 	public static bool TryParse([NotNullWhen(true)] string? s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result)
 	{
-		bool tryResult = PreciseNumber.TryParse(s, provider, out var preciseResult);
+		var tryResult = PreciseNumber.TryParse(s, provider, out var preciseResult);
 		result = tryResult ? preciseResult?.ToSignificantNumber() : Zero;
 		return tryResult;
 	}

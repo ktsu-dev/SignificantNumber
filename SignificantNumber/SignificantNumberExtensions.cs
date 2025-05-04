@@ -1,3 +1,7 @@
+// Copyright (c) ktsu.dev
+// All rights reserved.
+// Licensed under the MIT license.
+
 namespace ktsu.SignificantNumber;
 
 using System.Numerics;
@@ -26,7 +30,7 @@ public static class SignificantNumberExtensions
 
 		var inputType = input.GetType();
 		var significantNumberType = typeof(SignificantNumber);
-		bool isSignificantNumber = inputType == significantNumberType || inputType.IsSubclassOf(significantNumberType);
+		var isSignificantNumber = inputType == significantNumberType || inputType.IsSubclassOf(significantNumberType);
 
 		if (isSignificantNumber)
 		{
