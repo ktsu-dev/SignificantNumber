@@ -1,5 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="ktsu.Sdk.Lib/1.8.0">
   <ItemGroup>
-    <PackageReference Include="ktsu.PreciseNumber" Version="1.7.0" />
+    <PackageReference Include="ktsu.PreciseNumber" Version="1.7.1" />
   </ItemGroup>
 </Project>
