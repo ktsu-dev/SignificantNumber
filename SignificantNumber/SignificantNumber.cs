@@ -80,7 +80,7 @@ public record SignificantNumber
 	/// <returns>The result of the subtraction.</returns>
 	public static new SignificantNumber Subtract(PreciseNumber left, PreciseNumber right)
 	{
-		var lowestDecimalDigits = LowestDecimalDigits(left, right);
+		int lowestDecimalDigits = LowestDecimalDigits(left, right);
 		return PreciseNumber.Subtract(left, right)
 			.Round(lowestDecimalDigits)
 			.ToSignificantNumber();
@@ -94,7 +94,7 @@ public record SignificantNumber
 	/// <returns>The result of the addition.</returns>
 	public static new SignificantNumber Add(PreciseNumber left, PreciseNumber right)
 	{
-		var lowestDecimalDigits = LowestDecimalDigits(left, right);
+		int lowestDecimalDigits = LowestDecimalDigits(left, right);
 		return PreciseNumber.Add(left, right)
 			.Round(lowestDecimalDigits)
 			.ToSignificantNumber();
@@ -108,7 +108,7 @@ public record SignificantNumber
 	/// <returns>The result of the multiplication.</returns>
 	public static new SignificantNumber Multiply(PreciseNumber left, PreciseNumber right)
 	{
-		var lowestSignificantDigits = LowestSignificantDigits(left, right);
+		int lowestSignificantDigits = LowestSignificantDigits(left, right);
 		return PreciseNumber.Multiply(left, right)
 			.ToSignificantNumber(lowestSignificantDigits);
 	}
@@ -122,7 +122,7 @@ public record SignificantNumber
 	/// <returns>The result of the division.</returns>
 	public static new SignificantNumber Divide(PreciseNumber left, PreciseNumber right)
 	{
-		var lowestSignificantDigits = LowestSignificantDigits(left, right);
+		int lowestSignificantDigits = LowestSignificantDigits(left, right);
 		return PreciseNumber.Divide(left, right)
 			.ToSignificantNumber(lowestSignificantDigits);
 	}
@@ -135,7 +135,7 @@ public record SignificantNumber
 	/// <returns>The modulus of the two numbers.</returns>
 	public static new SignificantNumber Mod(PreciseNumber left, PreciseNumber right)
 	{
-		var lowestSignificantDigits = LowestSignificantDigits(left, right);
+		int lowestSignificantDigits = LowestSignificantDigits(left, right);
 		return PreciseNumber.Mod(left, right)
 			.ToSignificantNumber(lowestSignificantDigits);
 	}
@@ -280,7 +280,7 @@ public record SignificantNumber
 	{
 		ArgumentNullException.ThrowIfNull(left);
 		ArgumentNullException.ThrowIfNull(right);
-		var lowestSignificantDigits = LowestSignificantDigits(left, right);
+		int lowestSignificantDigits = LowestSignificantDigits(left, right);
 		return left.ReduceSignificance(lowestSignificantDigits).CompareTo(right.ReduceSignificance(lowestSignificantDigits));
 	}
 
@@ -447,7 +447,7 @@ public record SignificantNumber
 	/// <exception cref="ArgumentException">Thrown when the specified type is not a valid generic interface.</exception>
 	internal static bool DoesImplementGenericInterface(Type type, Type genericInterface)
 	{
-		var genericInterfaceIsValid = genericInterface.IsInterface && genericInterface.IsGenericType;
+		bool genericInterfaceIsValid = genericInterface.IsInterface && genericInterface.IsGenericType;
 
 		return genericInterfaceIsValid
 			? Array.Exists(type.GetInterfaces(), x => x.IsGenericType && x.GetGenericTypeDefinition() == genericInterface)
@@ -476,10 +476,10 @@ public record SignificantNumber
 			return One;
 		}
 
-		var significantDigits = LowestSignificantDigits(this, power);
+		int significantDigits = LowestSignificantDigits(this, power);
 
 		// Use logarithm and exponential to support decimal powers
-		var logValue = Math.Log(Math.Abs(To<double>()));
+		double logValue = Math.Log(Math.Abs(To<double>()));
 		return Math.Exp(logValue * power.To<double>()).ToSignificantNumber(significantDigits);
 	}
 
@@ -501,7 +501,7 @@ public record SignificantNumber
 			return E.ToSignificantNumber();
 		}
 
-		var significantDigits = LowestSignificantDigits(E, power);
+		int significantDigits = LowestSignificantDigits(E, power);
 
 		return Math.Exp(power.To<double>())
 			.ToSignificantNumber(significantDigits);
@@ -737,7 +737,7 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the conversion succeeded; otherwise, <c>false</c>.</returns>
 	public static bool TryConvertFromChecked<TOther>(TOther value, [NotNullWhen(true)] out SignificantNumber? result) where TOther : INumberBase<TOther>
 	{
-		var tryResult = PreciseNumber.TryConvertFromChecked(value, out var preciseResult);
+		bool tryResult = PreciseNumber.TryConvertFromChecked(value, out PreciseNumber? preciseResult);
 		result = tryResult ? preciseResult.ToSignificantNumber() : null;
 		return tryResult;
 	}
@@ -751,7 +751,7 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the conversion succeeded; otherwise, <c>false</c>.</returns>
 	public static bool TryConvertFromSaturating<TOther>(TOther value, [NotNullWhen(true)] out SignificantNumber? result) where TOther : INumberBase<TOther>
 	{
-		var tryResult = PreciseNumber.TryConvertFromSaturating(value, out var preciseResult);
+		bool tryResult = PreciseNumber.TryConvertFromSaturating(value, out PreciseNumber? preciseResult);
 		result = tryResult ? preciseResult.ToSignificantNumber() : null;
 		return tryResult;
 	}
@@ -765,7 +765,7 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the conversion succeeded; otherwise, <c>false</c>.</returns>
 	public static bool TryConvertFromTruncating<TOther>(TOther value, [NotNullWhen(true)] out SignificantNumber? result) where TOther : INumberBase<TOther>
 	{
-		var tryResult = PreciseNumber.TryConvertFromTruncating(value, out var preciseResult);
+		bool tryResult = PreciseNumber.TryConvertFromTruncating(value, out PreciseNumber? preciseResult);
 		result = tryResult ? preciseResult.ToSignificantNumber() : null;
 		return tryResult;
 	}
@@ -814,7 +814,7 @@ public record SignificantNumber
 	/// <exception cref="FormatException">Thrown when <paramref name="s"/> is not in a valid format.</exception>
 	public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, [NotNullWhen(true)] out SignificantNumber? result)
 	{
-		var tryResult = PreciseNumber.TryParse(s, style, provider, out var preciseResult);
+		bool tryResult = PreciseNumber.TryParse(s, style, provider, out PreciseNumber? preciseResult);
 		result = tryResult ? preciseResult?.ToSignificantNumber() : null;
 		return tryResult;
 	}
@@ -839,7 +839,7 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the parsing succeeded; otherwise, <c>false</c>.</returns>
 	public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [NotNullWhen(true)] out SignificantNumber? result)
 	{
-		var tryResult = PreciseNumber.TryParse(s, provider, out var preciseResult);
+		bool tryResult = PreciseNumber.TryParse(s, provider, out PreciseNumber? preciseResult);
 		result = tryResult ? preciseResult?.ToSignificantNumber() : null;
 		return tryResult;
 	}
@@ -864,7 +864,7 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the parsing succeeded; otherwise, <c>false</c>.</returns>
 	public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [NotNullWhen(true)] out SignificantNumber? result)
 	{
-		var tryResult = PreciseNumber.TryParse(s, provider, out var preciseResult);
+		bool tryResult = PreciseNumber.TryParse(s, provider, out PreciseNumber? preciseResult);
 		result = tryResult ? preciseResult?.ToSignificantNumber() : null;
 		return tryResult;
 	}
@@ -883,21 +883,23 @@ public record SignificantNumber
 	/// <exception cref="FormatException">Thrown when <paramref name="s"/> is not in a valid format.</exception>
 	public static bool TryParse([NotNullWhen(true)] string? s, NumberStyles style, IFormatProvider? provider, [MaybeNullWhen(false)] out SignificantNumber result)
 	{
-		var tryResult = PreciseNumber.TryParse(s, provider, out var preciseResult);
+		bool tryResult = TryParse(s, provider, out PreciseNumber? preciseResult);
 		result = tryResult ? preciseResult?.ToSignificantNumber() : Zero;
 		return tryResult;
 	}
 
+#if NET8_0_OR_GREATER
 	/// <summary>
 	/// Provides a specific implementation of the IUtf8SpanFormattable.TryFormat method
 	/// to resolve ambiguity.
 	/// <param name="utf8Destination">The destination span for the UTF-8 formatted output.</param>
 	/// <param name="bytesWritten">The number of bytes written to the destination span.</param>
 	/// <param name="format">The format specifier.</param>
-	/// <param name="formatProvider">The format provider.</param>
+	/// <param name="provider">The format provider.</param>
 	/// <returns><c>true</c> if the formatting was successful; otherwise, <c>false</c>.</returns>
 	/// </summary>
-	bool IUtf8SpanFormattable.TryFormat(Span<byte> utf8Destination, out int bytesWritten, ReadOnlySpan<char> format, IFormatProvider? formatProvider) =>
+	bool IUtf8SpanFormattable.TryFormat(Span<byte> utf8Destination, out int bytesWritten, ReadOnlySpan<char> format, IFormatProvider? provider) =>
 		 // Explicitly delegate to the base implementation to resolve ambiguity.
-		 ((IUtf8SpanFormattable)this).TryFormat(utf8Destination, out bytesWritten, format, formatProvider);
+		 ((IUtf8SpanFormattable)this).TryFormat(utf8Destination, out bytesWritten, format, provider);
+#endif
 }

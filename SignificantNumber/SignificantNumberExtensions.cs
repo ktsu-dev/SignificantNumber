@@ -28,16 +28,16 @@ public static class SignificantNumberExtensions
 	{
 		ArgumentNullException.ThrowIfNull(input);
 
-		var inputType = input.GetType();
-		var significantNumberType = typeof(SignificantNumber);
-		var isSignificantNumber = inputType == significantNumberType || inputType.IsSubclassOf(significantNumberType);
+		Type inputType = input.GetType();
+		Type significantNumberType = typeof(SignificantNumber);
+		bool isSignificantNumber = inputType == significantNumberType || inputType.IsSubclassOf(significantNumberType);
 
 		if (isSignificantNumber)
 		{
 			return (SignificantNumber)(object)input;
 		}
 
-		var preciseNumber = input.ToPreciseNumber();
+		PreciseNumber preciseNumber = input.ToPreciseNumber();
 
 		return SignificantNumber.CreateFromComponents(preciseNumber.Exponent, preciseNumber.Significand);
 	}
@@ -60,7 +60,7 @@ public static class SignificantNumberExtensions
 			throw new ArgumentOutOfRangeException(nameof(significantDigits), "Significant digits must be greater than zero.");
 		}
 
-		var preciseNumber = input
+		PreciseNumber preciseNumber = input
 			.ToPreciseNumber()
 			.ReduceSignificance(significantDigits);
 

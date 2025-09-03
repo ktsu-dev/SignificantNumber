@@ -3,6 +3,6 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="ktsu.PreciseNumber" Version="1.7.1" />
+    <PackageVersion Include="ktsu.PreciseNumber" Version="1.7.2" />
   </ItemGroup>
 </Project>
