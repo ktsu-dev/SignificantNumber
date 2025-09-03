@@ -1,6 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="ktsu.Sdk.Lib/1.8.0">
+﻿<Project>
+  <Sdk Name="Microsoft.NET.Sdk" />
+  <Sdk Name="ktsu.Sdk" />
   <ItemGroup>
-    <PackageReference Include="ktsu.PreciseNumber" Version="1.7.1" />
+    <PackageReference Include="ktsu.PreciseNumber" />
   </ItemGroup>
 </Project>
