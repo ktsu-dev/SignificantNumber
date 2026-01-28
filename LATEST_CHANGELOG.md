@@ -1,5 +1,3 @@
-## v1.4.4 (patch)
+## v1.4.4
 
-Changes since v1.4.3:
-
-- Update package references, target framework, and improve test assertions ([@matt-edmondson](https://github.com/matt-edmondson))
+No significant changes detected since v1.4.4.
