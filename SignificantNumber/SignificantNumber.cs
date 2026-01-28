@@ -2,8 +2,6 @@
 // All rights reserved.
 // Licensed under the MIT license.
 
-[assembly: CLSCompliant(true)]
-[assembly: System.Runtime.InteropServices.ComVisible(false)]
 namespace ktsu.SignificantNumber;
 
 using System;
@@ -184,8 +182,8 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the first number is greater than the second; otherwise, <c>false</c>.</returns>
 	public static new bool GreaterThan(PreciseNumber left, PreciseNumber right)
 	{
-		ArgumentNullException.ThrowIfNull(left);
-		ArgumentNullException.ThrowIfNull(right);
+		Ensure.NotNull(left);
+		Ensure.NotNull(right);
 		return left.CompareTo(right) > 0;
 	}
 
@@ -197,8 +195,8 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the first number is greater than or equal to the second; otherwise, <c>false</c>.</returns>
 	public static new bool GreaterThanOrEqual(PreciseNumber left, PreciseNumber right)
 	{
-		ArgumentNullException.ThrowIfNull(left);
-		ArgumentNullException.ThrowIfNull(right);
+		Ensure.NotNull(left);
+		Ensure.NotNull(right);
 		return left.CompareTo(right) >= 0;
 	}
 
@@ -210,8 +208,8 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the first number is less than the second; otherwise, <c>false</c>.</returns>
 	public static new bool LessThan(PreciseNumber left, PreciseNumber right)
 	{
-		ArgumentNullException.ThrowIfNull(left);
-		ArgumentNullException.ThrowIfNull(right);
+		Ensure.NotNull(left);
+		Ensure.NotNull(right);
 		return left.CompareTo(right) < 0;
 	}
 
@@ -223,8 +221,8 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the first number is less than or equal to the second; otherwise, <c>false</c>.</returns>
 	public static new bool LessThanOrEqual(PreciseNumber left, PreciseNumber right)
 	{
-		ArgumentNullException.ThrowIfNull(left);
-		ArgumentNullException.ThrowIfNull(right);
+		Ensure.NotNull(left);
+		Ensure.NotNull(right);
 		return left.CompareTo(right) <= 0;
 	}
 
@@ -236,8 +234,8 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the two numbers are equal; otherwise, <c>false</c>.</returns>
 	public static new bool Equal(PreciseNumber left, PreciseNumber right)
 	{
-		ArgumentNullException.ThrowIfNull(left);
-		ArgumentNullException.ThrowIfNull(right);
+		Ensure.NotNull(left);
+		Ensure.NotNull(right);
 		return left.CompareTo(right) == 0;
 	}
 
@@ -249,8 +247,8 @@ public record SignificantNumber
 	/// <returns><c>true</c> if the two numbers are not equal; otherwise, <c>false</c>.</returns>
 	public static new bool NotEqual(PreciseNumber left, PreciseNumber right)
 	{
-		ArgumentNullException.ThrowIfNull(left);
-		ArgumentNullException.ThrowIfNull(right);
+		Ensure.NotNull(left);
+		Ensure.NotNull(right);
 		return left.CompareTo(right) != 0;
 	}
 
@@ -278,8 +276,8 @@ public record SignificantNumber
 	/// </exception>
 	public static int CompareTo(PreciseNumber left, PreciseNumber right)
 	{
-		ArgumentNullException.ThrowIfNull(left);
-		ArgumentNullException.ThrowIfNull(right);
+		Ensure.NotNull(left);
+		Ensure.NotNull(right);
 		int lowestSignificantDigits = LowestSignificantDigits(left, right);
 		return left.ReduceSignificance(lowestSignificantDigits).CompareTo(right.ReduceSignificance(lowestSignificantDigits));
 	}
@@ -461,7 +459,7 @@ public record SignificantNumber
 	/// <returns>A new instance of <see cref="SignificantNumber"/> that is the result of raising the current instance to the specified power.</returns>
 	public new SignificantNumber Pow(PreciseNumber power)
 	{
-		ArgumentNullException.ThrowIfNull(power);
+		Ensure.NotNull(power);
 
 		if (Equal(power, Zero))
 		{
@@ -490,7 +488,7 @@ public record SignificantNumber
 	/// <returns>A new instance of <see cref="SignificantNumber"/> that is the result of raising e to the specified power.</returns>
 	public static new SignificantNumber Exp(PreciseNumber power)
 	{
-		ArgumentNullException.ThrowIfNull(power);
+		Ensure.NotNull(power);
 
 		if (Equal(power, Zero))
 		{

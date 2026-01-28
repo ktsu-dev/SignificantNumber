@@ -2,6 +2,8 @@
 // All rights reserved.
 // Licensed under the MIT license.
 
+[assembly: Parallelize]
+
 namespace SignificantNumber.Test;
 
 using System.Globalization;
@@ -87,7 +89,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
 		bool result = SignificantNumber.GreaterThan(left, right);
 
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "GreaterThan should return true when left (10) is greater than right (5)");
 	}
 
 	[TestMethod]
@@ -97,7 +99,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		bool result = SignificantNumber.LessThan(left, right);
 
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "LessThan should return true when left (5) is less than right (10)");
 	}
 
 	[TestMethod]
@@ -107,7 +109,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		bool result = SignificantNumber.Equal(left, right);
 
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "Equal should return true when both numbers have the same value (10)");
 	}
 
 	[TestMethod]
@@ -154,7 +156,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		bool result = SignificantNumber.GreaterThanOrEqual(left, right);
 
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "GreaterThanOrEqual should return true when both numbers are equal (10)");
 	}
 
 	[TestMethod]
@@ -164,7 +166,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		bool result = SignificantNumber.LessThanOrEqual(left, right);
 
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "LessThanOrEqual should return true when left (5) is less than right (10)");
 	}
 
 	[TestMethod]
@@ -174,7 +176,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
 		bool result = SignificantNumber.NotEqual(left, right);
 
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "NotEqual should return true when left (10) is not equal to right (5)");
 	}
 
 	[TestMethod]
@@ -184,7 +186,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
 		int result = SignificantNumber.CompareTo(left, right);
 
-		Assert.IsTrue(result > 0);
+		Assert.IsGreaterThan(0, result, "CompareTo should return a positive value when left (10) is greater than right (5)");
 	}
 
 	[TestMethod]
@@ -244,7 +246,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		bool result = left == right;
 
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "Equality operator should return true when both numbers have the same value (10)");
 	}
 
 	[TestMethod]
@@ -254,7 +256,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
 		bool result = left != right;
 
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "Inequality operator should return true when left (10) is not equal to right (5)");
 	}
 
 	[TestMethod]
@@ -264,7 +266,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
 		bool result = left > right;
 
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "Greater than operator should return true when left (10) is greater than right (5)");
 	}
 
 	[TestMethod]
@@ -274,7 +276,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		bool result = left < right;
 
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "Less than operator should return true when left (5) is less than right (10)");
 	}
 
 	[TestMethod]
@@ -284,7 +286,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		bool result = left >= right;
 
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "Greater than or equal operator should return true when both numbers are equal (10)");
 	}
 
 	[TestMethod]
@@ -294,7 +296,7 @@ public class SignificantNumberTests
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		bool result = left <= right;
 
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "Less than or equal operator should return true when left (5) is less than right (10)");
 	}
 
 	[TestMethod]
@@ -392,7 +394,7 @@ public class SignificantNumberTests
 		Type type = typeof(DummyTestClass);
 		Type genericInterface = typeof(ITest<>);
 		bool result = SignificantNumber.DoesImplementGenericInterface(type, genericInterface);
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "DoesImplementGenericInterface should return true for a type that implements the generic interface");
 	}
 
 	[TestMethod]
@@ -402,7 +404,7 @@ public class SignificantNumberTests
 		Type type = typeof(DummyNonTestClass);
 		Type genericInterface = typeof(ITest<>);
 		bool result = SignificantNumber.DoesImplementGenericInterface(type, genericInterface);
-		Assert.IsFalse(result);
+		Assert.IsFalse(result, "DoesImplementGenericInterface should return false for a type that does not implement the generic interface");
 	}
 
 	[TestMethod]
@@ -452,11 +454,8 @@ public class SignificantNumberTests
 		Type type = typeof(List<int>);
 		Type genericInterface = typeof(IEnumerable<>);
 
-		// This should not throw
+		// This should not throw - test passes if no exception is thrown
 		SignificantNumber.AssertDoesImplementGenericInterface(type, genericInterface);
-
-		// If we got here, the test passes
-		Assert.IsTrue(true);
 	}
 
 	[TestMethod]
@@ -516,8 +515,8 @@ public class SignificantNumberTests
 		bool result1 = leftSN == rightPN;
 		bool result2 = rightPN == leftSN;
 
-		Assert.IsTrue(result1);
-		Assert.IsTrue(result2);
+		Assert.IsTrue(result1, "Equality operator should return true when SignificantNumber equals PreciseNumber");
+		Assert.IsTrue(result2, "Equality operator should return true when PreciseNumber equals SignificantNumber");
 	}
 
 	[TestMethod]
@@ -534,10 +533,10 @@ public class SignificantNumberTests
 		bool gteResult1 = largerPN >= smallerSN;
 		bool gteResult2 = smallerSN <= largerPN;
 
-		Assert.IsTrue(gtResult1);
-		Assert.IsTrue(gtResult2);
-		Assert.IsTrue(gteResult1);
-		Assert.IsTrue(gteResult2);
+		Assert.IsTrue(gtResult1, "Greater than operator should return true when PreciseNumber (100) is greater than SignificantNumber (50)");
+		Assert.IsTrue(gtResult2, "Less than operator should return true when SignificantNumber (50) is less than PreciseNumber (100)");
+		Assert.IsTrue(gteResult1, "Greater than or equal operator should return true when PreciseNumber (100) is greater than SignificantNumber (50)");
+		Assert.IsTrue(gteResult2, "Less than or equal operator should return true when SignificantNumber (50) is less than PreciseNumber (100)");
 	}
 
 	[TestMethod]
@@ -569,7 +568,7 @@ public class SignificantNumberTests
 	{
 		SignificantNumber number = SignificantNumber.CreateFromComponents(0, new BigInteger(5));
 		bool result = SignificantNumber.IsCanonical(number);
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "IsCanonical should return true for a valid SignificantNumber");
 	}
 
 	[TestMethod]
@@ -577,7 +576,7 @@ public class SignificantNumberTests
 	{
 		SignificantNumber number = SignificantNumber.CreateFromComponents(0, new BigInteger(4));
 		bool result = SignificantNumber.IsEvenInteger(number);
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "IsEvenInteger should return true for an even number (4)");
 	}
 
 	[TestMethod]
@@ -585,7 +584,7 @@ public class SignificantNumberTests
 	{
 		SignificantNumber number = SignificantNumber.CreateFromComponents(0, new BigInteger(5));
 		bool result = SignificantNumber.IsEvenInteger(number);
-		Assert.IsFalse(result);
+		Assert.IsFalse(result, "IsEvenInteger should return false for an odd number (5)");
 	}
 
 	[TestMethod]
@@ -593,7 +592,7 @@ public class SignificantNumberTests
 	{
 		SignificantNumber number = SignificantNumber.CreateFromComponents(0, new BigInteger(5));
 		bool result = SignificantNumber.IsOddInteger(number);
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "IsOddInteger should return true for an odd number (5)");
 	}
 
 	[TestMethod]
@@ -601,7 +600,7 @@ public class SignificantNumberTests
 	{
 		SignificantNumber number = SignificantNumber.CreateFromComponents(0, new BigInteger(4));
 		bool result = SignificantNumber.IsOddInteger(number);
-		Assert.IsFalse(result);
+		Assert.IsFalse(result, "IsOddInteger should return false for an even number (4)");
 	}
 
 	[TestMethod]
@@ -609,7 +608,7 @@ public class SignificantNumberTests
 	{
 		SignificantNumber number = SignificantNumber.Zero;
 		bool result = SignificantNumber.IsZero(number);
-		Assert.IsTrue(result);
+		Assert.IsTrue(result, "IsZero should return true for SignificantNumber.Zero");
 	}
 
 	[TestMethod]
@@ -617,7 +616,7 @@ public class SignificantNumberTests
 	{
 		SignificantNumber number = SignificantNumber.CreateFromComponents(0, new BigInteger(5));
 		bool result = SignificantNumber.IsZero(number);
-		Assert.IsFalse(result);
+		Assert.IsFalse(result, "IsZero should return false for a non-zero number (5)");
 	}
 
 	[TestMethod]
@@ -651,7 +650,7 @@ public class SignificantNumberTests
 	{
 		string input = "5";
 		bool success = SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out SignificantNumber? result);
-		Assert.IsTrue(success);
+		Assert.IsTrue(success, "TryParse should return true for a valid numeric string");
 		Assert.AreEqual(SignificantNumber.CreateFromComponents(0, new BigInteger(5)), result);
 	}
 
@@ -660,7 +659,7 @@ public class SignificantNumberTests
 	{
 		string input = "invalid";
 		bool success = SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out SignificantNumber? result);
-		Assert.IsFalse(success);
+		Assert.IsFalse(success, "TryParse should return false for an invalid string");
 		Assert.IsNull(result);
 	}
 

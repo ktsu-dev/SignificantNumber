@@ -26,7 +26,10 @@ public static class SignificantNumberExtensions
 	public static SignificantNumber ToSignificantNumber<TInput>(this INumber<TInput> input)
 		where TInput : INumber<TInput>
 	{
+		// Ensure.NotNull cannot be used with INumber<T> due to CS8920 (static abstract interface members)
+#pragma warning disable KTSU0003
 		ArgumentNullException.ThrowIfNull(input);
+#pragma warning restore KTSU0003
 
 		Type inputType = input.GetType();
 		Type significantNumberType = typeof(SignificantNumber);
