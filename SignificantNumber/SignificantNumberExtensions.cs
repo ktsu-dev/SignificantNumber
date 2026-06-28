@@ -23,7 +23,7 @@ public static class SignificantNumberExtensions
 	/// If the input number is already a <see cref="SignificantNumber"/>, it is returned as-is.
 	/// Otherwise, the input is converted to a <see cref="PreciseNumber"/> and then to a <see cref="SignificantNumber"/>.
 	/// </remarks>
-	public static SignificantNumber ToSignificantNumber<TInput>(this INumber<TInput> input)
+	public static SignificantNumber ToSignificantNumber<TInput>(this TInput input)
 		where TInput : INumber<TInput>
 	{
 		// Ensure.NotNull cannot be used with INumber<T> due to CS8920 (static abstract interface members)
@@ -55,7 +55,7 @@ public static class SignificantNumberExtensions
 	/// <exception cref="ArgumentOutOfRangeException">
 	/// Thrown if <paramref name="significantDigits"/> is less than or equal to zero.
 	/// </exception>
-	public static SignificantNumber ToSignificantNumber<TInput>(this INumber<TInput> input, int significantDigits)
+	public static SignificantNumber ToSignificantNumber<TInput>(this TInput input, int significantDigits)
 		where TInput : INumber<TInput>
 	{
 		if (significantDigits <= 0)
