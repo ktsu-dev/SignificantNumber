@@ -4,6 +4,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="ktsu.PreciseNumber" Version="1.7.18" />
-    <PackageVersion Include="Polyfill" Version="10.11.2" />
+    <PackageVersion Include="Polyfill" Version="11.0.1" />
   </ItemGroup>
 </Project>
