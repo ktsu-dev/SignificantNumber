@@ -5,8 +5,15 @@
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ktsu-dev/SignificantNumber?label=commits)
 ![GitHub branch status](https://img.shields.io/github/checks-status/ktsu-dev/SignificantNumber/main)
 
-The `SignificantNumber` class represents a number with a significand and an exponent, enabling high-precision arithmetic operations that comply with calculation rules for significant figures. It provides a robust set of functionalities for mathematical computations and formatting.
+[![License](https://img.shields.io/github/license/ktsu-dev/SignificantNumber.svg?label=License&logo=nuget)](LICENSE.md)
+[![NuGet Version](https://img.shields.io/nuget/v/ktsu.SignificantNumber?label=Stable&logo=nuget)](https://nuget.org/packages/ktsu.SignificantNumber)
+[![NuGet Version](https://img.shields.io/nuget/vpre/ktsu.SignificantNumber?label=Latest&logo=nuget)](https://nuget.org/packages/ktsu.SignificantNumber)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/ktsu.SignificantNumber?label=Downloads&logo=nuget)](https://nuget.org/packages/ktsu.SignificantNumber)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ktsu-dev/SignificantNumber?label=Commits&logo=github)](https://github.com/ktsu-dev/SignificantNumber/commits/main)
+[![GitHub contributors](https://img.shields.io/github/contributors/ktsu-dev/SignificantNumber?label=Contributors&logo=github)](https://github.com/ktsu-dev/SignificantNumber/graphs/contributors)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ktsu-dev/SignificantNumber/dotnet.yml?label=Build&logo=github)](https://github.com/ktsu-dev/SignificantNumber/actions)
 
+The `SignificantNumber` class represents a number with a significand and an exponent, enabling high-precision arithmetic operations that comply with calculation rules for significant figures. It provides a robust set of functionalities for mathematical computations and formatting.
 ## Features
 
 - High-precision arithmetic operations (addition, subtraction, multiplication, division)
