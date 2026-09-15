@@ -1,6 +1,4 @@
-## v2.0.0 (major)
+## v2.0.0
 
-Changes since v1.4.40:
-
-- [major] Make SignificantNumber a value type ([@matt-edmondson](https://github.com/matt-edmondson))
+No significant changes detected since v2.0.0.
 
