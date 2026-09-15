@@ -13,43 +13,46 @@
 [![GitHub contributors](https://img.shields.io/github/contributors/ktsu-dev/SignificantNumber?label=Contributors&logo=github)](https://github.com/ktsu-dev/SignificantNumber/graphs/contributors)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ktsu-dev/SignificantNumber/dotnet.yml?branch=main&label=Build&logo=github)](https://github.com/ktsu-dev/SignificantNumber/actions)
 
-The `SignificantNumber` class represents a number with a significand and an exponent, enabling high-precision arithmetic operations that comply with calculation rules for significant figures. It provides a robust set of functionalities for mathematical computations and formatting.
+`SignificantNumber` is a numeric value type whose arithmetic follows the rules for significant figures. It holds a [`ktsu.PreciseNumber`](https://github.com/ktsu-dev/PreciseNumber) and rounds every result to the precision its operands justify.
+
 ## Features
 
-- High-precision arithmetic operations (addition, subtraction, multiplication, division)
-- Support for significant figures and exponents
-- Integration with .NET numerical interfaces
-- Comprehensive error handling and validation
+- Addition and subtraction round to the fewest decimal places among the operands, and multiplication, division, and modulus round to the fewest significant digits
+- Operands of exactly -1, 0, or 1 have unlimited precision, so they never limit a result
+- A `readonly record struct` whose `default` is zero, holding a `PreciseNumber` that it converts to implicitly
+- Implements `INumber<SignificantNumber>`, including `CreateChecked`, `CreateSaturating`, and `CreateTruncating` for every built-in numeric type, `BigInteger`, and `PreciseNumber`
 
-## Table of Contents
+Upgrading from 1.x? See the [2.0 migration guide](docs/migration-guide-2.0.md).
+
+## Table of contents
 
 - [Installation](#installation)
 - [Usage](#usage)
   - [Creating a SignificantNumber](#creating-a-significantnumber)
-    - [Supported Numeric Types](#supported-numeric-types)
+    - [Supported numeric types](#supported-numeric-types)
     - [Examples](#examples)
-  - [Arithmetic Operations](#arithmetic-operations)
-  - [Comparison Operations](#comparison-operations)
-  - [Formatting and Parsing](#formatting-and-parsing)
-  - [Extension Methods](#extension-methods)
+  - [Arithmetic operations](#arithmetic-operations)
+  - [Comparison operations](#comparison-operations)
+  - [Formatting and parsing](#formatting-and-parsing)
+  - [Extension methods](#extension-methods)
   - [Conversion](#conversion)
 - [Precision](#precision)
-  - [Significand and Exponent](#significand-and-exponent)
-  - [Precision Handling](#precision-handling)
-  - [Example of Precision](#example-of-precision)
-- [API Reference](#api-reference)
+  - [Significand and exponent](#significand-and-exponent)
+  - [Precision handling](#precision-handling)
+  - [Example of precision](#example-of-precision)
+- [API reference](#api-reference)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Installation
 
-To install the `SignificantNumber` library, you can use the .NET CLI:
+Install the package with the .NET CLI:
 
 ```sh
 dotnet add package ktsu.SignificantNumber
 ```
 
-Or, add the package reference directly in your project file:
+Or add the package reference directly in your project file:
 
 ```xml
 <PackageReference Include="ktsu.SignificantNumber" Version="x.x.x" />
@@ -59,13 +62,13 @@ Or, add the package reference directly in your project file:
 
 ### Creating a SignificantNumber
 
-You can create a `SignificantNumber` from various numeric types using the `ToSignificantNumber` extension method:
+Create a `SignificantNumber` from any supported numeric type with the `ToSignificantNumber` extension method, from text with `Parse`, or from a `PreciseNumber` with an explicit cast.
 
-#### Supported Numeric Types
+#### Supported numeric types
 
-The `SignificantNumber` class supports a wide range of numeric types through the `ToSignificantNumber` extension method, leveraging the `INumber` interface for conversions. The following types are supported:
+`ToSignificantNumber` converts through `INumber<T>`. These types are supported:
 
-- **Integer Types**:
+- **Integer types**:
   - `int`
   - `long`
   - `short`
@@ -76,17 +79,21 @@ The `SignificantNumber` class supports a wide range of numeric types through the
   - `byte`
   - `BigInteger`
 
-- **Floating-Point Types**:
+- **Floating point types**:
   - `double`
   - `float`
   - `Half`
   - `decimal`
 
+- **ktsu types**:
+  - `PreciseNumber`
+  - `SignificantNumber`
+
 ### Examples
 
-You can convert various numeric types to `SignificantNumber` using the `ToSignificantNumber` extension method:
-
 ```csharp
+using System.Numerics;
+using ktsu.PreciseNumber;
 using ktsu.SignificantNumber;
 
 // Integer types
@@ -96,7 +103,7 @@ SignificantNumber significantNumberFromInt = intValue.ToSignificantNumber();
 BigInteger bigIntValue = new BigInteger(9876543210);
 SignificantNumber significantNumberFromBigInt = bigIntValue.ToSignificantNumber();
 
-// Floating-point types
+// Floating point types
 double doubleValue = 123.45;
 SignificantNumber significantNumberFromDouble = doubleValue.ToSignificantNumber();
 
@@ -108,29 +115,31 @@ SignificantNumber significantNumberFromFloat = floatValue.ToSignificantNumber();
 
 decimal decimalValue = 123.45m;
 SignificantNumber significantNumberFromDecimal = decimalValue.ToSignificantNumber();
+
+// A PreciseNumber, with an explicit cast because it opts into the significant figure rules
+PreciseNumber precise = 12.5.ToPreciseNumber();
+SignificantNumber significantNumberFromPrecise = (SignificantNumber)precise;
 ```
 
-### Arithmetic Operations
-
-You can perform various arithmetic operations on `SignificantNumber` instances:
+### Arithmetic operations
 
 ```csharp
-var result1 = number1 + number2;
-var result2 = number1 - number2;
-var result3 = number1 * number2;
-var result4 = number1 / number2;
+SignificantNumber result1 = number1 + number2;
+SignificantNumber result2 = number1 - number2;
+SignificantNumber result3 = number1 * number2;
+SignificantNumber result4 = number1 / number2;
 
-// Square and cube operations
-var squared = number1.Squared();
-var cubed = number1.Cubed();
+// Square and cube operations, which return the unrounded PreciseNumber
+PreciseNumber squared = number1.Squared();
+PreciseNumber cubed = number1.Cubed();
 
 // Power operation
-var powerResult = number1.Pow(3); // number1 raised to the power of 3
+SignificantNumber powerResult = number1.Pow(3.ToPreciseNumber());
 ```
 
-### Comparison Operations
+The operators also accept a `PreciseNumber` on either side, and the result is a `SignificantNumber`.
 
-You can compare `SignificantNumber` instances using comparison operators:
+### Comparison operations
 
 ```csharp
 bool isEqual = number1 == number2;
@@ -138,55 +147,54 @@ bool isGreater = number1 > number2;
 bool isLessOrEqual = number1 <= number2;
 ```
 
-### Formatting and Parsing
+Ordering operators compare values exactly. `SignificantNumber.CompareTo(left, right)` and `CompareTo(SignificantNumber)` compare both numbers at the lower of their significant digit counts.
 
-You can format a `SignificantNumber` as a string:
+### Formatting and parsing
+
+Format a `SignificantNumber` as a string:
 
 ```csharp
 string formatted = number1.ToString("G", CultureInfo.InvariantCulture);
 Console.WriteLine(formatted);  // Outputs the formatted number
 ```
 
-Parsing is not supported and will throw `NotSupportedException`:
+Parse one from text, including scientific notation:
 
 ```csharp
-try
+SignificantNumber parsed = SignificantNumber.Parse("1.23E4", NumberStyles.Float, CultureInfo.InvariantCulture);
+
+if (SignificantNumber.TryParse("123.45", CultureInfo.InvariantCulture, out SignificantNumber result))
 {
-    var parsedNumber = SignificantNumber.Parse("123.45", CultureInfo.InvariantCulture);
-}
-catch (NotSupportedException ex)
-{
-    Console.WriteLine(ex.Message);
+    Console.WriteLine(result);
 }
 ```
 
-Instead, you should parse the number as another numeric type and convert it to a `SignificantNumber`:
+`TryParse` yields zero when parsing fails.
 
-```csharp
-double parsedDouble = double.Parse("123.45", CultureInfo.InvariantCulture);
-SignificantNumber significantNumberFromDouble = parsedDouble.ToSignificantNumber();
-```
-
-### Extension Methods
+### Extension methods
 
 #### `ToSignificantNumber`
 
-Converts various numeric types to a `SignificantNumber`.
+Converts a supported numeric type to a `SignificantNumber`. An overload takes the number of significant digits to keep.
 
 #### Usage
 
 ```csharp
-public static SignificantNumber ToSignificantNumber<TInput>(this INumber<TInput> input)
+public static SignificantNumber ToSignificantNumber<TInput>(this TInput input)
+    where TInput : INumber<TInput>
+
+public static SignificantNumber ToSignificantNumber<TInput>(this TInput input, int significantDigits)
     where TInput : INumber<TInput>
 ```
 
 #### Parameters
 
-- `input`: The input number to convert.
+- `input`: The number to convert.
+- `significantDigits`: The number of significant digits to keep. It must be greater than zero.
 
 #### Returns
 
-- `SignificantNumber`: The converted `SignificantNumber`.
+- `SignificantNumber`: The converted number.
 
 #### Example
 
@@ -214,10 +222,6 @@ public TOutput To<TOutput>()
     where TOutput : INumber<TOutput>
 ```
 
-#### Parameters
-
-- None
-
 #### Returns
 
 - `TOutput`: The converted value of the `SignificantNumber`.
@@ -225,65 +229,81 @@ public TOutput To<TOutput>()
 #### Example
 
 ```csharp
-SignificantNumber significantNumber = new SignificantNumber(3, 12345); // 12345e3
+SignificantNumber significantNumber = SignificantNumber.Parse("12345E3", NumberStyles.Float, CultureInfo.InvariantCulture);
 double result = significantNumber.To<double>();
 Console.WriteLine(result);  // Outputs 12345000
 ```
 
+Generic code converts the same way through `CreateChecked`, `CreateSaturating`, and `CreateTruncating`:
+
+```csharp
+static T ToMeters<T>(T feet) where T : INumber<T> => feet * T.CreateChecked(0.3048);
+
+SignificantNumber meters = ToMeters(10.ToSignificantNumber());
+double asDouble = double.CreateChecked(meters);
+```
+
+A `SignificantNumber` converts to a `PreciseNumber` implicitly, and `Value` returns the `PreciseNumber` it holds.
+
 ## Precision
 
-The `SignificantNumber` class is designed to handle high-precision arithmetic operations with significant figures and exponents.
+### Significand and exponent
 
-Here's how it ensures precision:
+A `SignificantNumber` holds a `PreciseNumber`, which stores two components:
 
-### Significand and Exponent
+- **Significand**: The significant digits of the number, stored as a `BigInteger`.
+- **Exponent**: The power of ten that scales the significand.
 
-A `SignificantNumber` consists of two main components:
+`Significand`, `Exponent`, and `SignificantDigits` are available directly on `SignificantNumber`.
 
-- **Significand**: This is the significant part of the number, stored as a `BigInteger` to accommodate a wide range of values with high precision.
-- **Exponent**: This is the exponent part of the number, which scales the significand by a power of ten.
+### Precision handling
 
-### Precision Handling
+- **Floating point input**: A `float` keeps up to 8 significant digits, and a `double` up to 16.
+- **Trailing zero removal**: Trailing zeros move from the significand into the exponent, so every value is stored in its most compact form.
+- **Rounding**: `Round` rounds to a number of decimal digits, and `ReduceSignificance` to a number of significant digits.
 
-- **Maximum Significant Digits**: When converting from a floating-point number to a `SignificantNumber` maximum number of significant digits is limited to 7 for `float` values, and 16 for `double` values.
-- **Trailing Zero Removal**: The class automatically sanitizes the significand by removing trailing zeros, ensuring that the number is stored in its most compact and precise form.
-- **Rounding**: You can round a `SignificantNumber` to a specified number of decimal digits, ensuring that you can control the precision of your calculations.
-
-### Example of Precision
+### Example of precision
 
 Consider the number `123.456000`:
 
-- When stored as a `SignificantNumber`, it will be represented as `123456e-3` after removing the trailing zeros and adjusting the exponent accordingly.
-- This ensures that the number is represented with the exact precision required for your calculations, without unnecessary trailing zeros.
+- As a `SignificantNumber`, it's stored as `123456e-3` after removing the trailing zeros and adjusting the exponent.
+- Adding `1.2` to it rounds the sum to one decimal place, giving `124.7`, because `1.2` has the fewest decimal places.
 
-By using the `SignificantNumber` class, you can perform high-precision arithmetic operations and maintain control over the significant figures and exponent, ensuring accurate and efficient mathematical computations.
-
-## API Reference
+## API reference
 
 ### Properties
 
-- `static SignificantNumber NegativeOne` - Gets the value -1 for the type.
-- `static SignificantNumber One` - Gets the value 1 for the type.
-- `static SignificantNumber Zero` - Gets the value 0 for the type.
+- `PreciseNumber Value` - Gets the `PreciseNumber` the number holds.
+- `int Exponent`, `BigInteger Significand`, and `int SignificantDigits` - Get the components of the held value.
+- `static SignificantNumber NegativeOne`, `One`, and `Zero` - Get -1, 1, and 0. `Zero` is also `default`.
+- `static SignificantNumber E`, `Pi`, and `Tau` - Get the mathematical constants.
 - `static int Radix` - Gets the radix, or base, for the type.
-- `static SignificantNumber AdditiveIdentity` - Gets the additive identity of the current type.
-- `static SignificantNumber MultiplicativeIdentity` - Gets the multiplicative identity of the current type.
+- `static SignificantNumber AdditiveIdentity` - Gets the additive identity of the type.
+- `static SignificantNumber MultiplicativeIdentity` - Gets the multiplicative identity of the type.
 
 ### Methods
 
-- `bool Equals(SignificantNumber other)` - Determines whether the specified object is equal to the current object.
+- `bool Equals(SignificantNumber other)` - Determines whether two numbers have the same significand and exponent.
 - `int CompareTo(object? obj)` - Compares the current instance with another object.
-- `int CompareTo(SignificantNumber other)` - Compares the current instance with another significant number.
-- `int CompareTo<TInput>(TInput other) where TInput : INumber<TInput>` - Compares the current instance with another number.
-- `SignificantNumber Abs()` - Returns the absolute value of the current instance.
-- `SignificantNumber Round(int decimalDigits)` - Rounds the current instance to the specified number of decimal digits.
-- `SignificantNumber Clamp<TNumber>(TNumber min, TNumber max) where TNumber : INumber<TNumber>` - Clamps the specified value between the minimum and maximum values.
-- `string ToString(string? format, IFormatProvider? formatProvider)` - Converts the current instance to its equivalent string representation using the specified format and format provider.
+- `int CompareTo(SignificantNumber other)` - Compares the current instance with another significant number at the lower of their significant digit counts.
+- `int CompareTo<TInput>(TInput other) where TInput : INumber<TInput>` - Compares the value of the current instance with another number.
+- `PreciseNumber Abs()` - Returns the absolute value of the current instance.
+- `PreciseNumber Round(int decimalDigits)` - Rounds the current instance to the specified number of decimal digits.
+- `PreciseNumber ReduceSignificance(int significantDigits)` - Reduces the current instance to the specified number of significant digits.
+- `PreciseNumber Clamp<TNumber>(TNumber min, TNumber max) where TNumber : INumber<TNumber>` - Clamps the current instance between the minimum and maximum values.
+- `SignificantNumber Pow(PreciseNumber power)` - Raises the current instance to a power.
+- `PreciseNumber ToPreciseNumber()` - Returns the `PreciseNumber` the number holds.
+- `string ToString(string? format, IFormatProvider? formatProvider)` - Converts the current instance to a string using the specified format and format provider.
 - `bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)` - Attempts to format the current instance into the provided span.
 - `TOutput To<TOutput>() where TOutput : INumber<TOutput>` - Converts the current significant number to the specified numeric type.
 
-### Static Methods
+### Static methods
 
+- `static SignificantNumber FromPreciseNumber(PreciseNumber value)` - Creates a significant number that holds a `PreciseNumber`.
+- `static SignificantNumber Add`, `Subtract`, `Multiply`, `Divide`, and `Mod(PreciseNumber left, PreciseNumber right)` - Apply the significant figure rules to two numbers.
+- `static SignificantNumber Exp(PreciseNumber power)` - Raises e to a power.
+- `static SignificantNumber Max`, `Min(SignificantNumber x, SignificantNumber y)`, and `Clamp(SignificantNumber value, SignificantNumber min, SignificantNumber max)` - Compare by value.
+- `static SignificantNumber Round(SignificantNumber value, int decimalDigits)` - Rounds a number to the specified number of decimal digits.
 - `static SignificantNumber Abs(SignificantNumber value)` - Returns the absolute value of a `SignificantNumber`.
 - `static bool IsCanonical(SignificantNumber value)` - Determines whether the specified value is canonical.
 - `static bool IsComplexNumber(SignificantNumber value)` - Determines whether the specified value is a complex number.
@@ -309,23 +329,19 @@ By using the `SignificantNumber` class, you can perform high-precision arithmeti
 
 ### Operators
 
+- `static implicit operator PreciseNumber(SignificantNumber value)` - Converts to the held `PreciseNumber`.
+- `static explicit operator SignificantNumber(PreciseNumber value)` - Creates a significant number that holds a `PreciseNumber`.
 - `static SignificantNumber operator -(SignificantNumber value)` - Negates a significant number.
-- `static SignificantNumber operator -(SignificantNumber left, SignificantNumber right)` - Subtracts one significant number from another.
-- `static bool operator !=(SignificantNumber left, SignificantNumber right)` - Determines whether two significant numbers are not equal.
-- `static SignificantNumber operator *(SignificantNumber left, SignificantNumber right)` - Multiplies two significant numbers.
-- `static SignificantNumber operator /(SignificantNumber left, SignificantNumber right)` - Divides one significant number by another.
+- `static SignificantNumber operator +`, `-`, `*`, `/`, and `%` - Apply the significant figure rules. Each also accepts a `PreciseNumber` on either side.
 - `static SignificantNumber operator +(SignificantNumber value)` - Returns the unary plus of a significant number.
-- `static SignificantNumber operator +(SignificantNumber left, SignificantNumber right)` - Adds two significant numbers.
-- `static bool operator ==(SignificantNumber left, SignificantNumber right)` - Determines whether two significant numbers are equal.
-- `static bool operator >(SignificantNumber left, SignificantNumber right)` - Determines whether one significant number is greater than another.
-- `static bool operator <(SignificantNumber left, SignificantNumber right)` - Determines whether one significant number is less than another.
-- `static bool operator >=(SignificantNumber left, SignificantNumber right)` - Determines whether one significant number is greater than or equal to another.
-- `static bool operator <=(SignificantNumber left, SignificantNumber right)` - Determines whether one significant number is less than or equal to another.
+- `static SignificantNumber operator ++` and `--` - Increment and decrement by one.
+- `static bool operator ==` and `!=` - Determine whether two numbers are equal, including against a `PreciseNumber`.
+- `static bool operator >`, `<`, `>=`, and `<=` - Compare two numbers, including against a `PreciseNumber`.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a pull request or open an issue.
+Contributions are welcome. Submit a pull request or open an issue.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE.md) file for details.

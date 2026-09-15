@@ -420,14 +420,11 @@ public class SignificantNumberTests
 	public class DummyNonTestClass { }
 
 	[TestMethod]
-	public void CreateFromComponents_WithExplicitNormalize_ReturnsNormalizedValue()
+	public void CreateFromComponents_ReturnsNormalizedValue()
 	{
-		// Tests the CreateFromComponents method with the normalize parameter
-		SignificantNumber number = SignificantNumber.CreateFromComponents(2, new BigInteger(123), true);
+		// Tests that CreateFromComponents keeps a significand with no trailing zeros as it is
+		SignificantNumber number = SignificantNumber.CreateFromComponents(2, new BigInteger(123));
 
-		// Verify it returns a normalized value (the implementation details might vary)
-		Assert.IsNotNull(number);
-		// This assumes normalization doesn't change the value for this simple case
 		Assert.AreEqual(new BigInteger(123), number.Significand);
 		Assert.AreEqual(2, number.Exponent);
 	}
@@ -439,10 +436,9 @@ public class SignificantNumberTests
 		SignificantNumber power = SignificantNumber.CreateFromComponents(0, new BigInteger(-2));
 		SignificantNumber result = SignificantNumber.Exp(power);
 
-		// The expected result should be approximately 1/e^2
-		// This is a very simple test; actual implementation may have more precision considerations
-		Assert.IsNotNull(result);
-		// Add specific value assertion based on your implementation
+		// The expected result is approximately 1/e^2, which is between zero and one
+		Assert.IsTrue(SignificantNumber.IsPositive(result), "Exp of a negative power should be positive");
+		Assert.IsLessThan(1.0, result.To<double>());
 	}
 
 	[TestMethod]
@@ -538,11 +534,19 @@ public class SignificantNumberTests
 	}
 
 	[TestMethod]
-	public void ToSignificantNumber_ReturnsSameInstance()
+	public void ToSignificantNumber_FromPreciseNumber_KeepsValue()
 	{
 		PreciseNumber number = SignificantNumber.CreateFromComponents(0, new BigInteger(5));
 		SignificantNumber result = number.ToSignificantNumber();
-		Assert.AreSame(number, result);
+		Assert.AreEqual<PreciseNumber>(number, result);
+	}
+
+	[TestMethod]
+	public void ToSignificantNumber_FromSignificantNumber_ReturnsSameValue()
+	{
+		SignificantNumber number = SignificantNumber.CreateFromComponents(0, new BigInteger(5));
+		SignificantNumber result = number.ToSignificantNumber();
+		Assert.AreEqual(number, result);
 	}
 
 	[TestMethod]
@@ -647,7 +651,7 @@ public class SignificantNumberTests
 	public void TryParse_ValidString_ReturnsTrueAndCorrectNumber()
 	{
 		string input = "5";
-		bool success = SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out SignificantNumber? result);
+		bool success = SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out SignificantNumber result);
 		Assert.IsTrue(success, "TryParse should return true for a valid numeric string");
 		Assert.AreEqual(SignificantNumber.CreateFromComponents(0, new BigInteger(5)), result);
 	}
@@ -656,29 +660,19 @@ public class SignificantNumberTests
 	public void TryParse_InvalidString_ReturnsFalse()
 	{
 		string input = "invalid";
-		bool success = SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out SignificantNumber? result);
+		bool success = SignificantNumber.TryParse(input, CultureInfo.InvariantCulture, out SignificantNumber result);
 		Assert.IsFalse(success, "TryParse should return false for an invalid string");
-		Assert.IsNull(result);
+		Assert.AreEqual(SignificantNumber.Zero, result);
 	}
 
 	[TestMethod]
-	public void CreateFromComponents_WithSanitizeTrue_RemovesTrailingZeros()
+	public void CreateFromComponents_TrailingZeros_AreRemoved()
 	{
-		SignificantNumber number = SignificantNumber.CreateFromComponents(2, new BigInteger(12300), true);
+		SignificantNumber number = SignificantNumber.CreateFromComponents(2, new BigInteger(12300));
 
-		// Assuming sanitization removes trailing zeros
+		// Sanitization removes trailing zeros and moves them into the exponent
 		Assert.AreEqual(new BigInteger(123), number.Significand);
 		Assert.AreEqual(4, number.Exponent); // Adjusted exponent
-	}
-
-	[TestMethod]
-	public void CreateFromComponents_WithSanitizeFalse_KeepsTrailingZeros()
-	{
-		SignificantNumber number = SignificantNumber.CreateFromComponents(2, new BigInteger(12300), false);
-
-		// Trailing zeros should remain
-		Assert.AreEqual(new BigInteger(12300), number.Significand);
-		Assert.AreEqual(2, number.Exponent);
 	}
 
 	[TestMethod]

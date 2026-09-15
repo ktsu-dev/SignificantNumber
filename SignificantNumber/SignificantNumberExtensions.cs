@@ -18,8 +18,8 @@ public static class SignificantNumberExtensions
 	/// <param name="input">The input number to convert.</param>
 	/// <returns>The converted <see cref="SignificantNumber"/>.</returns>
 	/// <remarks>
-	/// If the input number is already a <see cref="SignificantNumber"/>, it is returned as-is.
-	/// Otherwise, the input is converted to a <see cref="PreciseNumber"/> and then to a <see cref="SignificantNumber"/>.
+	/// If the input number is already a <see cref="SignificantNumber"/>, it is returned unchanged.
+	/// Otherwise, the input is converted to a <see cref="PreciseNumber"/>, which the result holds.
 	/// </remarks>
 	public static SignificantNumber ToSignificantNumber<TInput>(this TInput input)
 		where TInput : INumber<TInput>
@@ -29,18 +29,9 @@ public static class SignificantNumberExtensions
 		ArgumentNullException.ThrowIfNull(input);
 #pragma warning restore KTSU0003
 
-		Type inputType = input.GetType();
-		Type significantNumberType = typeof(SignificantNumber);
-		bool isSignificantNumber = inputType == significantNumberType || inputType.IsSubclassOf(significantNumberType);
-
-		if (isSignificantNumber)
-		{
-			return (SignificantNumber)(object)input;
-		}
-
-		PreciseNumber preciseNumber = input.ToPreciseNumber();
-
-		return SignificantNumber.CreateFromComponents(preciseNumber.Exponent, preciseNumber.Significand);
+		return typeof(TInput) == typeof(SignificantNumber)
+			? (SignificantNumber)(object)input
+			: new SignificantNumber(ToPreciseNumberValue(input));
 	}
 
 	/// <summary>
@@ -61,10 +52,25 @@ public static class SignificantNumberExtensions
 			throw new ArgumentOutOfRangeException(nameof(significantDigits), "Significant digits must be greater than zero.");
 		}
 
-		PreciseNumber preciseNumber = input
-			.ToPreciseNumber()
+		PreciseNumber preciseNumber = ToPreciseNumberValue(input)
 			.ReduceSignificance(significantDigits);
 
-		return SignificantNumber.CreateFromComponents(preciseNumber.Exponent, preciseNumber.Significand);
+		return new SignificantNumber(preciseNumber);
 	}
+
+	/// <summary>
+	/// Converts a number to a <see cref="PreciseNumber"/>, unwrapping a <see cref="SignificantNumber"/> directly.
+	/// </summary>
+	/// <typeparam name="TInput">The type of the input number.</typeparam>
+	/// <param name="input">The input number to convert.</param>
+	/// <returns>The input as a <see cref="PreciseNumber"/>.</returns>
+	/// <remarks>
+	/// <see cref="PreciseNumberExtensions.ToPreciseNumber{TInput}(TInput)"/> recognizes only built-in numeric types and
+	/// <see cref="PreciseNumber"/> itself, so a <see cref="SignificantNumber"/> has to be unwrapped here.
+	/// </remarks>
+	private static PreciseNumber ToPreciseNumberValue<TInput>(TInput input)
+		where TInput : INumber<TInput> =>
+		typeof(TInput) == typeof(SignificantNumber)
+			? ((SignificantNumber)(object)input).Value
+			: input.ToPreciseNumber();
 }
