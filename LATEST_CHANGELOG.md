@@ -1,6 +1,6 @@
-## v1.4.40 (patch)
+## v2.0.0 (major)
 
-Changes since v1.4.39:
+Changes since v1.4.40:
 
-- ci: adopt the consolidated .NET workflow [patch] ([@Claude](https://github.com/Claude))
+- [major] Make SignificantNumber a value type ([@matt-edmondson](https://github.com/matt-edmondson))
 
