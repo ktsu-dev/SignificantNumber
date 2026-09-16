@@ -67,6 +67,44 @@ rather than wrapping it, so `ToString` was an inherited member: measuring it wou
 that package here, and the reference makes `Parse` and `GetHashCode` ambiguous against their
 inherited counterparts. One operation is not worth the whole release history before 2.0.
 
+## What this type costs against a bare double
+
+`AbstractionCostBenchmarks` is the one benchmark here whose answer is a ratio rather than a
+duration. Every other class says how long an operation takes, which is only readable beside
+something; this supplies the something — the primitive a caller would otherwise have used.
+
+The same class, with the same loops and the same methodology, is in `ktsu.PreciseNumber` and
+`ktsu.Semantics`. Against PreciseNumber in particular the difference is what significance tracking
+adds, since this type is built on that one.
+
+| release | `Add` | `Multiply` |
+|---|---|---|
+| 1.3.0 | 1377.7× | 5809.6× |
+| 1.4.40 | 1352.4× | 5944.6× |
+| 2.0.0 | **89.7×** | **550.5×** |
+| 2.0.1 | 89.9× | 569.3× |
+
+Becoming a value type in 2.0 took roughly **15× off add and 10× off multiply**. For comparison,
+the same change in `ktsu.PreciseNumber` underneath moved its ratios by about 15% — so most of what
+2.0 recovered here was this layer's own allocation, not the number beneath it.
+
+**The ratio is not expected to be 1 and is not a defect for being large.** Every operation pays
+twice: once for the arbitrary-precision arithmetic and again for rounding the result back to the
+significance the operands justify, and both buy something a `double` cannot do at all. What the
+chart's third section is for is noticing the day it moves.
+
+Three things decide how the number should be read:
+
+- **These are loops.** A single operation over operands that do not change is loop-invariant and
+  the JIT hoists it out, which would leave the `double` side indistinguishable from an empty method
+  and the ratio meaningless. Each iteration feeds the next, so there is nothing to hoist.
+- **The loop's own cost biases toward 1**, being paid by both sides, so a ratio is a floor on the
+  real cost rather than the whole of it.
+- **Both loops accumulate rather than compound**, because the number underneath carries as many
+  digits as the arithmetic produces and a compounding chain would measure that growth instead of
+  the operation. How the cost grows with digits is a different question, and `ArithmeticBenchmarks`
+  answers it across the `Digits` axis.
+
 ## Reading the results
 
 Most classes are parameterised by `Digits` (8, 30, 200). That axis is the point: significance is
