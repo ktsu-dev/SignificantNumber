@@ -1,6 +1,7 @@
-## v2.0.1 (patch)
+## v2.0.2 (patch)
 
-Changes since v2.0.0:
+Changes since v2.0.1:
 
-- Gate Dependabot auto-merge on CI actually being green ([@Claude](https://github.com/Claude))
+- Seed the chart with every release the suite can measure [patch] ([@Claude](https://github.com/Claude))
+- Chart performance per release, and show it in the README [patch] ([@Claude](https://github.com/Claude))
 
