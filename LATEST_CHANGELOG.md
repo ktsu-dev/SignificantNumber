@@ -1,7 +1,4 @@
-## v2.0.3 (patch)
+## v2.0.3
 
-Changes since v2.0.2:
-
-- Seed the abstraction-cost pair across every release [patch] ([@Claude](https://github.com/Claude))
-- Measure this type against a bare double, and chart it per release [patch] ([@Claude](https://github.com/Claude))
+No significant changes detected since v2.0.3.
 
