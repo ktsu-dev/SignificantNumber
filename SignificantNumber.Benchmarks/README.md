@@ -39,11 +39,33 @@ project, so there is no older source to check out and run; and measuring package
 comparison anyway, because every version is timed by identical benchmark code rather than by
 whatever each tag happened to ship.
 
-It is also why nothing here touches an internal member, and why there is no formatting benchmark.
-Before 2.0 this type derived from `PreciseNumber` rather than wrapping it, so `ToString` was an
-inherited member: measuring it would mean referencing that package here, and the reference makes
-`Parse` and `GetHashCode` ambiguous against their inherited counterparts. One operation is not
-worth the whole release history before 2.0.
+### What the older packages cannot be asked
+
+The history starts at 1.3.0, and one panel of it starts at 1.4.20.
+
+`Operands` builds every value by parsing text, because that is the only construction route all the
+published versions share. 1.2.2 and 1.2.7 throw `NotSupportedException` from `Parse`, so they
+compile against these benchmarks, run, and report a table of `NA`. Ingest refuses a run with no
+measurement in it rather than putting a release on the axis with nothing under it, and the backfill
+reports it and moves on.
+
+Significance reduction is spelled three ways across the versions: 1.2.x has no precision overload of
+`ToSignificantNumber` at all, and 1.3 and 1.4.0 hang it off the `PreciseNumber` base, where the
+receiver's type argument has to be written out. Carrying three spellings of one benchmark would
+measure the spellings, so `SignificanceBenchmarks.cs` is left out of builds against anything older
+than 1.4.20 and the chart draws that panel with a gap. Everything else in those versions is still
+measured.
+
+### Why nothing here touches an internal member
+
+Measuring published packages is also why nothing here reaches for an internal. The
+`InternalsVisibleTo` that would expose one is not in the packages already published, so a benchmark
+built on internals could only ever measure the working copy.
+
+It is why there is no formatting benchmark, too. Before 2.0 this type derived from `PreciseNumber`
+rather than wrapping it, so `ToString` was an inherited member: measuring it would mean referencing
+that package here, and the reference makes `Parse` and `GetHashCode` ambiguous against their
+inherited counterparts. One operation is not worth the whole release history before 2.0.
 
 ## Reading the results
 

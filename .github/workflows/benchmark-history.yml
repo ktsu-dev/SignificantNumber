@@ -25,7 +25,9 @@ on:
       versions:
         description: "Space-separated released versions to backfill, oldest first"
         required: false
-        default: "1.2.2 1.2.7 1.3.0 1.4.0 1.4.20 1.4.40 2.0.0 2.0.1"
+        # 1.2.2 and 1.2.7 are left out: their Parse throws, which is how every operand here is
+        # built, so they measure nothing. The backfill would skip them; this saves it the run.
+        default: "1.3.0 1.4.0 1.4.20 1.4.40 2.0.0 2.0.1"
         type: string
 
 permissions:
