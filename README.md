@@ -26,6 +26,7 @@ Upgrading from 1.x? See the [2.0 migration guide](docs/migration-guide-2.0.md).
 
 ## Table of contents
 
+- [Performance](#performance)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Creating a SignificantNumber](#creating-a-significantnumber)
@@ -43,6 +44,26 @@ Upgrading from 1.x? See the [2.0 migration guide](docs/migration-guide-2.0.md).
 - [API reference](#api-reference)
 - [Contributing](#contributing)
 - [License](#license)
+
+## Performance
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/benchmarks/performance-dark.svg">
+  <img alt="Allocated bytes per operation, and time relative to a fixed reference workload, for each SignificantNumber release" src="docs/benchmarks/performance.svg">
+</picture>
+
+Every release measures a fixed set of benchmarks and adds a point to the chart; the numbers behind
+it are in [`docs/benchmarks/history.json`](docs/benchmarks/history.json), and the suite is
+[`SignificantNumber.Benchmarks`](SignificantNumber.Benchmarks/README.md).
+
+Read the two halves differently. **Allocation is exact** — the same code allocates the same bytes on
+any machine, so a step in the top row is always a real change. **Time is measured on shared CI
+runners**, where the host a job happens to land on varies more than most releases do, so each time
+is divided by a reference workload measured in the same job. That cancels most of the difference
+between machines; what is left is indicative rather than precise.
+
+The step at 2.0 is the type becoming a `readonly record struct` over `PreciseNumber` instead of
+deriving from it. A 200-digit addition went from 54,688 bytes and 128 μs to 112 bytes and 340 ns.
 
 ## Installation
 
