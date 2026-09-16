@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="992" height="722" viewBox="0 0 992 722" role="img" aria-label="SignificantNumber allocation and relative time per release">
+<style>
+  text { font-family: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, sans-serif; fill: #ffffff; }
+  .title { font-size: 15px; font-weight: 600; }
+  .section { font-size: 12.5px; font-weight: 600; }
+  .panel-title { font-size: 11px; font-weight: 600; fill: #ffffff; }
+  .muted, .muted-value, .caption { font-size: 9.5px; fill: #c3c2b7; }
+  .value { font-size: 10px; font-weight: 600; fill: #ffffff; }
+  .tick { font-size: 9px; fill: #c3c2b7; }
+  .axis { stroke: #333330; stroke-width: 1; }
+</style>
+<rect width="992" height="722" fill="#1a1a19" />
+<text x="56" y="28" class="title">SignificantNumber performance by release</text>
+<text x="56" y="45" class="caption">6 releases · newest 2.0.1 · 2026-09-16</text>
+<rect x="56" y="62" width="9" height="9" rx="2" fill="#3987e5" />
+<text x="71" y="70" class="section">Allocated bytes per operation</text>
+<text x="71" y="84" class="caption">Deterministic: the same code allocates the same bytes on any machine.</text>
+<text x="56" y="108" class="panel-title">Add (30 digits)</text>
+<line x1="62" y1="198.0" x2="258" y2="198.0" class="axis" />
+<polyline points="62.0,137.2 101.2,137.2 140.4,135.6 179.6,135.6 218.8,197.2 258.0,197.2" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="62.0" cy="137.2" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="101.2" cy="137.2" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="140.4" cy="135.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="179.6" cy="135.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="218.8" cy="197.2" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="258.0" cy="197.2" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<text x="258.0" y="188.2" class="value" text-anchor="end">40 B</text>
+<text x="62.0" y="128.2" class="muted-value" text-anchor="middle">3.0 KB</text>
+<text x="284" y="108" class="panel-title">Multiply (30 digits)</text>
+<line x1="290" y1="198.0" x2="486" y2="198.0" class="axis" />
+<polyline points="290.0,135.6 329.2,135.6 368.4,135.6 407.6,135.6 446.8,195.7 486.0,195.7" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="290.0" cy="135.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="329.2" cy="135.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="368.4" cy="135.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="407.6" cy="135.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="446.8" cy="195.7" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="486.0" cy="195.7" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<text x="486.0" y="186.7" class="value" text-anchor="end">248 B</text>
+<text x="290.0" y="126.6" class="muted-value" text-anchor="middle">6.7 KB</text>
+<text x="512" y="108" class="panel-title">Divide (30 digits)</text>
+<line x1="518" y1="198.0" x2="714" y2="198.0" class="axis" />
+<polyline points="518.0,135.6 557.2,135.6 596.4,135.9 635.6,135.9 674.8,194.5 714.0,194.5" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="518.0" cy="135.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="557.2" cy="135.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="596.4" cy="135.9" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="635.6" cy="135.9" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="674.8" cy="194.5" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="714.0" cy="194.5" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<text x="714.0" y="185.5" class="value" text-anchor="end">312 B</text>
+<text x="518.0" y="126.6" class="muted-value" text-anchor="middle">5.4 KB</text>
+<text x="740" y="108" class="panel-title">CompareTo (30 digits)</text>
+<line x1="746" y1="198.0" x2="942" y2="198.0" class="axis" />
+<polyline points="746.0,138.7 785.2,138.7 824.4,135.6 863.6,135.6 902.8,198.0 942.0,198.0" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="746.0" cy="138.7" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="785.2" cy="138.7" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="824.4" cy="135.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="863.6" cy="135.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="902.8" cy="198.0" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="942.0" cy="198.0" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<text x="942.0" y="189.0" class="value" text-anchor="end">0 B</text>
+<text x="746.0" y="129.7" class="muted-value" text-anchor="middle">3.0 KB</text>
+<text x="56" y="240" class="panel-title">Reduce to 3 (30 digits)</text>
+<line x1="62" y1="330.0" x2="258" y2="330.0" class="axis" />
+<polyline points="140.4,267.6 179.6,267.6 218.8,326.5 258.0,326.5" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="140.4" cy="267.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="179.6" cy="267.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="218.8" cy="326.5" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="258.0" cy="326.5" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<text x="258.0" y="317.5" class="value" text-anchor="end">80 B</text>
+<text x="140.4" y="258.6" class="muted-value" text-anchor="middle">1.4 KB</text>
+<text x="284" y="240" class="panel-title">Parse (30 digits)</text>
+<line x1="290" y1="330.0" x2="486" y2="330.0" class="axis" />
+<polyline points="290.0,267.6 329.2,267.6 368.4,267.6 407.6,267.6 446.8,329.2 486.0,329.2" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="290.0" cy="267.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="329.2" cy="267.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="368.4" cy="267.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="407.6" cy="267.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="446.8" cy="329.2" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="486.0" cy="329.2" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<text x="486.0" y="320.2" class="value" text-anchor="end">40 B</text>
+<text x="290.0" y="258.6" class="muted-value" text-anchor="middle">3.0 KB</text>
+<text x="512" y="240" class="panel-title">From double</text>
+<line x1="518" y1="330.0" x2="714" y2="330.0" class="axis" />
+<polyline points="518.0,267.6 557.2,267.6 596.4,268.9 635.6,268.9 674.8,330.0 714.0,330.0" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="518.0" cy="267.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="557.2" cy="267.6" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="596.4" cy="268.9" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="635.6" cy="268.9" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="674.8" cy="330.0" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<circle cx="714.0" cy="330.0" r="4" fill="#3987e5" stroke="#1a1a19" stroke-width="2" />
+<text x="714.0" y="321.0" class="value" text-anchor="end">0 B</text>
+<text x="518.0" y="258.6" class="muted-value" text-anchor="middle">1.2 KB</text>
+<rect x="56" y="360" width="9" height="9" rx="2" fill="#d95926" />
+<text x="71" y="368" class="section">Time, as a multiple of a fixed reference workload</text>
+<text x="71" y="382" class="caption">Divided by a reference loop measured in the same job, which cancels most of the difference between CI runners. Lower is faster.</text>
+<text x="56" y="406" class="panel-title">Add (30 digits)</text>
+<line x1="62" y1="496.0" x2="258" y2="496.0" class="axis" />
+<polyline points="62.0,433.6 101.2,435.4 140.4,437.0 179.6,436.6 218.8,494.7 258.0,494.6" fill="none" stroke="#d95926" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="62.0" cy="433.6" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="101.2" cy="435.4" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="140.4" cy="437.0" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="179.6" cy="436.6" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="218.8" cy="494.7" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="258.0" cy="494.6" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<text x="258.0" y="485.6" class="value" text-anchor="end">0.274×</text>
+<text x="62.0" y="424.6" class="muted-value" text-anchor="middle">12.2×</text>
+<text x="284" y="406" class="panel-title">Multiply (30 digits)</text>
+<line x1="290" y1="496.0" x2="486" y2="496.0" class="axis" />
+<polyline points="290.0,433.6 329.2,434.8 368.4,434.3 407.6,433.8 446.8,491.8 486.0,491.7" fill="none" stroke="#d95926" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="290.0" cy="433.6" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="329.2" cy="434.8" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="368.4" cy="434.3" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="407.6" cy="433.8" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="446.8" cy="491.8" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="486.0" cy="491.7" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<text x="486.0" y="482.7" class="value" text-anchor="end">1.70×</text>
+<text x="290.0" y="424.6" class="muted-value" text-anchor="middle">24.9×</text>
+<text x="512" y="406" class="panel-title">Divide (30 digits)</text>
+<line x1="518" y1="496.0" x2="714" y2="496.0" class="axis" />
+<polyline points="518.0,435.4 557.2,435.3 596.4,435.9 635.6,433.6 674.8,489.6 714.0,489.5" fill="none" stroke="#d95926" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="518.0" cy="435.4" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="557.2" cy="435.3" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="596.4" cy="435.9" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="635.6" cy="433.6" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="674.8" cy="489.6" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="714.0" cy="489.5" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<text x="714.0" y="480.5" class="value" text-anchor="end">2.08×</text>
+<text x="518.0" y="426.4" class="muted-value" text-anchor="middle">19.5×</text>
+<text x="740" y="406" class="panel-title">CompareTo (30 digits)</text>
+<line x1="746" y1="496.0" x2="942" y2="496.0" class="axis" />
+<polyline points="746.0,438.4 785.2,436.5 824.4,433.6 863.6,435.3 902.8,495.9 942.0,495.9" fill="none" stroke="#d95926" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="746.0" cy="438.4" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="785.2" cy="436.5" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="824.4" cy="433.6" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="863.6" cy="435.3" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="902.8" cy="495.9" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="942.0" cy="495.9" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<text x="942.0" y="486.9" class="value" text-anchor="end">0.0259×</text>
+<text x="746.0" y="429.4" class="muted-value" text-anchor="middle">11.0×</text>
+<text x="56" y="538" class="panel-title">Reduce to 3 (30 digits)</text>
+<line x1="62" y1="628.0" x2="258" y2="628.0" class="axis" />
+<polyline points="140.4,566.2 179.6,565.6 218.8,622.1 258.0,621.9" fill="none" stroke="#d95926" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="140.4" cy="566.2" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="179.6" cy="565.6" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="218.8" cy="622.1" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="258.0" cy="621.9" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<text x="258.0" y="612.9" class="value" text-anchor="end">0.364×</text>
+<text x="140.4" y="557.2" class="muted-value" text-anchor="middle">3.68×</text>
+<text x="284" y="538" class="panel-title">Parse (30 digits)</text>
+<line x1="290" y1="628.0" x2="486" y2="628.0" class="axis" />
+<polyline points="290.0,565.6 329.2,566.6 368.4,568.7 407.6,568.2 446.8,621.8 486.0,621.8" fill="none" stroke="#d95926" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="290.0" cy="565.6" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="329.2" cy="566.6" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="368.4" cy="568.7" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="407.6" cy="568.2" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="446.8" cy="621.8" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="486.0" cy="621.8" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<text x="486.0" y="612.8" class="value" text-anchor="end">1.07×</text>
+<text x="290.0" y="556.6" class="muted-value" text-anchor="middle">10.8×</text>
+<text x="512" y="538" class="panel-title">From double</text>
+<line x1="518" y1="628.0" x2="714" y2="628.0" class="axis" />
+<polyline points="518.0,565.6 557.2,566.2 596.4,566.5 635.6,568.1 674.8,614.8 714.0,614.5" fill="none" stroke="#d95926" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="518.0" cy="565.6" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="557.2" cy="566.2" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="596.4" cy="566.5" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="635.6" cy="568.1" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="674.8" cy="614.8" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<circle cx="714.0" cy="614.5" r="4" fill="#d95926" stroke="#1a1a19" stroke-width="2" />
+<text x="714.0" y="605.5" class="value" text-anchor="end">0.817×</text>
+<text x="518.0" y="556.6" class="muted-value" text-anchor="middle">3.77×</text>
+<text x="56" y="664" class="tick">releases, oldest to newest: 1.3.0 → 1.4.0 → 1.4.20 → 1.4.40 → 2.0.0 → 2.0.1</text>
+<text x="56" y="680" class="caption">Measured on Intel Xeon Processor 2.80GHz. Full tables: SignificantNumber.Benchmarks.</text>
+</svg>
