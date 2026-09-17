@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="ktsu.PreciseNumber" Version="2.1.0" />
+    <PackageVersion Include="ktsu.PreciseNumber" Version="2.3.0" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="BenchmarkDotNet.Annotations" Version="0.15.8" />
     <!-- Only the benchmark project references this, and only when BenchmarkAgainstVersion asks
