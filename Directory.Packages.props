@@ -11,6 +11,6 @@
          placeholder that VersionOverride replaces; central package management requires the
          entry to exist before a project may override it. -->
     <PackageVersion Include="ktsu.SignificantNumber" Version="2.0.1" />
-    <PackageVersion Include="Polyfill" Version="11.3.0" />
+    <PackageVersion Include="Polyfill" Version="11.4.0" />
   </ItemGroup>
 </Project>
