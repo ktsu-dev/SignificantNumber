@@ -1,6 +1,8 @@
-## v2.0.11
+## v2.0.12 (patch)
 
-No significant changes detected since v2.0.11.
+Changes since v2.0.11:
+
+- Keep the base's precision when Pow or Exp takes an integer exponent [patch] ([@Claude](https://github.com/Claude))
 
 ## v2.0.11 (patch)
 
