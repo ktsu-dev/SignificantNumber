@@ -717,6 +717,56 @@ public class SignificantNumberTests
 	}
 
 	[TestMethod]
+	public void Pow_IntegerExponent_MatchesRepeatedMultiplication()
+	{
+		SignificantNumber baseNumber = SignificantNumber.CreateFromComponents(-3, new BigInteger(1234));
+		SignificantNumber two = SignificantNumber.CreateFromComponents(0, new BigInteger(2));
+		SignificantNumber three = SignificantNumber.CreateFromComponents(0, new BigInteger(3));
+
+		SignificantNumber squared = baseNumber.Pow(two);
+		SignificantNumber cubed = baseNumber.Pow(three);
+
+		// 1.234^2 = 1.522756 and 1.234^3 = 1.879080904, each kept to the base's 4 significant digits
+		Assert.AreEqual(baseNumber * baseNumber, squared);
+		Assert.AreEqual(1.523, squared.To<double>());
+		Assert.AreEqual(4, squared.SignificantDigits);
+		Assert.AreEqual(baseNumber * baseNumber * baseNumber, cubed);
+		Assert.AreEqual(1.879, cubed.To<double>());
+	}
+
+	[TestMethod]
+	public void Pow_NegativeBaseAndOddExponent_KeepsBasePrecision()
+	{
+		SignificantNumber baseNumber = SignificantNumber.CreateFromComponents(-1, new BigInteger(-25));
+		SignificantNumber power = SignificantNumber.CreateFromComponents(0, new BigInteger(3));
+		SignificantNumber result = baseNumber.Pow(power);
+
+		// (-2.5)^3 = -15.625, kept to the base's 2 significant digits
+		Assert.AreEqual(-16.0, result.To<double>());
+	}
+
+	[TestMethod]
+	public void Pow_NegativeIntegerExponent_MatchesReciprocalOfPower()
+	{
+		SignificantNumber baseNumber = SignificantNumber.CreateFromComponents(-3, new BigInteger(1234));
+		SignificantNumber power = SignificantNumber.CreateFromComponents(0, new BigInteger(-2));
+		SignificantNumber result = baseNumber.Pow(power);
+
+		// 1.234^-2 = 0.65670..., kept to the base's 4 significant digits
+		Assert.AreEqual(0.6567, result.To<double>());
+	}
+
+	[TestMethod]
+	public void Exp_IntegerExponent_KeepsMoreThanOneSignificantDigit()
+	{
+		SignificantNumber power = SignificantNumber.CreateFromComponents(0, new BigInteger(2));
+		SignificantNumber result = SignificantNumber.Exp(power);
+
+		Assert.IsGreaterThan(1, result.SignificantDigits);
+		Assert.AreEqual(Math.Exp(2), result.To<double>(), 1e-12);
+	}
+
+	[TestMethod]
 	public void Pow_NegativeOneAndOddExponent_ReturnsNegativeOne()
 	{
 		SignificantNumber baseNumber = SignificantNumber.CreateFromComponents(0, new BigInteger(-1));
