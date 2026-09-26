@@ -1,6 +1,4 @@
-## v2.0.11 (patch)
+## v2.0.11
 
-Changes since v2.0.10:
-
-- Keep the sign of a negative base in Pow, and reject undefined powers [patch] ([@Claude](https://github.com/Claude))
+No significant changes detected since v2.0.11.
 
