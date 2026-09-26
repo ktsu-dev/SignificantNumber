@@ -706,6 +706,48 @@ public class SignificantNumberTests
 	}
 
 	[TestMethod]
+	public void Pow_NegativeBaseAndOddExponent_ReturnsNegativeResult()
+	{
+		SignificantNumber baseNumber = SignificantNumber.CreateFromComponents(0, new BigInteger(-2));
+		SignificantNumber power = SignificantNumber.CreateFromComponents(0, new BigInteger(3));
+		SignificantNumber result = baseNumber.Pow(power);
+
+		// Expected result is (-2)^3 = -8
+		Assert.AreEqual(SignificantNumber.CreateFromComponents(0, new BigInteger(-8)), result);
+	}
+
+	[TestMethod]
+	public void Pow_NegativeOneAndOddExponent_ReturnsNegativeOne()
+	{
+		SignificantNumber baseNumber = SignificantNumber.CreateFromComponents(0, new BigInteger(-1));
+		SignificantNumber power = SignificantNumber.CreateFromComponents(0, new BigInteger(3));
+		SignificantNumber result = baseNumber.Pow(power);
+
+		// Expected result is (-1)^3 = -1
+		Assert.AreEqual(SignificantNumber.CreateFromComponents(0, new BigInteger(-1)), result);
+	}
+
+	[TestMethod]
+	public void Pow_NegativeBaseAndFractionalExponent_ThrowsArgumentException()
+	{
+		SignificantNumber baseNumber = SignificantNumber.CreateFromComponents(0, new BigInteger(-2));
+		SignificantNumber power = SignificantNumber.CreateFromComponents(-1, new BigInteger(5));
+
+		// (-2)^0.5 has no real result
+		Assert.ThrowsExactly<ArgumentException>(() => baseNumber.Pow(power));
+	}
+
+	[TestMethod]
+	public void Pow_ZeroBaseAndNegativeExponent_ThrowsDivideByZeroException()
+	{
+		SignificantNumber baseNumber = SignificantNumber.CreateFromComponents(0, BigInteger.Zero);
+		SignificantNumber power = SignificantNumber.CreateFromComponents(0, new BigInteger(-1));
+
+		// 0^-1 is 1/0
+		Assert.ThrowsExactly<DivideByZeroException>(() => baseNumber.Pow(power));
+	}
+
+	[TestMethod]
 	public void Operator_Addition_WithPreciseNumber_ReturnsCorrectResult()
 	{
 		SignificantNumber left = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
