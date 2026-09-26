@@ -586,7 +586,22 @@ public readonly record struct SignificantNumber
 			throw new ArgumentException("Cannot raise a negative number to a non-integer power.", nameof(power));
 		}
 
-		int significantDigits = LowestSignificantDigits(this, power);
+		if (PreciseNumber.IsInteger(power) && Math.Abs(power.To<double>()) <= MaxExactIntegerPower)
+		{
+			// An integer power is an exact count, like the counting numbers in a multiplication, so the
+			// result keeps the base's significant digits. Computing it by exact repeated multiplication
+			// makes x.Pow(2) agree with x * x and keeps the sign of a negative base.
+			BigInteger exponent = IntegerValue(power);
+			PreciseNumber positivePower = ExactIntegerPower(Value, BigInteger.Abs(exponent));
+			PreciseNumber exact = exponent.Sign < 0 ? PreciseNumber.Divide(PreciseNumber.One, positivePower) : positivePower;
+			return exact.ToSignificantNumber(Value.SignificantDigits);
+		}
+
+		// An integer power too large to compute exactly is still exact, so it keeps the base's
+		// precision, bounded by the double the result is computed in.
+		int significantDigits = PreciseNumber.IsInteger(power)
+			? int.Min(Value.SignificantDigits, DoubleSignificantDigits)
+			: LowestSignificantDigits(this, power);
 
 		// Use logarithm and exponential to support decimal powers. This computes |x|^p, so the
 		// sign of a negative base is restored for odd integer powers.
@@ -612,10 +627,62 @@ public readonly record struct SignificantNumber
 			return E;
 		}
 
-		int significantDigits = LowestSignificantDigits(E, power);
+		// An integer power is exact, so the precision is bounded only by the double the result is
+		// computed in, not by the single significant digit an integer like 2 carries.
+		int significantDigits = PreciseNumber.IsInteger(power)
+			? int.Min(E.SignificantDigits, DoubleSignificantDigits)
+			: LowestSignificantDigits(E, power);
 
 		return Math.Exp(power.To<double>())
 			.ToSignificantNumber(significantDigits);
+	}
+
+	/// <summary>
+	/// The number of significant decimal digits a <see cref="double"/> always represents exactly.
+	/// </summary>
+	private const int DoubleSignificantDigits = 15;
+
+	/// <summary>
+	/// The largest integer power <see cref="Pow"/> computes exactly. Larger powers fall back to the
+	/// logarithm path, so that an extreme exponent cannot build an arbitrarily large intermediate.
+	/// </summary>
+	private const int MaxExactIntegerPower = 1024;
+
+	/// <summary>
+	/// Gets the value of an integer <see cref="PreciseNumber"/> as a <see cref="BigInteger"/>.
+	/// </summary>
+	/// <param name="value">A number that <see cref="PreciseNumber.IsInteger"/> reports as an integer.</param>
+	/// <returns>The integer value of <paramref name="value"/>.</returns>
+	private static BigInteger IntegerValue(PreciseNumber value) =>
+		value.Exponent >= 0
+			? value.Significand * BigInteger.Pow(10, value.Exponent)
+			: value.Significand / BigInteger.Pow(10, -value.Exponent);
+
+	/// <summary>
+	/// Raises a number to a non-negative integer power by exact repeated squaring.
+	/// </summary>
+	/// <param name="value">The base.</param>
+	/// <param name="exponent">The non-negative power.</param>
+	/// <returns><paramref name="value"/> raised to <paramref name="exponent"/>, with no rounding.</returns>
+	private static PreciseNumber ExactIntegerPower(PreciseNumber value, BigInteger exponent)
+	{
+		PreciseNumber result = PreciseNumber.One;
+		PreciseNumber square = value;
+		while (!exponent.IsZero)
+		{
+			if (!exponent.IsEven)
+			{
+				result = PreciseNumber.Multiply(result, square);
+			}
+
+			exponent >>= 1;
+			if (!exponent.IsZero)
+			{
+				square = PreciseNumber.Multiply(square, square);
+			}
+		}
+
+		return result;
 	}
 
 	/// <summary>
