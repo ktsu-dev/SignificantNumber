@@ -1,6 +1,6 @@
-## v2.0.10 (patch)
+## v2.0.11 (patch)
 
-Changes since v2.0.9:
+Changes since v2.0.10:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Keep the sign of a negative base in Pow, and reject undefined powers [patch] ([@Claude](https://github.com/Claude))
 
