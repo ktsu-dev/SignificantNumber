@@ -561,6 +561,8 @@ public readonly record struct SignificantNumber
 	/// </summary>
 	/// <param name="power">The power to raise the significant number to.</param>
 	/// <returns>The current number raised to <paramref name="power"/>, rounded to the fewest significant digits of the two.</returns>
+	/// <exception cref="DivideByZeroException">Thrown when the current number is zero and <paramref name="power"/> is negative.</exception>
+	/// <exception cref="ArgumentException">Thrown when the current number is negative and <paramref name="power"/> is not an integer, as the result is not a real number.</exception>
 	public SignificantNumber Pow(PreciseNumber power)
 	{
 		if (Equal(power, Zero))
@@ -569,18 +571,29 @@ public readonly record struct SignificantNumber
 		}
 		else if (Equal(this, Zero))
 		{
-			return Zero;
+			return PreciseNumber.IsNegative(power)
+				? throw new DivideByZeroException("Cannot raise zero to a negative power.")
+				: Zero;
 		}
 		else if (Equal(this, One))
 		{
 			return One;
 		}
 
+		bool isNegativeBase = PreciseNumber.IsNegative(Value);
+		if (isNegativeBase && !PreciseNumber.IsInteger(power))
+		{
+			throw new ArgumentException("Cannot raise a negative number to a non-integer power.", nameof(power));
+		}
+
 		int significantDigits = LowestSignificantDigits(this, power);
 
-		// Use logarithm and exponential to support decimal powers
+		// Use logarithm and exponential to support decimal powers. This computes |x|^p, so the
+		// sign of a negative base is restored for odd integer powers.
 		double logValue = Math.Log(Math.Abs(Value.To<double>()));
-		return Math.Exp(logValue * power.To<double>()).ToSignificantNumber(significantDigits);
+		double magnitude = Math.Exp(logValue * power.To<double>());
+		double result = isNegativeBase && PreciseNumber.IsOddInteger(power) ? -magnitude : magnitude;
+		return result.ToSignificantNumber(significantDigits);
 	}
 
 	/// <summary>
