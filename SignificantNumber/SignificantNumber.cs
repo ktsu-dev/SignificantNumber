@@ -563,6 +563,7 @@ public readonly record struct SignificantNumber
 	/// <returns>The current number raised to <paramref name="power"/>, rounded to the fewest significant digits of the two.</returns>
 	/// <exception cref="DivideByZeroException">Thrown when the current number is zero and <paramref name="power"/> is negative.</exception>
 	/// <exception cref="ArgumentException">Thrown when the current number is negative and <paramref name="power"/> is not an integer, as the result is not a real number.</exception>
+	/// <exception cref="OverflowException">Thrown when the result's power of ten is too large or too small to represent.</exception>
 	public SignificantNumber Pow(PreciseNumber power)
 	{
 		if (Equal(power, Zero))
@@ -605,10 +606,19 @@ public readonly record struct SignificantNumber
 
 		// Use logarithm and exponential to support decimal powers. This computes |x|^p, so the
 		// sign of a negative base is restored for odd integer powers.
+		bool isNegativeResult = isNegativeBase && PreciseNumber.IsOddInteger(power);
 		double logValue = Math.Log(Math.Abs(Value.To<double>()));
 		double magnitude = Math.Exp(logValue * power.To<double>());
-		double result = isNegativeBase && PreciseNumber.IsOddInteger(power) ? -magnitude : magnitude;
-		return result.ToSignificantNumber(significantDigits);
+		if (double.IsNormal(magnitude))
+		{
+			double result = isNegativeResult ? -magnitude : magnitude;
+			return result.ToSignificantNumber(significantDigits);
+		}
+
+		// The base or the result is outside the range of a double, so work in base-10 logarithms
+		// built from the base's significand and exponent, which never pass through a double.
+		double log10Magnitude = Log10OfMagnitude(Value) * power.To<double>();
+		return FromLog10OfMagnitude(log10Magnitude, isNegativeResult, significantDigits);
 	}
 
 	/// <summary>
@@ -616,6 +626,7 @@ public readonly record struct SignificantNumber
 	/// </summary>
 	/// <param name="power">The power to raise e to.</param>
 	/// <returns>e raised to <paramref name="power"/>, rounded to the fewest significant digits of the two.</returns>
+	/// <exception cref="OverflowException">Thrown when the result's power of ten is too large or too small to represent.</exception>
 	public static SignificantNumber Exp(PreciseNumber power)
 	{
 		if (Equal(power, Zero))
@@ -633,8 +644,59 @@ public readonly record struct SignificantNumber
 			? int.Min(E.SignificantDigits, DoubleSignificantDigits)
 			: LowestSignificantDigits(E, power);
 
-		return Math.Exp(power.To<double>())
-			.ToSignificantNumber(significantDigits);
+		double result = Math.Exp(power.To<double>());
+		if (double.IsNormal(result))
+		{
+			return result.ToSignificantNumber(significantDigits);
+		}
+
+		// The result is outside the range of a double: e^p = 10^(p × log10(e)).
+		return FromLog10OfMagnitude(power.To<double>() * Math.Log10(Math.E), isNegative: false, significantDigits);
+	}
+
+	/// <summary>
+	/// Computes the base-10 logarithm of the magnitude of a nonzero number from its significand and exponent, so
+	/// that it works for magnitudes outside the range of a <see cref="double"/>.
+	/// </summary>
+	/// <param name="value">A nonzero number.</param>
+	/// <returns>log10(|<paramref name="value"/>|).</returns>
+	private static double Log10OfMagnitude(PreciseNumber value) =>
+		BigInteger.Log10(BigInteger.Abs(value.Significand)) + value.Exponent;
+
+	/// <summary>
+	/// Builds a number from the base-10 logarithm of its magnitude, keeping the power of ten as an integer so that
+	/// the result can lie outside the range of a <see cref="double"/>.
+	/// </summary>
+	/// <param name="log10Magnitude">log10 of the magnitude of the result.</param>
+	/// <param name="isNegative">Whether the result is negative.</param>
+	/// <param name="significantDigits">The number of significant digits the result should have.</param>
+	/// <returns>
+	/// The result, rounded to <paramref name="significantDigits"/>, or to fewer digits when the logarithm cannot
+	/// determine that many: a double carries about 15 significant digits, and the integer part of the logarithm
+	/// uses some of them.
+	/// </returns>
+	/// <exception cref="OverflowException">Thrown when the result's power of ten is too large or too small to represent.</exception>
+	private static SignificantNumber FromLog10OfMagnitude(double log10Magnitude, bool isNegative, int significantDigits)
+	{
+		double wholePart = Math.Floor(log10Magnitude);
+		if (!double.IsFinite(wholePart) || Math.Abs(wholePart) > MaxLog10Magnitude)
+		{
+			throw new OverflowException(log10Magnitude > 0
+				? "The result is too large to represent."
+				: "The result is too small to represent.");
+		}
+
+		// 10^fraction is in [1, 10), so scaling it by 10^16 gives a 17-digit significand that a double holds exactly.
+		double mantissa = Math.Pow(10, log10Magnitude - wholePart);
+		BigInteger significand = new(Math.Round(mantissa * 1e16));
+		int exponent = (int)wholePart - 16;
+
+		int integerDigits = wholePart == 0 ? 1 : (int)Math.Floor(Math.Log10(Math.Abs(wholePart))) + 1;
+		int determinedDigits = int.Max(1, DoubleSignificantDigits - integerDigits);
+
+		return CreateFromComponents(exponent, isNegative ? -significand : significand)
+			.Value
+			.ToSignificantNumber(int.Min(significantDigits, determinedDigits));
 	}
 
 	/// <summary>
@@ -647,6 +709,12 @@ public readonly record struct SignificantNumber
 	/// logarithm path, so that an extreme exponent cannot build an arbitrarily large intermediate.
 	/// </summary>
 	private const int MaxExactIntegerPower = 1024;
+
+	/// <summary>
+	/// The largest power of ten, in either direction, that <see cref="Pow"/> and <see cref="Exp"/> produce. It keeps the
+	/// exponent of the result well inside the range of an <see cref="int"/>.
+	/// </summary>
+	private const int MaxLog10Magnitude = 1_000_000_000;
 
 	/// <summary>
 	/// Gets the value of an integer <see cref="PreciseNumber"/> as a <see cref="BigInteger"/>.
