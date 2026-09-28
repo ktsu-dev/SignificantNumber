@@ -178,18 +178,31 @@ public readonly record struct SignificantNumber
 	/// </summary>
 	/// <param name="left">The first number.</param>
 	/// <param name="right">The second number.</param>
-	/// <returns>The lower of the significant digit counts of the two numbers.</returns>
+	/// <returns>
+	/// The lower of the significant digit counts of the two numbers, or 1 when both have unlimited precision, since any
+	/// product, quotient, or remainder of -1, 0, and 1 is exact at one significant digit.
+	/// </returns>
 	private static int LowestSignificantDigits(PreciseNumber left, PreciseNumber right)
 	{
-		int leftSignificantDigits = left.SignificantDigits;
-		int rightSignificantDigits = right.SignificantDigits;
+		bool leftIsExact = HasInfinitePrecision(left);
+		bool rightIsExact = HasInfinitePrecision(right);
 
-		leftSignificantDigits = HasInfinitePrecision(left) ? rightSignificantDigits : leftSignificantDigits;
-		rightSignificantDigits = HasInfinitePrecision(right) ? leftSignificantDigits : rightSignificantDigits;
+		if (leftIsExact && rightIsExact)
+		{
+			return 1;
+		}
 
-		return leftSignificantDigits < rightSignificantDigits
-			? leftSignificantDigits
-			: rightSignificantDigits;
+		if (leftIsExact)
+		{
+			return right.SignificantDigits;
+		}
+
+		if (rightIsExact)
+		{
+			return left.SignificantDigits;
+		}
+
+		return int.Min(left.SignificantDigits, right.SignificantDigits);
 	}
 
 	/// <summary>
