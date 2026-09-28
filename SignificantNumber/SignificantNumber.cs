@@ -689,9 +689,10 @@ public readonly record struct SignificantNumber
 		// 10^fraction is in [1, 10), so scaling it by 10^16 gives a 17-digit significand that a double holds exactly.
 		double mantissa = Math.Pow(10, log10Magnitude - wholePart);
 		BigInteger significand = new(Math.Round(mantissa * 1e16));
-		int exponent = (int)wholePart - 16;
+		int powerOfTen = (int)wholePart;
+		int exponent = powerOfTen - 16;
 
-		int integerDigits = wholePart == 0 ? 1 : (int)Math.Floor(Math.Log10(Math.Abs(wholePart))) + 1;
+		int integerDigits = int.Abs(powerOfTen).ToString(CultureInfo.InvariantCulture).Length;
 		int determinedDigits = int.Max(1, DoubleSignificantDigits - integerDigits);
 
 		return CreateFromComponents(exponent, isNegative ? -significand : significand)
