@@ -80,4 +80,21 @@ public class SignificantNumberExactOperandTests
 			}
 		}
 	}
+
+	[TestMethod]
+	[DataRow("1", "1.23", "1.23")]
+	[DataRow("-1", "1.23", "-1.23")]
+	[DataRow("1.23", "1", "1.23")]
+	[DataRow("1.23", "-1", "-1.23")]
+	[DataRow("0", "1.23", "0")]
+	[DataRow("1.23", "0", "0")]
+	public void Multiply_OneExactOperand_KeepsTheOtherOperandsPrecision(string left, string right, string expected) =>
+		Assert.AreEqual(Parse(expected), Parse(left) * Parse(right));
+
+	[TestMethod]
+	[DataRow("1.23", "1", "1.23")]
+	[DataRow("1.23", "-1", "-1.23")]
+	[DataRow("1", "4.1", "0.24")]
+	public void Divide_OneExactOperand_KeepsTheOtherOperandsPrecision(string left, string right, string expected) =>
+		Assert.AreEqual(Parse(expected), Parse(left) / Parse(right));
 }
