@@ -19,9 +19,9 @@ using ktsu.PreciseNumber;
 /// zero, so an uninitialized field or array element is a valid number.
 /// </para>
 /// <para>
-/// Addition and subtraction round the result to the fewest decimal places among the operands. Multiplication,
-/// division, and modulus round it to the fewest significant digits. An operand of exactly -1, 0, or 1 is treated as
-/// having unlimited precision, so it never limits the result.
+/// Addition, subtraction, and modulus round the result to the fewest decimal places among the operands.
+/// Multiplication and division round it to the fewest significant digits. An operand of exactly -1, 0, or 1 is treated
+/// as having unlimited precision, so it never limits the result.
 /// </para>
 /// </remarks>
 [DebuggerDisplay("{Significand}e{Exponent}")]
@@ -247,12 +247,19 @@ public readonly record struct SignificantNumber
 	/// </summary>
 	/// <param name="left">The number to divide.</param>
 	/// <param name="right">The number to divide by.</param>
-	/// <returns>The modulus of the two numbers.</returns>
+	/// <returns>The modulus of the two numbers, whose magnitude is always less than that of <paramref name="right"/>.</returns>
+	/// <remarks>
+	/// A remainder is a subtraction, <c>left - right × quotient</c>, so it is rounded to the fewest decimal places like
+	/// <see cref="Subtract(PreciseNumber, PreciseNumber)"/>. When that rounding carries the remainder up to the divisor
+	/// or beyond, the remainder is indistinguishable from a whole multiple of the divisor, so the result is zero.
+	/// </remarks>
 	public static SignificantNumber Mod(PreciseNumber left, PreciseNumber right)
 	{
-		int lowestSignificantDigits = LowestSignificantDigits(left, right);
-		return PreciseNumber.Mod(left, right)
-			.ToSignificantNumber(lowestSignificantDigits);
+		int lowestDecimalDigits = LowestDecimalDigits(left, right);
+		PreciseNumber remainder = PreciseNumber.Mod(left, right).Round(lowestDecimalDigits);
+		return PreciseNumber.Abs(remainder) >= PreciseNumber.Abs(right)
+			? Zero
+			: new(remainder);
 	}
 
 	/// <summary>
