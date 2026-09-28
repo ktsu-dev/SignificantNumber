@@ -17,7 +17,7 @@
 
 ## Features
 
-- Addition and subtraction round to the fewest decimal places among the operands, and multiplication, division, and modulus round to the fewest significant digits
+- Addition, subtraction, and modulus round to the fewest decimal places among the operands, and multiplication and division round to the fewest significant digits
 - Operands of exactly -1, 0, or 1 have unlimited precision, so they never limit a result
 - A `readonly record struct` whose `default` is zero, holding a `PreciseNumber` that it converts to implicitly
 - Implements `INumber<SignificantNumber>`, including `CreateChecked`, `CreateSaturating`, and `CreateTruncating` for every built-in numeric type, `BigInteger`, and `PreciseNumber`
