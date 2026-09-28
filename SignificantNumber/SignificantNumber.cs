@@ -604,21 +604,33 @@ public readonly record struct SignificantNumber
 			? int.Min(Value.SignificantDigits, DoubleSignificantDigits)
 			: LowestSignificantDigits(this, power);
 
-		// Use logarithm and exponential to support decimal powers. This computes |x|^p, so the
-		// sign of a negative base is restored for odd integer powers.
+		// This computes |x|^p, so the sign of a negative base is restored for odd integer powers.
 		bool isNegativeResult = isNegativeBase && PreciseNumber.IsOddInteger(power);
-		double logValue = Math.Log(Math.Abs(Value.To<double>()));
+		return PowByLogarithm(Value, power, isNegativeResult, significantDigits);
+	}
+
+	/// <summary>
+	/// Raises the magnitude of a nonzero number to a power by logarithm and exponential, which supports decimal powers.
+	/// </summary>
+	/// <param name="value">The nonzero base.</param>
+	/// <param name="power">The power to raise the magnitude of <paramref name="value"/> to.</param>
+	/// <param name="isNegative">Whether the result is negative.</param>
+	/// <param name="significantDigits">The number of significant digits the result should have.</param>
+	/// <returns>|<paramref name="value"/>|^<paramref name="power"/>, negated when <paramref name="isNegative"/> is set.</returns>
+	private static SignificantNumber PowByLogarithm(PreciseNumber value, PreciseNumber power, bool isNegative, int significantDigits)
+	{
+		double logValue = Math.Log(Math.Abs(value.To<double>()));
 		double magnitude = Math.Exp(logValue * power.To<double>());
 		if (double.IsNormal(magnitude))
 		{
-			double result = isNegativeResult ? -magnitude : magnitude;
+			double result = isNegative ? -magnitude : magnitude;
 			return result.ToSignificantNumber(significantDigits);
 		}
 
 		// The base or the result is outside the range of a double, so work in base-10 logarithms
 		// built from the base's significand and exponent, which never pass through a double.
-		double log10Magnitude = Log10OfMagnitude(Value) * power.To<double>();
-		return FromLog10OfMagnitude(log10Magnitude, isNegativeResult, significantDigits);
+		double log10Magnitude = Log10OfMagnitude(value) * power.To<double>();
+		return FromLog10OfMagnitude(log10Magnitude, isNegative, significantDigits);
 	}
 
 	/// <summary>
