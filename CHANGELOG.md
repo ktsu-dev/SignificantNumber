@@ -1,3 +1,10 @@
+## v2.0.14-pre.1 (prerelease)
+
+Changes since v2.0.13:
+
+- Bump Polyfill from 11.4.0 to 11.4.1 ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
 ## v2.0.13 (patch)
 
 Changes since v2.0.12:
@@ -161,8 +168,10 @@ Changes since v1.4.29:
 Changes since v1.4.28:
 
 - Set PrivateAssets=all on Polyfill and normalize line endings for ktsu.Sdk 2.26 analyzers ([@matt-edmondson](https://github.com/matt-edmondson))
+- Sync .github\workflows\dotnet.yml ([@KtsuTools](https://github.com/KtsuTools))
 - Sync .editorconfig ([@KtsuTools](https://github.com/KtsuTools))
 - Sync global.json ([@KtsuTools](https://github.com/KtsuTools))
+- Sync .github\workflows\dotnet.yml ([@KtsuTools](https://github.com/KtsuTools))
 
 ## v1.4.28 (patch)
 
@@ -294,10 +303,13 @@ Changes since v1.4.8:
 - chore: remove unused SourceLink package versions ([@matt-edmondson](https://github.com/matt-edmondson))
 - chore: remove unused SourceLink package references ([@matt-edmondson](https://github.com/matt-edmondson))
 - Add TAGS.md with NuGet package tags ([@matt-edmondson](https://github.com/matt-edmondson))
+- Sync .github\workflows\dotnet.yml ([@KtsuTools](https://github.com/KtsuTools))
 
 ## v1.4.9-pre.1 (prerelease)
 
-No significant changes detected since v1.4.9.
+Changes since v1.4.8:
+
+- Sync .github\workflows\dotnet.yml ([@KtsuTools](https://github.com/KtsuTools))
 
 ## v1.4.8 (patch)
 
@@ -311,7 +323,11 @@ Changes since v1.4.7:
 
 ## v1.4.8-pre.1 (prerelease)
 
-No significant changes detected since v1.4.8.
+Changes since v1.4.7:
+
+- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
 
 ## v1.4.7 (patch)
 
@@ -400,7 +416,11 @@ Changes since v1.4.6-pre.1:
 
 ## v1.4.6-pre.1 (prerelease)
 
-No significant changes detected since v1.4.6.
+Changes since v1.4.5:
+
+- Sync scripts\update-winget-manifests.ps1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync COPYRIGHT.md ([@ktsu[bot]](https://github.com/ktsu[bot]))
 
 ## v1.4.5 (patch)
 
@@ -436,7 +456,13 @@ Changes since v1.4.4-pre.1:
 
 ## v1.4.4-pre.1 (prerelease)
 
-No significant changes detected since v1.4.4.
+Changes since v1.4.3:
+
+- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync scripts\update-winget-manifests.ps1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync .gitattributes ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync .runsettings ([@ktsu[bot]](https://github.com/ktsu[bot]))
 
 ## v1.4.3 (patch)
 
@@ -533,7 +559,9 @@ No significant changes detected since v1.4.2-pre.1.
 
 ## v1.4.2-pre.1 (prerelease)
 
-No significant changes detected since v1.4.2.
+Changes since v1.4.1:
+
+- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
 
 ## v1.4.1 (patch)
 
@@ -544,7 +572,11 @@ Changes since v1.4.0:
 
 ## v1.4.1-pre.1 (prerelease)
 
-No significant changes detected since v1.4.1.
+Changes since v1.4.0:
+
+- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync .editorconfig ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync .runsettings ([@ktsu[bot]](https://github.com/ktsu[bot]))
 
 ## v1.4.0 (minor)
 
