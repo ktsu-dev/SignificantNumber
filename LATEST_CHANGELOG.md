@@ -1,6 +1,6 @@
-## v2.0.14 (patch)
+## v2.0.15 (patch)
 
-Changes since v2.0.13:
+Changes since v2.0.14:
 
-- Move CI onto the shared ci-shared.yml pipeline ([@Claude](https://github.com/Claude))
+- Round sums and differences to tens and hundreds when an operand is that coarse [patch] ([@Claude](https://github.com/Claude))
 
