@@ -145,14 +145,14 @@ public readonly record struct SignificantNumber
 		value.Exponent == 0 && BigInteger.Abs(value.Significand) <= BigInteger.One;
 
 	/// <summary>
-	/// Counts the digits after the decimal point in a number.
+	/// Counts the decimal places of a number's least significant digit.
 	/// </summary>
 	/// <param name="value">The number to count the decimal digits of.</param>
-	/// <returns>The number of digits after the decimal point.</returns>
-	private static int CountDecimalDigits(PreciseNumber value) =>
-		value.Exponent > 0
-		? 0
-		: int.Abs(value.Exponent);
+	/// <returns>
+	/// The number of digits after the decimal point, or, when the least significant digit is left of the decimal point,
+	/// the negated count of places it sits to the left of the units: -1 for tens, -2 for hundreds, and so on.
+	/// </returns>
+	private static int CountDecimalDigits(PreciseNumber value) => -value.Exponent;
 
 	/// <summary>
 	/// Gets the lower of the decimal digit counts of two numbers, ignoring an operand with unlimited precision.
