@@ -364,6 +364,11 @@ public readonly record struct SignificantNumber
 	/// <summary>
 	/// Compares two numbers at the lower of their significant digit counts.
 	/// </summary>
+	/// <remarks>
+	/// This is not a total order: <c>1.23</c> and <c>1.2</c> compare equal, as do <c>1.2</c> and <c>1.17</c>, but
+	/// <c>1.23</c> is greater than <c>1.17</c>. Use it to ask whether two measurements agree to the precision they
+	/// share, and use <see cref="CompareTo(SignificantNumber)"/> to sort.
+	/// </remarks>
 	/// <param name="left">The first number to compare.</param>
 	/// <param name="right">The second number to compare.</param>
 	/// <returns>
@@ -380,7 +385,7 @@ public readonly record struct SignificantNumber
 	/// </item>
 	/// </list>
 	/// </returns>
-	public static int CompareTo(PreciseNumber left, PreciseNumber right)
+	public static int CompareAtSignificance(PreciseNumber left, PreciseNumber right)
 	{
 		int lowestSignificantDigits = LowestSignificantDigits(left, right);
 		return left.ReduceSignificance(lowestSignificantDigits).CompareTo(right.ReduceSignificance(lowestSignificantDigits));
@@ -787,7 +792,7 @@ public readonly record struct SignificantNumber
 	}
 
 	/// <summary>
-	/// Compares the current instance with another <see cref="SignificantNumber"/> at the lower of their significant digit counts.
+	/// Compares the value of the current instance with another <see cref="SignificantNumber"/>.
 	/// </summary>
 	/// <param name="other">The <see cref="SignificantNumber"/> to compare with the current instance.</param>
 	/// <returns>
@@ -804,8 +809,14 @@ public readonly record struct SignificantNumber
 	/// </item>
 	/// </list>
 	/// </returns>
+	/// <remarks>
+	/// The values are compared exactly, without applying significant figure rules, so the order agrees with
+	/// <c>==</c>, <c>&lt;</c> and <c>&gt;</c> and is a consistent total order for sorting. Use
+	/// <see cref="CompareAtSignificance(PreciseNumber, PreciseNumber)"/> to compare at the lower of the two
+	/// significant digit counts.
+	/// </remarks>
 	public int CompareTo(SignificantNumber other) =>
-		CompareTo(this, other);
+		Value.CompareTo(other.Value);
 
 	/// <summary>
 	/// Compares the current instance with an object.
@@ -816,15 +827,15 @@ public readonly record struct SignificantNumber
 	/// <see langword="null"/> object sorts before every number.
 	/// </returns>
 	/// <remarks>
-	/// A <see cref="SignificantNumber"/> or <see cref="PreciseNumber"/> is compared at the lower of the two significant
-	/// digit counts. Any other object is passed to <see cref="PreciseNumber.CompareTo(object)"/>.
+	/// A <see cref="SignificantNumber"/> or <see cref="PreciseNumber"/> is compared by exact value, the same as
+	/// <see cref="CompareTo(SignificantNumber)"/>. Any other object is passed to <see cref="PreciseNumber.CompareTo(object)"/>.
 	/// </remarks>
 	public int CompareTo(object? obj) =>
 		obj switch
 		{
 			null => 1,
-			SignificantNumber significantNumber => CompareTo(significantNumber),
-			PreciseNumber preciseNumber => CompareTo(this, preciseNumber),
+			SignificantNumber significantNumber => Value.CompareTo(significantNumber.Value),
+			PreciseNumber preciseNumber => Value.CompareTo(preciseNumber),
 			_ => Value.CompareTo(obj),
 		};
 

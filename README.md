@@ -168,7 +168,14 @@ bool isGreater = number1 > number2;
 bool isLessOrEqual = number1 <= number2;
 ```
 
-Ordering operators compare values exactly. `SignificantNumber.CompareTo(left, right)` and `CompareTo(SignificantNumber)` compare both numbers at the lower of their significant digit counts.
+Ordering operators, `Equals` and `CompareTo` compare values exactly, so `Array.Sort`, `OrderBy`, `SortedSet` and `Comparer<SignificantNumber>.Default` all see one consistent order.
+
+To ask whether two measurements agree to the precision they share, use `SignificantNumber.CompareAtSignificance(left, right)`. It compares both numbers at the lower of their significant digit counts, so `1.23` and `1.2` compare equal. That comparison is not transitive (`1.2` also equals `1.17`, but `1.23` does not), so don't sort with it.
+
+```csharp
+int exact = number1.CompareTo(number2);
+int atSharedPrecision = SignificantNumber.CompareAtSignificance(number1, number2);
+```
 
 ### Formatting and parsing
 
@@ -306,7 +313,7 @@ Consider the number `123.456000`:
 
 - `bool Equals(SignificantNumber other)` - Determines whether two numbers have the same significand and exponent.
 - `int CompareTo(object? obj)` - Compares the current instance with another object.
-- `int CompareTo(SignificantNumber other)` - Compares the current instance with another significant number at the lower of their significant digit counts.
+- `int CompareTo(SignificantNumber other)` - Compares the value of the current instance with another significant number exactly.
 - `int CompareTo<TInput>(TInput other) where TInput : INumber<TInput>` - Compares the value of the current instance with another number.
 - `PreciseNumber Abs()` - Returns the absolute value of the current instance.
 - `PreciseNumber Round(int decimalDigits)` - Rounds the current instance to the specified number of decimal digits.
@@ -324,6 +331,7 @@ Consider the number `123.456000`:
 - `static SignificantNumber Add`, `Subtract`, `Multiply`, `Divide`, and `Mod(PreciseNumber left, PreciseNumber right)` - Apply the significant figure rules to two numbers.
 - `static SignificantNumber Exp(PreciseNumber power)` - Raises e to a power.
 - `static SignificantNumber Max`, `Min(SignificantNumber x, SignificantNumber y)`, and `Clamp(SignificantNumber value, SignificantNumber min, SignificantNumber max)` - Compare by value.
+- `static int CompareAtSignificance(PreciseNumber left, PreciseNumber right)` - Compares two numbers at the lower of their significant digit counts. Not a total order, so not for sorting.
 - `static SignificantNumber Round(SignificantNumber value, int decimalDigits)` - Rounds a number to the specified number of decimal digits.
 - `static SignificantNumber Abs(SignificantNumber value)` - Returns the absolute value of a `SignificantNumber`.
 - `static bool IsCanonical(SignificantNumber value)` - Determines whether the specified value is canonical.
