@@ -244,8 +244,8 @@ public class SignificantNumberValueTypeTests
 
 		Array.Sort(values);
 
-		CollectionAssert.AreEqual(expected, values);
-		CollectionAssert.AreEqual(expected, values.Reverse().OrderBy(x => x).ToArray());
+		Assert.AreSequenceEqual(expected, values);
+		Assert.AreSequenceEqual(expected, values.Reverse().OrderBy(x => x));
 	}
 
 	[TestMethod]
@@ -254,7 +254,7 @@ public class SignificantNumberValueTypeTests
 		SortedSet<SignificantNumber> set = [Parse("1.23"), Parse("1.2"), Parse("1.17")];
 
 		Assert.HasCount(3, set);
-		Assert.IsTrue(set.Contains(Parse("1.2")));
+		Assert.Contains(Parse("1.2"), set);
 	}
 
 	[TestMethod]
