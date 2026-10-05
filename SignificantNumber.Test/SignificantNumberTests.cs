@@ -178,13 +178,13 @@ public class SignificantNumberTests
 	}
 
 	[TestMethod]
-	public void CompareTo_TwoNumbers_ReturnsCorrectComparison()
+	public void CompareAtSignificance_TwoNumbers_ReturnsCorrectComparison()
 	{
 		SignificantNumber left = SignificantNumber.CreateFromComponents(1, new BigInteger(10));
 		SignificantNumber right = SignificantNumber.CreateFromComponents(1, new BigInteger(5));
-		int result = SignificantNumber.CompareTo(left, right);
+		int result = SignificantNumber.CompareAtSignificance(left, right);
 
-		Assert.IsGreaterThan(0, result, "CompareTo should return a positive value when left (10) is greater than right (5)");
+		Assert.IsGreaterThan(0, result, "CompareAtSignificance should return a positive value when left (10) is greater than right (5)");
 	}
 
 	[TestMethod]

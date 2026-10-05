@@ -231,4 +231,68 @@ public class SignificantNumberValueTypeTests
 
 		Assert.AreEqual(Parse("123"), result);
 	}
+
+	// IComparable is what Array.Sort, OrderBy, SortedSet and Comparer<T>.Default use, so it has to be a
+	// consistent total order. It used to compare at the lower of the two significant digit counts, under
+	// which 1.23 == 1.2 and 1.2 == 1.17 but 1.23 > 1.17, so sorting gave a wrong order.
+
+	[TestMethod]
+	public void ArraySort_OrdersByExactValue()
+	{
+		SignificantNumber[] values = [Parse("1.17"), Parse("1.23"), Parse("1.2"), Parse("1.21"), Parse("1.19")];
+		SignificantNumber[] expected = [Parse("1.17"), Parse("1.19"), Parse("1.2"), Parse("1.21"), Parse("1.23")];
+
+		Array.Sort(values);
+
+		CollectionAssert.AreEqual(expected, values);
+		CollectionAssert.AreEqual(expected, values.Reverse().OrderBy(x => x).ToArray());
+	}
+
+	[TestMethod]
+	public void SortedSet_KeepsValuesThatDifferOnlyBelowTheSharedSignificance()
+	{
+		SortedSet<SignificantNumber> set = [Parse("1.23"), Parse("1.2"), Parse("1.17")];
+
+		Assert.HasCount(3, set);
+		Assert.IsTrue(set.Contains(Parse("1.2")));
+	}
+
+	[TestMethod]
+	public void CompareTo_AgreesWithEqualityAndOrderingOperators()
+	{
+		SignificantNumber[] values = [Parse("1.17"), Parse("1.19"), Parse("1.2"), Parse("1.21"), Parse("1.23"), Parse("1.20"), Parse("-3"), Parse("0"), Parse("1200")];
+
+		foreach (SignificantNumber left in values)
+		{
+			foreach (SignificantNumber right in values)
+			{
+				int comparison = left.CompareTo(right);
+				Assert.AreEqual(left == right, comparison == 0, $"{left}.CompareTo({right}) == 0");
+				Assert.AreEqual(left < right, comparison < 0, $"{left}.CompareTo({right}) < 0");
+				Assert.AreEqual(left > right, comparison > 0, $"{left}.CompareTo({right}) > 0");
+				Assert.AreEqual(int.Sign(comparison), int.Sign(left.CompareTo((object)right)), $"{left}.CompareTo((object){right})");
+				Assert.AreEqual(int.Sign(comparison), int.Sign(left.CompareTo(right.Value)), $"{left}.CompareTo({right}.Value)");
+			}
+		}
+	}
+
+	[TestMethod]
+	public void CompareToObject_BoxedPreciseNumber_ComparesExactValue()
+	{
+		object precise = PreciseNumber.Parse("1.2", CultureInfo.InvariantCulture);
+
+		Assert.IsGreaterThan(0, Parse("1.23").CompareTo(precise));
+	}
+
+	[TestMethod]
+	[DataRow("1.23", "1.2", 0)]
+	[DataRow("1.2", "1.17", 0)]
+	[DataRow("1.23", "1.17", 1)]
+	[DataRow("1.17", "1.23", -1)]
+	[DataRow("1200", "1234", 0)]
+	[DataRow("1.5", "1.4", 1)]
+	public void CompareAtSignificance_ComparesAtTheLowerSignificantDigitCount(string left, string right, int expected)
+	{
+		Assert.AreEqual(expected, int.Sign(SignificantNumber.CompareAtSignificance(Parse(left), Parse(right))));
+	}
 }
