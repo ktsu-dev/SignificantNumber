@@ -644,6 +644,9 @@ public readonly record struct SignificantNumber
 	/// <returns>|<paramref name="value"/>|^<paramref name="power"/>, negated when <paramref name="isNegative"/> is set.</returns>
 	private static SignificantNumber PowByLogarithm(PreciseNumber value, PreciseNumber power, bool isNegative, int significantDigits)
 	{
+		// |x|^p = e^(p × ln|x|), so the digits are bounded by how precisely e^(p × ln|x|) is known.
+		significantDigits = CapToExponentPrecision(significantDigits, Log10OfMagnitude(value) * Math.Log(10) * power.To<double>());
+
 		double logValue = Math.Log(Math.Abs(value.To<double>()));
 		double magnitude = Math.Exp(logValue * power.To<double>());
 		if (double.IsNormal(magnitude))
@@ -680,6 +683,7 @@ public readonly record struct SignificantNumber
 		int significantDigits = PreciseNumber.IsInteger(power)
 			? int.Min(E.SignificantDigits, DoubleSignificantDigits)
 			: LowestSignificantDigits(E, power);
+		significantDigits = CapToExponentPrecision(significantDigits, power.To<double>());
 
 		double result = Math.Exp(power.To<double>());
 		if (double.IsNormal(result))
@@ -689,6 +693,25 @@ public readonly record struct SignificantNumber
 
 		// The result is outside the range of a double: e^p = 10^(p × log10(e)).
 		return FromLog10OfMagnitude(power.To<double>() * Math.Log10(Math.E), isNegative: false, significantDigits);
+	}
+
+	/// <summary>
+	/// Limits a significant digit count to the digits that e^<paramref name="exponent"/> computed in a
+	/// <see cref="double"/> can be trusted to. The exponent carries a relative error of about 2⁻⁵³, which
+	/// becomes an absolute error of |exponent| × 2⁻⁵³ in it, and so a relative error of that size in the result:
+	/// every power of ten in |exponent| costs one of the double's significant digits.
+	/// </summary>
+	/// <param name="significantDigits">The significant digit count to limit.</param>
+	/// <param name="exponent">The natural logarithm of the magnitude of the result.</param>
+	/// <returns>The lower of <paramref name="significantDigits"/> and the digits the double result determines, and at least 1.</returns>
+	private static int CapToExponentPrecision(int significantDigits, double exponent)
+	{
+		double magnitude = Math.Abs(exponent);
+		int lostDigits = !double.IsFinite(magnitude)
+			? DoubleSignificantDigits
+			: magnitude > 1 ? (int)Math.Ceiling(Math.Log10(magnitude)) : 0;
+
+		return int.Max(1, int.Min(significantDigits, DoubleSignificantDigits - lostDigits));
 	}
 
 	/// <summary>
