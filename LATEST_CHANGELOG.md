@@ -1,6 +1,7 @@
-## v3.0.1-pre.1 (prerelease)
+## v3.0.1-pre.2 (prerelease)
 
-Changes since v3.0.0:
+Changes since v3.0.1-pre.1:
 
+- Bump MSTest.Sdk from 4.4.1 to 4.5.1 ([@dependabot[bot]](https://github.com/dependabot[bot]))
 - Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
 
