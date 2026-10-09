@@ -1,7 +1,6 @@
-## v3.0.1-pre.2 (prerelease)
+## v3.0.1 (patch)
 
-Changes since v3.0.1-pre.1:
+Changes since v3.0.0:
 
-- Bump MSTest.Sdk from 4.4.1 to 4.5.1 ([@dependabot[bot]](https://github.com/dependabot[bot]))
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Cap Pow and Exp digits by the precision of the double exponent [patch] ([@Claude](https://github.com/Claude))
 
