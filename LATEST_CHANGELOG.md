@@ -1,6 +1,6 @@
-## v3.0.1 (patch)
+## v3.0.2-pre.1 (prerelease)
 
-Changes since v3.0.0:
+Changes since v3.0.1:
 
-- Cap Pow and Exp digits by the precision of the double exponent [patch] ([@Claude](https://github.com/Claude))
+- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
 
