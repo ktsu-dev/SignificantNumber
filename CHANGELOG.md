@@ -2,197 +2,197 @@
 
 Changes since v3.0.2-pre.1:
 
-- Bump Polyfill from 11.4.3 to 11.4.5 ([@dependabot[bot]](https://github.com/dependabot[bot]))
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump Polyfill from 11.4.3 to 11.4.5 (dependabot[bot])
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v3.0.2-pre.1 (prerelease)
 
 Changes since v3.0.1:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v3.0.1 (patch)
 
 Changes since v3.0.0:
 
-- Cap Pow and Exp digits by the precision of the double exponent [patch] ([@Claude](https://github.com/Claude))
+- Cap Pow and Exp digits by the precision of the double exponent [patch] (Claude)
 
 ## v3.0.1-pre.2 (prerelease)
 
 Changes since v3.0.1-pre.1:
 
-- Bump MSTest.Sdk from 4.4.1 to 4.5.1 ([@dependabot[bot]](https://github.com/dependabot[bot]))
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump MSTest.Sdk from 4.4.1 to 4.5.1 (dependabot[bot])
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v3.0.1-pre.1 (prerelease)
 
 Changes since v3.0.0:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v3.0.0 (major)
 
 Changes since v2.0.0:
 
-- Use Assert.AreSequenceEqual and Assert.Contains in the new comparison tests ([@Claude](https://github.com/Claude))
-- Compare exact values in IComparable so sorting is a total order [major] ([@Claude](https://github.com/Claude))
-- Round sums and differences to tens and hundreds when an operand is that coarse [patch] ([@Claude](https://github.com/Claude))
-- Move CI onto the shared ci-shared.yml pipeline ([@Claude](https://github.com/Claude))
-- Move Pow's logarithm path into a helper to keep its complexity within bounds ([@Claude](https://github.com/Claude))
-- Cover an exact operand on either side of a multiplication or division ([@Claude](https://github.com/Claude))
-- Count the result's integer digits without a floating-point comparison ([@Claude](https://github.com/Claude))
-- Compute Pow and Exp beyond the range of a double [patch] ([@Claude](https://github.com/Claude))
-- Keep the remainder of % smaller than the divisor [patch] ([@Claude](https://github.com/Claude))
-- Stop multiplying by zero from throwing when the zero is on the right [patch] ([@Claude](https://github.com/Claude))
-- Keep the base's precision when Pow or Exp takes an integer exponent [patch] ([@Claude](https://github.com/Claude))
-- Keep the sign of a negative base in Pow, and reject undefined powers [patch] ([@Claude](https://github.com/Claude))
-- Seed the abstraction-cost pair across every release [patch] ([@Claude](https://github.com/Claude))
-- Measure this type against a bare double, and chart it per release [patch] ([@Claude](https://github.com/Claude))
-- Seed the chart with every release the suite can measure [patch] ([@Claude](https://github.com/Claude))
-- Chart performance per release, and show it in the README [patch] ([@Claude](https://github.com/Claude))
-- Gate Dependabot auto-merge on CI actually being green ([@Claude](https://github.com/Claude))
+- Use Assert.AreSequenceEqual and Assert.Contains in the new comparison tests (Claude)
+- Compare exact values in IComparable so sorting is a total order [major] (Claude)
+- Round sums and differences to tens and hundreds when an operand is that coarse [patch] (Claude)
+- Move CI onto the shared ci-shared.yml pipeline (Claude)
+- Move Pow's logarithm path into a helper to keep its complexity within bounds (Claude)
+- Cover an exact operand on either side of a multiplication or division (Claude)
+- Count the result's integer digits without a floating-point comparison (Claude)
+- Compute Pow and Exp beyond the range of a double [patch] (Claude)
+- Keep the remainder of % smaller than the divisor [patch] (Claude)
+- Stop multiplying by zero from throwing when the zero is on the right [patch] (Claude)
+- Keep the base's precision when Pow or Exp takes an integer exponent [patch] (Claude)
+- Keep the sign of a negative base in Pow, and reject undefined powers [patch] (Claude)
+- Seed the abstraction-cost pair across every release [patch] (Claude)
+- Measure this type against a bare double, and chart it per release [patch] (Claude)
+- Seed the chart with every release the suite can measure [patch] (Claude)
+- Chart performance per release, and show it in the README [patch] (Claude)
+- Gate Dependabot auto-merge on CI actually being green (Claude)
 
 ## v2.0.16-pre.2 (prerelease)
 
 Changes since v2.0.16-pre.1:
 
-- Bump Polyfill from 11.4.1 to 11.4.3 ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump Polyfill from 11.4.1 to 11.4.3 (dependabot[bot])
 
 ## v2.0.16-pre.1 (prerelease)
 
 Changes since v2.0.15:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v2.0.15 (patch)
 
 Changes since v2.0.14:
 
-- Round sums and differences to tens and hundreds when an operand is that coarse [patch] ([@Claude](https://github.com/Claude))
+- Round sums and differences to tens and hundreds when an operand is that coarse [patch] (Claude)
 
 ## v2.0.14 (patch)
 
 Changes since v2.0.13:
 
-- Move CI onto the shared ci-shared.yml pipeline ([@Claude](https://github.com/Claude))
+- Move CI onto the shared ci-shared.yml pipeline (Claude)
 
 ## v2.0.14-pre.1 (prerelease)
 
 Changes since v2.0.13:
 
-- Bump Polyfill from 11.4.0 to 11.4.1 ([@dependabot[bot]](https://github.com/dependabot[bot]))
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump Polyfill from 11.4.0 to 11.4.1 (dependabot[bot])
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v2.0.13 (patch)
 
 Changes since v2.0.12:
 
-- Move Pow's logarithm path into a helper to keep its complexity within bounds ([@Claude](https://github.com/Claude))
-- Cover an exact operand on either side of a multiplication or division ([@Claude](https://github.com/Claude))
-- Count the result's integer digits without a floating-point comparison ([@Claude](https://github.com/Claude))
-- Compute Pow and Exp beyond the range of a double [patch] ([@Claude](https://github.com/Claude))
-- Keep the remainder of % smaller than the divisor [patch] ([@Claude](https://github.com/Claude))
-- Stop multiplying by zero from throwing when the zero is on the right [patch] ([@Claude](https://github.com/Claude))
+- Move Pow's logarithm path into a helper to keep its complexity within bounds (Claude)
+- Cover an exact operand on either side of a multiplication or division (Claude)
+- Count the result's integer digits without a floating-point comparison (Claude)
+- Compute Pow and Exp beyond the range of a double [patch] (Claude)
+- Keep the remainder of % smaller than the divisor [patch] (Claude)
+- Stop multiplying by zero from throwing when the zero is on the right [patch] (Claude)
 
 ## v2.0.12 (patch)
 
 Changes since v2.0.11:
 
-- Keep the base's precision when Pow or Exp takes an integer exponent [patch] ([@Claude](https://github.com/Claude))
+- Keep the base's precision when Pow or Exp takes an integer exponent [patch] (Claude)
 
 ## v2.0.11 (patch)
 
 Changes since v2.0.10:
 
-- Keep the sign of a negative base in Pow, and reject undefined powers [patch] ([@Claude](https://github.com/Claude))
+- Keep the sign of a negative base in Pow, and reject undefined powers [patch] (Claude)
 
 ## v2.0.10 (patch)
 
 Changes since v2.0.9:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v2.0.9 (patch)
 
 Changes since v2.0.8:
 
-- Bump the ktsu group with 9 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 9 updates (dependabot[bot])
 
 ## v2.0.8 (patch)
 
 Changes since v2.0.7:
 
-- Bump the ktsu group with 10 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 10 updates (dependabot[bot])
 
 ## v2.0.7 (patch)
 
 Changes since v2.0.6:
 
-- Bump the ktsu group with 10 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 10 updates (dependabot[bot])
 
 ## v2.0.6 (patch)
 
 Changes since v2.0.5:
 
-- Bump Polyfill from 11.3.0 to 11.4.0 ([@dependabot[bot]](https://github.com/dependabot[bot]))
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump Polyfill from 11.3.0 to 11.4.0 (dependabot[bot])
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v2.0.5 (patch)
 
 Changes since v2.0.4:
 
-- Bump the ktsu group with 9 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 9 updates (dependabot[bot])
 
 ## v2.0.4 (patch)
 
 Changes since v2.0.3:
 
-- Bump MSTest.Sdk from 4.4.0 to 4.4.1 ([@dependabot[bot]](https://github.com/dependabot[bot]))
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump MSTest.Sdk from 4.4.0 to 4.4.1 (dependabot[bot])
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v2.0.3 (patch)
 
 Changes since v2.0.2:
 
-- Seed the abstraction-cost pair across every release [patch] ([@Claude](https://github.com/Claude))
-- Measure this type against a bare double, and chart it per release [patch] ([@Claude](https://github.com/Claude))
+- Seed the abstraction-cost pair across every release [patch] (Claude)
+- Measure this type against a bare double, and chart it per release [patch] (Claude)
 
 ## v2.0.2 (patch)
 
 Changes since v2.0.1:
 
-- Seed the chart with every release the suite can measure [patch] ([@Claude](https://github.com/Claude))
-- Chart performance per release, and show it in the README [patch] ([@Claude](https://github.com/Claude))
+- Seed the chart with every release the suite can measure [patch] (Claude)
+- Chart performance per release, and show it in the README [patch] (Claude)
 
 ## v2.0.1 (patch)
 
 Changes since v2.0.0:
 
-- Gate Dependabot auto-merge on CI actually being green ([@Claude](https://github.com/Claude))
+- Gate Dependabot auto-merge on CI actually being green (Claude)
 
 ## v2.0.0 (major)
 
 Changes since v1.4.40:
 
-- [major] Make SignificantNumber a value type ([@matt-edmondson](https://github.com/matt-edmondson))
+- [major] Make SignificantNumber a value type (matt-edmondson)
 
 ## v1.4.40 (patch)
 
 Changes since v1.4.39:
 
-- ci: adopt the consolidated .NET workflow [patch] ([@Claude](https://github.com/Claude))
+- ci: adopt the consolidated .NET workflow [patch] (Claude)
 
 ## v1.4.39 (patch)
 
 Changes since v1.4.38:
 
-- Bump Polyfill from 11.2.0 to 11.3.0 ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump Polyfill from 11.2.0 to 11.3.0 (dependabot[bot])
 
 ## v1.4.38 (patch)
 
 Changes since v1.4.37:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v1.4.37 (patch)
 
@@ -202,14 +202,14 @@ No significant changes detected since v1.4.36.
 
 Changes since v1.4.35:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v1.4.35 (patch)
 
 Changes since v1.4.34:
 
-- ci: make the SonarQube quality gate opt in [patch] ([@matt-edmondson](https://github.com/matt-edmondson))
-- ci: adopt the unified dotnet workflow [patch] ([@matt-edmondson](https://github.com/matt-edmondson))
+- ci: make the SonarQube quality gate opt in [patch] (matt-edmondson)
+- ci: adopt the unified dotnet workflow [patch] (matt-edmondson)
 
 ## v1.4.34 (patch)
 
@@ -219,365 +219,365 @@ No significant changes detected since v1.4.33.
 
 Changes since v1.4.32:
 
-- Bump the ktsu group with 10 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 10 updates (dependabot[bot])
 
 ## v1.4.32 (patch)
 
 Changes since v1.4.31:
 
-- Bump the ktsu group with 10 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 10 updates (dependabot[bot])
 
 ## v1.4.31 (patch)
 
 Changes since v1.4.30:
 
-- chore: store icon.png in LFS as .gitattributes declares ([@matt-edmondson](https://github.com/matt-edmondson))
-- docs: scope build badge to the default branch ([@matt-edmondson](https://github.com/matt-edmondson))
-- docs: correct README, DESCRIPTION and TAGS metadata ([@matt-edmondson](https://github.com/matt-edmondson))
+- chore: store icon.png in LFS as .gitattributes declares (matt-edmondson)
+- docs: scope build badge to the default branch (matt-edmondson)
+- docs: correct README, DESCRIPTION and TAGS metadata (matt-edmondson)
 
 ## v1.4.30 (patch)
 
 Changes since v1.4.29:
 
-- Stop Update SDKs failing when there is nothing to update ([@matt-edmondson](https://github.com/matt-edmondson))
+- Stop Update SDKs failing when there is nothing to update (matt-edmondson)
 
 ## v1.4.29 (patch)
 
 Changes since v1.4.28:
 
-- Set PrivateAssets=all on Polyfill and normalize line endings for ktsu.Sdk 2.26 analyzers ([@matt-edmondson](https://github.com/matt-edmondson))
-- Sync .github\workflows\dotnet.yml ([@KtsuTools](https://github.com/KtsuTools))
-- Sync .editorconfig ([@KtsuTools](https://github.com/KtsuTools))
-- Sync global.json ([@KtsuTools](https://github.com/KtsuTools))
-- Sync .github\workflows\dotnet.yml ([@KtsuTools](https://github.com/KtsuTools))
+- Set PrivateAssets=all on Polyfill and normalize line endings for ktsu.Sdk 2.26 analyzers (matt-edmondson)
+- Sync .github\workflows\dotnet.yml (KtsuTools)
+- Sync .editorconfig (KtsuTools)
+- Sync global.json (KtsuTools)
+- Sync .github\workflows\dotnet.yml (KtsuTools)
 
 ## v1.4.28 (patch)
 
 Changes since v1.4.27:
 
-- chore: update ktsu.Sdk to 2.21.1 [patch] ([@matt-edmondson](https://github.com/matt-edmondson))
+- chore: update ktsu.Sdk to 2.21.1 [patch] (matt-edmondson)
 
 ## v1.4.27 (patch)
 
 Changes since v1.4.26:
 
-- Bump Polyfill from 11.0.1 to 11.0.2 ([@dependabot[bot]](https://github.com/dependabot[bot]))
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump Polyfill from 11.0.1 to 11.0.2 (dependabot[bot])
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v1.4.26 (patch)
 
 Changes since v1.4.25:
 
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
+- Sync global.json (ktsu[bot])
 
 ## v1.4.25 (patch)
 
 Changes since v1.4.24:
 
-- Sync .github\workflows\update-sdks.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dependabot-merge.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .gitattributes ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync .github\workflows\update-sdks.yml (ktsu[bot])
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
+- Sync .github\workflows\dependabot-merge.yml (ktsu[bot])
+- Sync .gitattributes (ktsu[bot])
 
 ## v1.4.24 (patch)
 
 Changes since v1.4.23:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v1.4.23 (patch)
 
 Changes since v1.4.22:
 
-- Bump MSTest.Sdk from 4.3.2 to 4.3.3 ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump MSTest.Sdk from 4.3.2 to 4.3.3 (dependabot[bot])
 
 ## v1.4.22 (patch)
 
 Changes since v1.4.21:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v1.4.21 (patch)
 
 Changes since v1.4.20:
 
-- Bump the ktsu group with 8 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 8 updates (dependabot[bot])
 
 ## v1.4.20 (patch)
 
 Changes since v1.4.19:
 
-- Bump the ktsu group with 2 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 2 updates (dependabot[bot])
 
 ## v1.4.19 (patch)
 
 Changes since v1.4.18:
 
-- Bump the ktsu group with 2 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 2 updates (dependabot[bot])
 
 ## v1.4.18 (patch)
 
 Changes since v1.4.17:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v1.4.17 (patch)
 
 Changes since v1.4.16:
 
-- Bump MSTest.Sdk from 4.3.0 to 4.3.2 ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump MSTest.Sdk from 4.3.0 to 4.3.2 (dependabot[bot])
 
 ## v1.4.16 (patch)
 
 Changes since v1.4.15:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v1.4.15 (patch)
 
 Changes since v1.4.14:
 
-- Bump MSTest.Sdk from 4.2.3 to 4.3.0 ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump MSTest.Sdk from 4.2.3 to 4.3.0 (dependabot[bot])
 
 ## v1.4.14 (patch)
 
 Changes since v1.4.13:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v1.4.13 (patch)
 
 Changes since v1.4.12:
 
-- Bump the ktsu group with 9 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 9 updates (dependabot[bot])
 
 ## v1.4.12 (patch)
 
 Changes since v1.4.11:
 
-- Bump Polyfill from 10.11.0 to 10.11.2 ([@dependabot[bot]](https://github.com/dependabot[bot]))
-- Bump the ktsu group with 8 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump Polyfill from 10.11.0 to 10.11.2 (dependabot[bot])
+- Bump the ktsu group with 8 updates (dependabot[bot])
 
 ## v1.4.11 (patch)
 
 Changes since v1.4.10:
 
-- Bump the ktsu group with 1 update ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 1 update (dependabot[bot])
 
 ## v1.4.10 (patch)
 
 Changes since v1.4.9:
 
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
+- Sync global.json (ktsu[bot])
 
 ## v1.4.9 (patch)
 
 Changes since v1.4.8:
 
-- fix: relax SignificantNumber extension constraints ([@matt-edmondson](https://github.com/matt-edmondson))
-- chore: remove unused SourceLink package versions ([@matt-edmondson](https://github.com/matt-edmondson))
-- chore: remove unused SourceLink package references ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add TAGS.md with NuGet package tags ([@matt-edmondson](https://github.com/matt-edmondson))
-- Sync .github\workflows\dotnet.yml ([@KtsuTools](https://github.com/KtsuTools))
+- fix: relax SignificantNumber extension constraints (matt-edmondson)
+- chore: remove unused SourceLink package versions (matt-edmondson)
+- chore: remove unused SourceLink package references (matt-edmondson)
+- Add TAGS.md with NuGet package tags (matt-edmondson)
+- Sync .github\workflows\dotnet.yml (KtsuTools)
 
 ## v1.4.9-pre.1 (prerelease)
 
 Changes since v1.4.8:
 
-- Sync .github\workflows\dotnet.yml ([@KtsuTools](https://github.com/KtsuTools))
+- Sync .github\workflows\dotnet.yml (KtsuTools)
 
 ## v1.4.8 (patch)
 
 Changes since v1.4.7:
 
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
 
 ## v1.4.8-pre.1 (prerelease)
 
 Changes since v1.4.7:
 
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
 
 ## v1.4.7 (patch)
 
 Changes since v1.4.6:
 
-- Remove legacy build scripts ([@matt-edmondson](https://github.com/matt-edmondson))
+- Remove legacy build scripts (matt-edmondson)
 
 ## v1.4.6 (patch)
 
 Changes since v1.4.5:
 
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\update-winget-manifests.ps1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\update-winget-manifests.ps1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync COPYRIGHT.md ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync COPYRIGHT.md ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\update-winget-manifests.ps1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync COPYRIGHT.md ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
+- Sync global.json (ktsu[bot])
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync scripts\update-winget-manifests.ps1 (ktsu[bot])
+- Sync scripts\update-winget-manifests.ps1 (ktsu[bot])
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
+- Sync global.json (ktsu[bot])
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
+- Sync global.json (ktsu[bot])
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync global.json (ktsu[bot])
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync global.json (ktsu[bot])
+- Sync COPYRIGHT.md (ktsu[bot])
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync COPYRIGHT.md (ktsu[bot])
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
+- Sync scripts\update-winget-manifests.ps1 (ktsu[bot])
+- Sync global.json (ktsu[bot])
+- Sync COPYRIGHT.md (ktsu[bot])
 
 ## v1.4.6-pre.8 (prerelease)
 
 Changes since v1.4.6-pre.7:
 
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\update-winget-manifests.ps1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync scripts\update-winget-manifests.ps1 (ktsu[bot])
 
 ## v1.4.6-pre.7 (prerelease)
 
 Changes since v1.4.6-pre.6:
 
-- Sync scripts\update-winget-manifests.ps1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync scripts\update-winget-manifests.ps1 (ktsu[bot])
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
+- Sync global.json (ktsu[bot])
 
 ## v1.4.6-pre.6 (prerelease)
 
 Changes since v1.4.6-pre.5:
 
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
 
 ## v1.4.6-pre.5 (prerelease)
 
 Changes since v1.4.6-pre.4:
 
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
+- Sync global.json (ktsu[bot])
 
 ## v1.4.6-pre.4 (prerelease)
 
 Changes since v1.4.6-pre.3:
 
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync global.json (ktsu[bot])
 
 ## v1.4.6-pre.3 (prerelease)
 
 Changes since v1.4.6-pre.2:
 
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync COPYRIGHT.md ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync global.json (ktsu[bot])
+- Sync COPYRIGHT.md (ktsu[bot])
 
 ## v1.4.6-pre.2 (prerelease)
 
 Changes since v1.4.6-pre.1:
 
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync COPYRIGHT.md ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync COPYRIGHT.md (ktsu[bot])
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
 
 ## v1.4.6-pre.1 (prerelease)
 
 Changes since v1.4.5:
 
-- Sync scripts\update-winget-manifests.ps1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync global.json ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync COPYRIGHT.md ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync scripts\update-winget-manifests.ps1 (ktsu[bot])
+- Sync global.json (ktsu[bot])
+- Sync COPYRIGHT.md (ktsu[bot])
 
 ## v1.4.5 (patch)
 
 Changes since v1.4.4:
 
-- Remove .github\workflows\project.yml ([@matt-edmondson](https://github.com/matt-edmondson))
+- Remove .github\workflows\project.yml (matt-edmondson)
 
 ## v1.4.4 (patch)
 
 Changes since v1.4.3:
 
-- Update package references, target framework, and improve test assertions ([@matt-edmondson](https://github.com/matt-edmondson))
+- Update package references, target framework, and improve test assertions (matt-edmondson)
 
 ## v1.4.4-pre.4 (prerelease)
 
 Changes since v1.4.4-pre.3:
 
-- Sync scripts\update-winget-manifests.ps1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync scripts\update-winget-manifests.ps1 (ktsu[bot])
 
 ## v1.4.4-pre.3 (prerelease)
 
 Changes since v1.4.4-pre.2:
 
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
 
 ## v1.4.4-pre.2 (prerelease)
 
 Changes since v1.4.4-pre.1:
 
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
 
 ## v1.4.4-pre.1 (prerelease)
 
 Changes since v1.4.3:
 
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\update-winget-manifests.ps1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .gitattributes ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .runsettings ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
+- Sync scripts\update-winget-manifests.ps1 (ktsu[bot])
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
+- Sync .gitattributes (ktsu[bot])
+- Sync .runsettings (ktsu[bot])
 
 ## v1.4.3 (patch)
 
 Changes since v1.4.2:
 
-- Update sdk ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update sdk ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update .editorconfig, .gitignore, .gitattributes, .mailmap, .runsettings, and PSBuild.psm1 for improved configurations and cleanup ([@matt-edmondson](https://github.com/matt-edmondson))
+- Update sdk (matt-edmondson)
+- Update sdk (matt-edmondson)
+- Update .editorconfig, .gitignore, .gitattributes, .mailmap, .runsettings, and PSBuild.psm1 for improved configurations and cleanup (matt-edmondson)
 
 ## v1.4.2 (patch)
 
 Changes since v1.4.1:
 
-- Update ktsu.PreciseNumber package reference to version 1.7.1 ([@matt-edmondson](https://github.com/matt-edmondson))
+- Update ktsu.PreciseNumber package reference to version 1.7.1 (matt-edmondson)
 
 ## v1.4.2-pre.17 (prerelease)
 
 Changes since v1.4.2-pre.16:
 
-- Merge remote-tracking branch 'refs/remotes/origin/main' ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .editorconfig ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .gitattributes ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .gitignore ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .mailmap ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .runsettings ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Merge remote-tracking branch 'refs/remotes/origin/main' (ktsu[bot])
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
+- Sync .editorconfig (ktsu[bot])
+- Sync .gitattributes (ktsu[bot])
+- Sync .gitignore (ktsu[bot])
+- Sync .mailmap (ktsu[bot])
+- Sync .runsettings (ktsu[bot])
 
 ## v1.4.2-pre.16 (prerelease)
 
 Changes since v1.4.2-pre.15:
 
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .editorconfig ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .gitattributes ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .gitignore ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .mailmap ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .runsettings ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
+- Sync .editorconfig (ktsu[bot])
+- Sync .gitattributes (ktsu[bot])
+- Sync .gitignore (ktsu[bot])
+- Sync .mailmap (ktsu[bot])
+- Sync .runsettings (ktsu[bot])
 
 ## v1.4.2-pre.15 (prerelease)
 
@@ -639,194 +639,194 @@ No significant changes detected since v1.4.2-pre.1.
 
 Changes since v1.4.1:
 
-- Sync scripts\PSBuild.psm1 ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync scripts\PSBuild.psm1 (ktsu[bot])
 
 ## v1.4.1 (patch)
 
 Changes since v1.4.0:
 
-- Remove obsolete build configuration files and update SignificantNumber class for improved variable declarations and copyright information. ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update README and project files for SignificantNumber ([@matt-edmondson](https://github.com/matt-edmondson))
+- Remove obsolete build configuration files and update SignificantNumber class for improved variable declarations and copyright information. (matt-edmondson)
+- Update README and project files for SignificantNumber (matt-edmondson)
 
 ## v1.4.1-pre.1 (prerelease)
 
 Changes since v1.4.0:
 
-- Sync .github\workflows\dotnet.yml ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .editorconfig ([@ktsu[bot]](https://github.com/ktsu[bot]))
-- Sync .runsettings ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync .github\workflows\dotnet.yml (ktsu[bot])
+- Sync .editorconfig (ktsu[bot])
+- Sync .runsettings (ktsu[bot])
 
 ## v1.4.0 (minor)
 
 Changes since v1.3.0:
 
-- Add constructor for SignificantNumber from PreciseNumber ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update ktsu.PreciseNumber package version ([@matt-edmondson](https://github.com/matt-edmondson))
+- Add constructor for SignificantNumber from PreciseNumber (matt-edmondson)
+- Update ktsu.PreciseNumber package version (matt-edmondson)
 
 ## v1.3.1-pre.1 (prerelease)
 
 Changes since v1.3.0:
 
-- Update ktsu.PreciseNumber package version ([@matt-edmondson](https://github.com/matt-edmondson))
+- Update ktsu.PreciseNumber package version (matt-edmondson)
 
 ## v1.3.0 (minor)
 
 Changes since v1.2.7:
 
-- Refactor SignificantNumber tests and implementation ([@matt-edmondson](https://github.com/matt-edmondson))
-- Merge branch 'precise-number' into precise-number-merge ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add LICENSE template ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update packages ([@matt-edmondson](https://github.com/matt-edmondson))
-- Apply new editorconfig ([@matt-edmondson](https://github.com/matt-edmondson))
-- Inherit from precise number ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add automation scripts for metadata management and versioning ([@matt-edmondson](https://github.com/matt-edmondson))
-- Renamed metadata files ([@matt-edmondson](https://github.com/matt-edmondson))
+- Refactor SignificantNumber tests and implementation (matt-edmondson)
+- Merge branch 'precise-number' into precise-number-merge (matt-edmondson)
+- Add LICENSE template (matt-edmondson)
+- Update packages (matt-edmondson)
+- Apply new editorconfig (matt-edmondson)
+- Inherit from precise number (matt-edmondson)
+- Add automation scripts for metadata management and versioning (matt-edmondson)
+- Renamed metadata files (matt-edmondson)
 
 ## v1.2.7 (patch)
 
 Changes since v1.2.6:
 
-- Bump MSTest.TestFramework from 3.6.3 to 3.6.4 ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump MSTest.TestFramework from 3.6.3 to 3.6.4 (dependabot[bot])
 
 ## v1.2.6 (patch)
 
 Changes since v1.2.5:
 
-- Bump MSTest.TestAdapter from 3.6.3 to 3.6.4 ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump MSTest.TestAdapter from 3.6.3 to 3.6.4 (dependabot[bot])
 
 ## v1.2.5 (patch)
 
 Changes since v1.2.4:
 
-- Sync Directory.Build.targets ([@ktsu[bot]](https://github.com/ktsu[bot]))
+- Sync Directory.Build.targets (ktsu[bot])
 
 ## v1.2.4 (patch)
 
 Changes since v1.2.3:
 
-- Add package references for ILCompiler and ILLink.Tasks in test project ([@matt-edmondson](https://github.com/matt-edmondson))
+- Add package references for ILCompiler and ILLink.Tasks in test project (matt-edmondson)
 
 ## v1.2.3 (patch)
 
 Changes since v1.2.2:
 
-- Add MakeCommonized method call for significand comparison ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add test project and new test cases for ToSignificantNumber ([@matt-edmondson](https://github.com/matt-edmondson))
+- Add MakeCommonized method call for significand comparison (matt-edmondson)
+- Add test project and new test cases for ToSignificantNumber (matt-edmondson)
 
 ## v1.2.2 (patch)
 
 Changes since v1.2.1:
 
-- Fix SignificantNumber handling of zero significand ([@matt-edmondson](https://github.com/matt-edmondson))
-- Remove culture-specific tests from AITests.cs ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update dotnet.yml ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update dotnet.yml ([@matt-edmondson](https://github.com/matt-edmondson))
-- Migrate to ktsu namespace ([@matt-edmondson](https://github.com/matt-edmondson))
+- Fix SignificantNumber handling of zero significand (matt-edmondson)
+- Remove culture-specific tests from AITests.cs (matt-edmondson)
+- Update dotnet.yml (matt-edmondson)
+- Update dotnet.yml (matt-edmondson)
+- Migrate to ktsu namespace (matt-edmondson)
 
 ## v1.2.1 (minor)
 
 Changes since v1.1.0:
 
-- Version 1.2.1 ([@matt-edmondson](https://github.com/matt-edmondson))
-- Enhance Pow and Exp in SignificantNumber ([@matt-edmondson](https://github.com/matt-edmondson))
-- update changelist ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add unit tests for Exp method in AITests.cs ([@matt-edmondson](https://github.com/matt-edmondson))
-- Refactor SignificantNumber handling and formatting ([@matt-edmondson](https://github.com/matt-edmondson))
-- Fix typos ([@matt-edmondson](https://github.com/matt-edmondson))
-- Refactor and expand SignificantNumber ([@matt-edmondson](https://github.com/matt-edmondson))
-- Version 1.1.4 ([@matt-edmondson](https://github.com/matt-edmondson))
-- Optimize `Round` method and add rounding tests ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated changelog, description, and version ([@matt-edmondson](https://github.com/matt-edmondson))
-- Refine division logic in SignificantNumber ([@matt-edmondson](https://github.com/matt-edmondson))
-- Fix Incorrect Exponent Handling for Integers in SignificantNumber Conversion ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update changelog ([@matt-edmondson](https://github.com/matt-edmondson))
-- Optimize To<TOutput>() ([@matt-edmondson](https://github.com/matt-edmondson))
+- Version 1.2.1 (matt-edmondson)
+- Enhance Pow and Exp in SignificantNumber (matt-edmondson)
+- update changelist (matt-edmondson)
+- Add unit tests for Exp method in AITests.cs (matt-edmondson)
+- Refactor SignificantNumber handling and formatting (matt-edmondson)
+- Fix typos (matt-edmondson)
+- Refactor and expand SignificantNumber (matt-edmondson)
+- Version 1.1.4 (matt-edmondson)
+- Optimize `Round` method and add rounding tests (matt-edmondson)
+- Updated changelog, description, and version (matt-edmondson)
+- Refine division logic in SignificantNumber (matt-edmondson)
+- Fix Incorrect Exponent Handling for Integers in SignificantNumber Conversion (matt-edmondson)
+- Update changelog (matt-edmondson)
+- Optimize To<TOutput>() (matt-edmondson)
 
 ## v1.1.0 (major)
 
-- Add Squared, Cubed, and Pow methods ([@matt-edmondson](https://github.com/matt-edmondson))
-- Version 1.0.1 ([@matt-edmondson](https://github.com/matt-edmondson))
-- Added `To<TOutput>` method to `SignificantNumber` ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update README.md ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update README and package references to ktsu.io.SignificantNumber ([@matt-edmondson](https://github.com/matt-edmondson))
-- Replace Codecov badge with Sonar in README ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated software version to 1.0.0 ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated README and SignificantNumber class description ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update README with new sections and examples ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated README.md with detailed `SignificantNumber` class info ([@matt-edmondson](https://github.com/matt-edmondson))
-- Refactored testing methods and removed `TestMaxDecimalPlaces` ([@matt-edmondson](https://github.com/matt-edmondson))
-- Refactor SignificantNumber initialization and parsing methods ([@matt-edmondson](https://github.com/matt-edmondson))
-- Removed MinDecimalPlaces from SignificantNumber struct ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update README.md ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update README.md ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update README.md ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add documentation ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add documentation to SignificantNumberExtensions ([@matt-edmondson](https://github.com/matt-edmondson))
-- Added CA5394 to NoWarn for test projects ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated Helpers.cs, refactored InvalidNumber.cs, and simplified Tests.cs ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add documentation comments ([@matt-edmondson](https://github.com/matt-edmondson))
-- Added new test method in `Tests` class ([@matt-edmondson](https://github.com/matt-edmondson))
-- Refactor and clean up `Tests.cs` file ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated and added extensive tests in AITests class ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated build properties and modified warning handling ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated SignificantNumber class and added new methods ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated SignificantNumber class and tests ([@matt-edmondson](https://github.com/matt-edmondson))
-- Added comprehensive test suite for SignificantNumber class ([@matt-edmondson](https://github.com/matt-edmondson))
-- Added new operator tests for SignificantNumber class ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add new test methods for SignificantNumber class ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated `integerComponent` creation logic for null character handling ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add tests for Add and Subtract methods in SignificantNumber class ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add new test methods to Tests class ([@matt-edmondson](https://github.com/matt-edmondson))
-- Added unit tests for SignificantNumber class ([@matt-edmondson](https://github.com/matt-edmondson))
-- Refactor `SignificantNumber` struct and add new methods ([@matt-edmondson](https://github.com/matt-edmondson))
-- Added new tests and updated code analysis suppression ([@matt-edmondson](https://github.com/matt-edmondson))
-- Refactor `InvalidNumber` class and update using statements ([@matt-edmondson](https://github.com/matt-edmondson))
-- Changed access modifier for TryCreate<TInput> method ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated error handling and refactored `SignificantNumber` struct ([@matt-edmondson](https://github.com/matt-edmondson))
-- Added InvalidNumber class for testing the exceptions in the SignificantNumberExtensions class ([@matt-edmondson](https://github.com/matt-edmondson))
-- Refactor `ToSignificantNumber<TInput>` method in `SignificantNumberExtensions` ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated assertion methods and added new utility methods ([@matt-edmondson](https://github.com/matt-edmondson))
-- Added and updated test cases, removed redundant test ([@matt-edmondson](https://github.com/matt-edmondson))
-- Refactor UnaryPlus and remove UnaryNegation ([@matt-edmondson](https://github.com/matt-edmondson))
-- Extend SignificantNumber struct with new static methods ([@matt-edmondson](https://github.com/matt-edmondson))
-- Introduced constant in SignificantNumber.cs for readability ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated `ToSignificantNumber<TInput>` method ([@matt-edmondson](https://github.com/matt-edmondson))
-- Change exception for ++ operator in SignificantNumber ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update SignificantNumber struct and operator overloads ([@matt-edmondson](https://github.com/matt-edmondson))
-- Replaced `ToString()` with `TryFormat` and stack allocated spans ([@matt-edmondson](https://github.com/matt-edmondson))
-- Moved a ToString overload to sit with teh rest of them ([@matt-edmondson](https://github.com/matt-edmondson))
-- Refactor `SignificantNumber` struct and remove code smells ([@matt-edmondson](https://github.com/matt-edmondson))
-- Refactor `Radix` to use `BinaryRadix` constant ([@matt-edmondson](https://github.com/matt-edmondson))
-- Introduce constant `ten` to replace literal `10` ([@matt-edmondson](https://github.com/matt-edmondson))
-- `Added ComVisible attribute` ([@matt-edmondson](https://github.com/matt-edmondson))
-- Added CLSCompliant attribute and imported namespaces ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update dotnet.yml ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update dotnet.yml ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update dotnet.yml ([@matt-edmondson](https://github.com/matt-edmondson))
-- `Removed test.runsettings file from .NET project` ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated data collector format in `test.runsettings` ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update dotnet.yml ([@matt-edmondson](https://github.com/matt-edmondson))
-- Updated SignificantNumber.cs and related test cases ([@matt-edmondson](https://github.com/matt-edmondson))
-- INumber implementation ([@matt-edmondson](https://github.com/matt-edmondson))
-- Sort members ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update dotnet.yml ([@matt-edmondson](https://github.com/matt-edmondson))
-- 1.0.0-alpha.2 ([@matt-edmondson](https://github.com/matt-edmondson))
-- Assert that stringified inputs should be in exponential form ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add a test to validate we dont support Half values ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add round trip testing ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add new tests on random numbers of each supported type ([@matt-edmondson](https://github.com/matt-edmondson))
-- Switch to a generic extension method for creating new instances ([@matt-edmondson](https://github.com/matt-edmondson))
-- Fix a missing sign formatting negative numbers ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add extra constness and null checks ([@matt-edmondson](https://github.com/matt-edmondson))
-- Fix an issue where -1 was not being given special case precision like 1 and 0 ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add additional tests for string formatting ([@matt-edmondson](https://github.com/matt-edmondson))
-- Fix an issue when formatting to string for negative numbers ([@matt-edmondson](https://github.com/matt-edmondson))
-- Add additional test coverage ([@matt-edmondson](https://github.com/matt-edmondson))
-- Replace some unreachable exceptions with asserts ([@matt-edmondson](https://github.com/matt-edmondson))
-- Initial version ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update dotnet.yml ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update DESCRIPTION ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update README.md ([@matt-edmondson](https://github.com/matt-edmondson))
-- Update VERSION ([@matt-edmondson](https://github.com/matt-edmondson))
-- Initial commit ([@matt-edmondson](https://github.com/matt-edmondson))
+- Add Squared, Cubed, and Pow methods (matt-edmondson)
+- Version 1.0.1 (matt-edmondson)
+- Added `To<TOutput>` method to `SignificantNumber` (matt-edmondson)
+- Update README.md (matt-edmondson)
+- Update README and package references to ktsu.io.SignificantNumber (matt-edmondson)
+- Replace Codecov badge with Sonar in README (matt-edmondson)
+- Updated software version to 1.0.0 (matt-edmondson)
+- Updated README and SignificantNumber class description (matt-edmondson)
+- Update README with new sections and examples (matt-edmondson)
+- Updated README.md with detailed `SignificantNumber` class info (matt-edmondson)
+- Refactored testing methods and removed `TestMaxDecimalPlaces` (matt-edmondson)
+- Refactor SignificantNumber initialization and parsing methods (matt-edmondson)
+- Removed MinDecimalPlaces from SignificantNumber struct (matt-edmondson)
+- Update README.md (matt-edmondson)
+- Update README.md (matt-edmondson)
+- Update README.md (matt-edmondson)
+- Add documentation (matt-edmondson)
+- Add documentation to SignificantNumberExtensions (matt-edmondson)
+- Added CA5394 to NoWarn for test projects (matt-edmondson)
+- Updated Helpers.cs, refactored InvalidNumber.cs, and simplified Tests.cs (matt-edmondson)
+- Add documentation comments (matt-edmondson)
+- Added new test method in `Tests` class (matt-edmondson)
+- Refactor and clean up `Tests.cs` file (matt-edmondson)
+- Updated and added extensive tests in AITests class (matt-edmondson)
+- Updated build properties and modified warning handling (matt-edmondson)
+- Updated SignificantNumber class and added new methods (matt-edmondson)
+- Updated SignificantNumber class and tests (matt-edmondson)
+- Added comprehensive test suite for SignificantNumber class (matt-edmondson)
+- Added new operator tests for SignificantNumber class (matt-edmondson)
+- Add new test methods for SignificantNumber class (matt-edmondson)
+- Updated `integerComponent` creation logic for null character handling (matt-edmondson)
+- Add tests for Add and Subtract methods in SignificantNumber class (matt-edmondson)
+- Add new test methods to Tests class (matt-edmondson)
+- Added unit tests for SignificantNumber class (matt-edmondson)
+- Refactor `SignificantNumber` struct and add new methods (matt-edmondson)
+- Added new tests and updated code analysis suppression (matt-edmondson)
+- Refactor `InvalidNumber` class and update using statements (matt-edmondson)
+- Changed access modifier for TryCreate<TInput> method (matt-edmondson)
+- Updated error handling and refactored `SignificantNumber` struct (matt-edmondson)
+- Added InvalidNumber class for testing the exceptions in the SignificantNumberExtensions class (matt-edmondson)
+- Refactor `ToSignificantNumber<TInput>` method in `SignificantNumberExtensions` (matt-edmondson)
+- Updated assertion methods and added new utility methods (matt-edmondson)
+- Added and updated test cases, removed redundant test (matt-edmondson)
+- Refactor UnaryPlus and remove UnaryNegation (matt-edmondson)
+- Extend SignificantNumber struct with new static methods (matt-edmondson)
+- Introduced constant in SignificantNumber.cs for readability (matt-edmondson)
+- Updated `ToSignificantNumber<TInput>` method (matt-edmondson)
+- Change exception for ++ operator in SignificantNumber (matt-edmondson)
+- Update SignificantNumber struct and operator overloads (matt-edmondson)
+- Replaced `ToString()` with `TryFormat` and stack allocated spans (matt-edmondson)
+- Moved a ToString overload to sit with teh rest of them (matt-edmondson)
+- Refactor `SignificantNumber` struct and remove code smells (matt-edmondson)
+- Refactor `Radix` to use `BinaryRadix` constant (matt-edmondson)
+- Introduce constant `ten` to replace literal `10` (matt-edmondson)
+- `Added ComVisible attribute` (matt-edmondson)
+- Added CLSCompliant attribute and imported namespaces (matt-edmondson)
+- Update dotnet.yml (matt-edmondson)
+- Update dotnet.yml (matt-edmondson)
+- Update dotnet.yml (matt-edmondson)
+- `Removed test.runsettings file from .NET project` (matt-edmondson)
+- Updated data collector format in `test.runsettings` (matt-edmondson)
+- Update dotnet.yml (matt-edmondson)
+- Updated SignificantNumber.cs and related test cases (matt-edmondson)
+- INumber implementation (matt-edmondson)
+- Sort members (matt-edmondson)
+- Update dotnet.yml (matt-edmondson)
+- 1.0.0-alpha.2 (matt-edmondson)
+- Assert that stringified inputs should be in exponential form (matt-edmondson)
+- Add a test to validate we dont support Half values (matt-edmondson)
+- Add round trip testing (matt-edmondson)
+- Add new tests on random numbers of each supported type (matt-edmondson)
+- Switch to a generic extension method for creating new instances (matt-edmondson)
+- Fix a missing sign formatting negative numbers (matt-edmondson)
+- Add extra constness and null checks (matt-edmondson)
+- Fix an issue where -1 was not being given special case precision like 1 and 0 (matt-edmondson)
+- Add additional tests for string formatting (matt-edmondson)
+- Fix an issue when formatting to string for negative numbers (matt-edmondson)
+- Add additional test coverage (matt-edmondson)
+- Replace some unreachable exceptions with asserts (matt-edmondson)
+- Initial version (matt-edmondson)
+- Update dotnet.yml (matt-edmondson)
+- Update DESCRIPTION (matt-edmondson)
+- Update README.md (matt-edmondson)
+- Update VERSION (matt-edmondson)
+- Initial commit (matt-edmondson)
 
