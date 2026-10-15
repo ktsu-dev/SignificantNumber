@@ -740,7 +740,7 @@ Changes since v1.1.0:
 - Refine division logic in SignificantNumber (matt-edmondson)
 - Fix Incorrect Exponent Handling for Integers in SignificantNumber Conversion (matt-edmondson)
 - Update changelog (matt-edmondson)
-- Optimize To<TOutput>() (matt-edmondson)
+- Optimize To\<TOutput\>() (matt-edmondson)
 
 ## v1.1.0 (major)
 
@@ -781,7 +781,7 @@ Changes since v1.1.0:
 - Refactor `SignificantNumber` struct and add new methods (matt-edmondson)
 - Added new tests and updated code analysis suppression (matt-edmondson)
 - Refactor `InvalidNumber` class and update using statements (matt-edmondson)
-- Changed access modifier for TryCreate<TInput> method (matt-edmondson)
+- Changed access modifier for TryCreate\<TInput\> method (matt-edmondson)
 - Updated error handling and refactored `SignificantNumber` struct (matt-edmondson)
 - Added InvalidNumber class for testing the exceptions in the SignificantNumberExtensions class (matt-edmondson)
 - Refactor `ToSignificantNumber<TInput>` method in `SignificantNumberExtensions` (matt-edmondson)
