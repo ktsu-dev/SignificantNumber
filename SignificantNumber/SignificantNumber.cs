@@ -605,6 +605,11 @@ public readonly record struct SignificantNumber
 		{
 			return One;
 		}
+		else if (Equal(this, NegativeOne) && PreciseNumber.IsInteger(power))
+		{
+			// (-1)^n is exact for any integer n, however far beyond the range of a double it is.
+			return PreciseNumber.IsEvenInteger(power) ? One : NegativeOne;
+		}
 
 		bool isNegativeBase = PreciseNumber.IsNegative(Value);
 		if (isNegativeBase && !PreciseNumber.IsInteger(power))

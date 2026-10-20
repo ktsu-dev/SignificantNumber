@@ -57,6 +57,26 @@ public class SignificantNumberRangeTests
 	}
 
 	[TestMethod]
+	[DataRow("2E308", "1")]
+	[DataRow("-1E400", "1")]
+	[DataRow("1E308", "1")]
+	[DataRow("-3E400", "1")]
+	public void Pow_NegativeOneToAnEvenIntegerBeyondDoubleRange_ReturnsOne(string power, string expected) =>
+		Assert.AreEqual(Parse(expected), SignificantNumber.NegativeOne.Pow(Precise(power)));
+
+	[TestMethod]
+	public void Pow_NegativeOneToAnOddIntegerBeyondDoubleRange_ReturnsNegativeOne()
+	{
+		PreciseNumber oddPower = Precise("2" + new string('0', 310) + "1");
+		Assert.AreEqual(SignificantNumber.NegativeOne, SignificantNumber.NegativeOne.Pow(oddPower));
+		Assert.AreEqual(SignificantNumber.NegativeOne, SignificantNumber.NegativeOne.Pow(PreciseNumber.Negate(oddPower)));
+	}
+
+	[TestMethod]
+	public void Pow_NegativeOneToANonIntegerPower_StillThrowsArgumentException() =>
+		Assert.ThrowsExactly<ArgumentException>(() => SignificantNumber.NegativeOne.Pow(Precise("0.5")));
+
+	[TestMethod]
 	public void Pow_PowerOfTenBeyondExponentRange_ThrowsOverflowException()
 	{
 		Assert.ThrowsExactly<OverflowException>(() => Parse("10").Pow(Precise("1E300")));
