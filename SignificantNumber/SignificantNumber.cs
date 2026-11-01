@@ -1013,21 +1013,37 @@ public readonly record struct SignificantNumber
 	/// custom pattern like <c>0.00</c>, is written the way <see cref="decimal"/> writes the same value, or the way
 	/// <see cref="double"/> does when the value is outside the range or precision of <see cref="decimal"/>.
 	/// </remarks>
-	public string ToString(string? format, IFormatProvider? formatProvider) =>
-		IsExactFormat(format)
-			? PreciseNumber.ToString(Value, format, formatProvider)
-			: TryToExactDecimal(out decimal exact)
-				? exact.ToString(format, formatProvider)
-				: Value.To<double>().ToString(format, formatProvider);
+	public string ToString(string? format, IFormatProvider? formatProvider)
+	{
+		if (IsExactFormat(format))
+		{
+			return PreciseNumber.ToString(Value, format, formatProvider);
+		}
+
+		if (TryToExactDecimal(out decimal exact))
+		{
+			return exact.ToString(format, formatProvider);
+		}
+
+		return Value.To<double>().ToString(format, formatProvider);
+	}
 
 	/// <inheritdoc/>
 	/// <remarks><inheritdoc cref="ToString(string?, IFormatProvider?)" path="/remarks"/></remarks>
-	public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider) =>
-		IsExactFormat(format)
-			? Value.TryFormat(destination, out charsWritten, format, provider)
-			: TryToExactDecimal(out decimal exact)
-				? exact.TryFormat(destination, out charsWritten, format, provider)
-				: Value.To<double>().TryFormat(destination, out charsWritten, format, provider);
+	public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+	{
+		if (IsExactFormat(format))
+		{
+			return Value.TryFormat(destination, out charsWritten, format, provider);
+		}
+
+		if (TryToExactDecimal(out decimal exact))
+		{
+			return exact.TryFormat(destination, out charsWritten, format, provider);
+		}
+
+		return Value.To<double>().TryFormat(destination, out charsWritten, format, provider);
+	}
 
 	/// <summary>
 	/// Determines whether a format is one that <see cref="PreciseNumber"/> writes from the exact value: empty, or
