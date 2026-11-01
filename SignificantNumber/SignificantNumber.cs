@@ -1004,14 +1004,81 @@ public readonly record struct SignificantNumber
 	/// </summary>
 	/// <param name="format">The format to use.</param>
 	/// <returns>The string representation of the number.</returns>
-	public string ToString(string format) => PreciseNumber.ToString(Value, format, null);
+	/// <remarks><inheritdoc cref="ToString(string?, IFormatProvider?)" path="/remarks"/></remarks>
+	public string ToString(string format) => ToString(format, null);
 
 	/// <inheritdoc/>
-	public string ToString(string? format, IFormatProvider? formatProvider) => PreciseNumber.ToString(Value, format, formatProvider);
+	/// <remarks>
+	/// The standard formats G, R, F, N and E are written from the exact value. Any other format, such as C, P or a
+	/// custom pattern like <c>0.00</c>, is written the way <see cref="decimal"/> writes the same value, or the way
+	/// <see cref="double"/> does when the value is outside the range or precision of <see cref="decimal"/>.
+	/// </remarks>
+	public string ToString(string? format, IFormatProvider? formatProvider) =>
+		IsExactFormat(format)
+			? PreciseNumber.ToString(Value, format, formatProvider)
+			: TryToExactDecimal(out decimal exact)
+				? exact.ToString(format, formatProvider)
+				: Value.To<double>().ToString(format, formatProvider);
 
 	/// <inheritdoc/>
+	/// <remarks><inheritdoc cref="ToString(string?, IFormatProvider?)" path="/remarks"/></remarks>
 	public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider) =>
-		Value.TryFormat(destination, out charsWritten, format, provider);
+		IsExactFormat(format)
+			? Value.TryFormat(destination, out charsWritten, format, provider)
+			: TryToExactDecimal(out decimal exact)
+				? exact.TryFormat(destination, out charsWritten, format, provider)
+				: Value.To<double>().TryFormat(destination, out charsWritten, format, provider);
+
+	/// <summary>
+	/// Determines whether a format is one that <see cref="PreciseNumber"/> writes from the exact value: empty, or
+	/// G, R, F, N or E, in either case, optionally followed by a precision.
+	/// </summary>
+	/// <param name="format">The format to check.</param>
+	/// <returns><see langword="true"/> if <see cref="PreciseNumber"/> handles <paramref name="format"/>; otherwise, <see langword="false"/>.</returns>
+	private static bool IsExactFormat(ReadOnlySpan<char> format)
+	{
+		if (format.IsEmpty)
+		{
+			return true;
+		}
+
+		if (char.ToUpperInvariant(format[0]) is not ('G' or 'R' or 'F' or 'N' or 'E'))
+		{
+			return false;
+		}
+
+		foreach (char digit in format[1..])
+		{
+			if (!char.IsAsciiDigit(digit))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/// <summary>
+	/// Converts the current instance to a <see cref="decimal"/> when that loses nothing.
+	/// </summary>
+	/// <param name="exact">The value as a <see cref="decimal"/>, when the method returns <see langword="true"/>.</param>
+	/// <returns><see langword="true"/> if <see cref="decimal"/> holds the value exactly; otherwise, <see langword="false"/>.</returns>
+	private bool TryToExactDecimal(out decimal exact)
+	{
+		if (PreciseNumber.Abs(Value) > DecimalMaxValue)
+		{
+			exact = default;
+			return false;
+		}
+
+		exact = Value.To<decimal>();
+		return exact.ToPreciseNumber() == Value;
+	}
+
+	/// <summary>
+	/// The largest <see cref="decimal"/>, as a <see cref="PreciseNumber"/>.
+	/// </summary>
+	private static readonly PreciseNumber DecimalMaxValue = decimal.MaxValue.ToPreciseNumber();
 
 	/// <summary>
 	/// Determines whether the specified <see cref="SignificantNumber"/> is canonical.
