@@ -847,21 +847,6 @@ public readonly record struct SignificantNumber
 		Value.CompareTo(other.Value);
 
 	/// <summary>
-	/// Determines whether the current instance holds the same value as a <see cref="PreciseNumber"/>.
-	/// </summary>
-	/// <param name="other">The precise number to compare with the current instance.</param>
-	/// <returns><see langword="true"/> if the values are equal; otherwise, <see langword="false"/>.</returns>
-	/// <remarks>
-	/// The values are compared exactly, so the result agrees with <c>==</c> and with
-	/// <see cref="PreciseNumber.Equals(PreciseNumber)"/> called the other way round. A <see cref="PreciseNumber"/> boxed as
-	/// an <see cref="object"/> still goes to <see cref="Equals(SignificantNumber)"/> through the record's
-	/// <c>Equals(object)</c>, which returns <see langword="false"/> because the object is not a
-	/// <see cref="SignificantNumber"/>, even though <see cref="CompareTo(object)"/> returns zero for it.
-	/// </remarks>
-	public bool Equals(PreciseNumber other) =>
-		Value.Equals(other);
-
-	/// <summary>
 	/// Compares the current instance with an object.
 	/// </summary>
 	/// <param name="obj">The object to compare with the current instance.</param>
@@ -905,6 +890,21 @@ public readonly record struct SignificantNumber
 		obj is SignificantNumber significantNumber
 			? Value.CompareTo(significantNumber.Value)
 			: Value.CompareTo(obj);
+
+	/// <summary>
+	/// Determines whether the current instance holds the same value as a <see cref="PreciseNumber"/>.
+	/// </summary>
+	/// <param name="other">The precise number to compare with the current instance.</param>
+	/// <returns><see langword="true"/> if the values are equal; otherwise, <see langword="false"/>.</returns>
+	/// <remarks>
+	/// The values are compared exactly, so the result agrees with <c>==</c> and with
+	/// <see cref="PreciseNumber.Equals(PreciseNumber)"/> called the other way round. A <see cref="PreciseNumber"/> boxed as
+	/// an <see cref="object"/> still goes to <see cref="Equals(SignificantNumber)"/> through the record's
+	/// <c>Equals(object)</c>, which returns <see langword="false"/> because the object is not a
+	/// <see cref="SignificantNumber"/>, even though <see cref="CompareTo(object)"/> returns zero for it.
+	/// </remarks>
+	public bool Equals(PreciseNumber other) =>
+		Value.Equals(other);
 
 	/// <summary>
 	/// Returns the absolute value of the specified <see cref="SignificantNumber"/>.
