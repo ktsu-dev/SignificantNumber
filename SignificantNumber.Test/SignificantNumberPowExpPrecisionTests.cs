@@ -49,4 +49,16 @@ public class SignificantNumberPowExpPrecisionTests
 	[TestMethod]
 	public void Pow_SmallLogarithmOfResult_KeepsTheDoublesPrecision() =>
 		Assert.AreEqual(15, Parse("1.2345678901234567890").Pow(Precise("0.5000000000000000001")).SignificantDigits);
+
+	// A base in the subnormal double range carries only a few digits as a double, so its logarithm must come
+	// from its significand and exponent. Reference values from Python decimal at 60 digits.
+	[TestMethod]
+	[DataRow("1.23456789e-320", "0.5000001", "1.11102926279157148966176568132872269505814553044809283401739E-160")]
+	[DataRow("1.23456789e-320", "-0.5000001", "9.00066302022865331618424814993882055897651460128454545426800E+159")]
+	public void Pow_SubnormalDoubleBase_ReportsOnlyCorrectDigits(string baseNumber, string power, string trueValue)
+	{
+		SignificantNumber result = Parse(baseNumber).Pow(Precise(power));
+		Assert.AreEqual(7, result.SignificantDigits);
+		AssertReportedDigitsAreCorrect(trueValue, result);
+	}
 }
