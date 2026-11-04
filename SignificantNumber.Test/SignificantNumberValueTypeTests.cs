@@ -295,4 +295,34 @@ public class SignificantNumberValueTypeTests
 	{
 		Assert.AreEqual(expected, int.Sign(SignificantNumber.CompareAtSignificance(Parse(left), Parse(right))));
 	}
+
+	[TestMethod]
+	[DataRow("1.5", "1.5", true)]
+	[DataRow("1.50", "1.5", true)]
+	[DataRow("0", "0", true)]
+	[DataRow("-2.25", "-2.25", true)]
+	[DataRow("1.5", "1.4", false)]
+	[DataRow("1.4", "1.5", false)]
+	public void EqualsPreciseNumber_AgreesInBothArgumentOrdersAndWithOperator(string significant, string precise, bool expected)
+	{
+		SignificantNumber s = Parse(significant);
+		PreciseNumber p = PreciseNumber.Parse(precise, CultureInfo.InvariantCulture);
+
+		Assert.AreEqual(expected, s == p, $"{s} == {p}");
+		Assert.AreEqual(expected, s.Equals(p), $"{s}.Equals({p})");
+		Assert.AreEqual(expected, p.Equals(s), $"{p}.Equals({s})");
+		Assert.AreEqual(expected, s.CompareTo((object)p) == 0, $"{s}.CompareTo((object){p}) == 0");
+	}
+
+	[TestMethod]
+	public void EqualsObject_BoxedPreciseNumber_IsFalseEvenWhenEqual()
+	{
+		SignificantNumber s = Parse("1.5");
+		object boxed = PreciseNumber.Parse("1.5", CultureInfo.InvariantCulture);
+
+		// The record struct's Equals(object) only accepts another SignificantNumber, so a boxed PreciseNumber is
+		// never equal to it, although CompareTo(object) treats the two as the same value.
+		Assert.IsFalse(s.Equals(boxed));
+		Assert.AreEqual(0, s.CompareTo(boxed));
+	}
 }
