@@ -1,6 +1,10 @@
-## v3.0.2 (patch)
+## v3.1.0 (minor)
 
-Changes since v3.0.1:
+Changes since v3.0.0:
 
+- Compare a SignificantNumber with a PreciseNumber through Equals [minor] (#144) (matt-edmondson)
+- Take the logarithm of a subnormal base from its significand and exponent [patch] (#142) (matt-edmondson)
+- Write C, P and custom format strings the way decimal does [patch] (#141) (matt-edmondson)
 - Return ±1 from (-1).Pow for an integer power beyond double range [patch] (Claude)
+- Cap Pow and Exp digits by the precision of the double exponent [patch] (Claude)
 
