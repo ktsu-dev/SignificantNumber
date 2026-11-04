@@ -652,7 +652,12 @@ public readonly record struct SignificantNumber
 		// |x|^p = e^(p × ln|x|), so the digits are bounded by how precisely e^(p × ln|x|) is known.
 		significantDigits = CapToExponentPrecision(significantDigits, Log10OfMagnitude(value) * Math.Log(10) * power.To<double>());
 
-		double logValue = Math.Log(Math.Abs(value.To<double>()));
+		// A base outside the normal double range (subnormal, or beyond double.MaxValue) loses digits or becomes
+		// infinite as a double, so its logarithm is built from its significand and exponent instead.
+		double baseMagnitude = Math.Abs(value.To<double>());
+		double logValue = double.IsNormal(baseMagnitude)
+			? Math.Log(baseMagnitude)
+			: Log10OfMagnitude(value) * Math.Log(10);
 		double magnitude = Math.Exp(logValue * power.To<double>());
 		if (double.IsNormal(magnitude))
 		{
