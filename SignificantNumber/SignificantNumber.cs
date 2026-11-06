@@ -1030,9 +1030,17 @@ public readonly record struct SignificantNumber
 	/// <inheritdoc/>
 	/// <remarks>
 	/// The standard formats G, R, F, N and E are written from the exact value. Any other format, such as C, P or a
-	/// custom pattern like <c>0.00</c>, is written the way <see cref="decimal"/> writes the same value, or the way
-	/// <see cref="double"/> does when the value is outside the range or precision of <see cref="decimal"/>.
+	/// custom pattern like <c>0.00</c>, is written the way <see cref="decimal"/> writes the same value, rounded to
+	/// the 28 or 29 significant digits <see cref="decimal"/> holds when it can't hold it exactly. A value too large
+	/// for <see cref="decimal"/>, or too small for <see cref="decimal"/> to keep the 15 significant digits
+	/// <see cref="double"/> would, is written the way <see cref="double"/> writes it. A value outside the finite
+	/// range of <see cref="double"/> can't be written that way, so it throws rather than being written as an
+	/// infinity or a zero.
 	/// </remarks>
+	/// <exception cref="FormatException">
+	/// The format is not G, R, F, N or E, and the value is too large or too small for <see cref="double"/> to write.
+	/// Use the E or G format for such a value.
+	/// </exception>
 	public string ToString(string? format, IFormatProvider? formatProvider)
 	{
 		if (IsExactFormat(format))
@@ -1040,12 +1048,12 @@ public readonly record struct SignificantNumber
 			return PreciseNumber.ToString(Value, format, formatProvider);
 		}
 
-		if (TryToExactDecimal(out decimal exact))
+		if (TryToFormattingDecimal(out decimal asDecimal))
 		{
-			return exact.ToString(format, formatProvider);
+			return asDecimal.ToString(format, formatProvider);
 		}
 
-		return Value.To<double>().ToString(format, formatProvider);
+		return ToFormattingDouble(format).ToString(format, formatProvider);
 	}
 
 	/// <inheritdoc/>
@@ -1057,12 +1065,12 @@ public readonly record struct SignificantNumber
 			return Value.TryFormat(destination, out charsWritten, format, provider);
 		}
 
-		if (TryToExactDecimal(out decimal exact))
+		if (TryToFormattingDecimal(out decimal asDecimal))
 		{
-			return exact.TryFormat(destination, out charsWritten, format, provider);
+			return asDecimal.TryFormat(destination, out charsWritten, format, provider);
 		}
 
-		return Value.To<double>().TryFormat(destination, out charsWritten, format, provider);
+		return ToFormattingDouble(format).TryFormat(destination, out charsWritten, format, provider);
 	}
 
 	/// <summary>
@@ -1095,26 +1103,52 @@ public readonly record struct SignificantNumber
 	}
 
 	/// <summary>
-	/// Converts the current instance to a <see cref="decimal"/> when that loses nothing.
+	/// Converts the current instance to the <see cref="decimal"/> that formats it, when <see cref="decimal"/> holds it
+	/// exactly or keeps at least as many significant digits as <see cref="double"/> would.
 	/// </summary>
-	/// <param name="exact">The value as a <see cref="decimal"/>, when the method returns <see langword="true"/>.</param>
-	/// <returns><see langword="true"/> if <see cref="decimal"/> holds the value exactly; otherwise, <see langword="false"/>.</returns>
-	private bool TryToExactDecimal(out decimal exact)
+	/// <param name="asDecimal">The value as a <see cref="decimal"/>, when the method returns <see langword="true"/>.</param>
+	/// <returns><see langword="true"/> if the value should be formatted as <paramref name="asDecimal"/>; otherwise, <see langword="false"/>.</returns>
+	private bool TryToFormattingDecimal(out decimal asDecimal)
 	{
-		if (PreciseNumber.Abs(Value) > DecimalMaxValue)
+		PreciseNumber magnitude = PreciseNumber.Abs(Value);
+		if (magnitude > DecimalMaxValue)
 		{
-			exact = default;
+			asDecimal = default;
 			return false;
 		}
 
-		exact = Value.To<decimal>();
-		return exact.ToPreciseNumber() == Value;
+		asDecimal = Value.To<decimal>();
+		return magnitude >= DecimalFormattingMinMagnitude || asDecimal.ToPreciseNumber() == Value;
+	}
+
+	/// <summary>
+	/// Converts the current instance to the <see cref="double"/> that formats it.
+	/// </summary>
+	/// <param name="format">The format being written, for the exception message.</param>
+	/// <returns>The value as a <see cref="double"/>.</returns>
+	/// <exception cref="FormatException">The value overflows <see cref="double"/> to an infinity, or underflows it to zero.</exception>
+	private double ToFormattingDouble(ReadOnlySpan<char> format)
+	{
+		double asDouble = Value.To<double>();
+		if (double.IsInfinity(asDouble) || (asDouble == 0 && !PreciseNumber.IsZero(Value)))
+		{
+			throw new FormatException(
+				$"The format \"{format}\" can't write {PreciseNumber.ToString(Value, "E", CultureInfo.InvariantCulture)}, which is outside the range of double. Use the E or G format instead.");
+		}
+
+		return asDouble;
 	}
 
 	/// <summary>
 	/// The largest <see cref="decimal"/>, as a <see cref="PreciseNumber"/>.
 	/// </summary>
 	private static readonly PreciseNumber DecimalMaxValue = decimal.MaxValue.ToPreciseNumber();
+
+	/// <summary>
+	/// The smallest magnitude at which <see cref="decimal"/>, with its 28 decimal places, still keeps 16 significant
+	/// digits: at least the 15 that <see cref="double"/> formats a custom pattern from.
+	/// </summary>
+	private static readonly PreciseNumber DecimalFormattingMinMagnitude = 1e-13m.ToPreciseNumber();
 
 	/// <summary>
 	/// Determines whether the specified <see cref="SignificantNumber"/> is canonical.

@@ -122,6 +122,66 @@ public class SignificantNumberFormatTests
 	}
 
 	[TestMethod]
+	[DataRow("1E400", "C")]
+	[DataRow("1E400", "P")]
+	[DataRow("1E400", "0.##E+0")]
+	[DataRow("1E400", "#,##0")]
+	[DataRow("-1E400", "#,##0")]
+	[DataRow("1E-400", "C")]
+	[DataRow("1E-400", "P")]
+	[DataRow("1E-400", "0.##E+0")]
+	[DataRow("-1E-400", "#,##0")]
+	public void ToString_FormatOutsideDoubleRange_Throws(string value, string format)
+	{
+		SignificantNumber number = Parse(value);
+
+		Assert.ThrowsExactly<FormatException>(() => number.ToString(format, CultureInfo.InvariantCulture));
+	}
+
+	[TestMethod]
+	[DataRow("1E400", "C")]
+	[DataRow("1E400", "P")]
+	[DataRow("1E400", "0.##E+0")]
+	[DataRow("1E400", "#,##0")]
+	[DataRow("1E-400", "0.##E+0")]
+	[DataRow("-1E-400", "#,##0")]
+	public void TryFormat_FormatOutsideDoubleRange_Throws(string value, string format)
+	{
+		SignificantNumber number = Parse(value);
+		char[] destination = new char[512];
+
+		Assert.ThrowsExactly<FormatException>(() => number.TryFormat(destination, out _, format, CultureInfo.InvariantCulture));
+	}
+
+	[TestMethod]
+	public void ToString_ExactFormatOutsideDoubleRange_StillWritesTheValue()
+	{
+		Assert.AreEqual("1.00E+400", Parse("1E400").ToString("E2", CultureInfo.InvariantCulture));
+	}
+
+	[TestMethod]
+	[DataRow("0.123456789012345678901234567891", "0.0000000000000000000000000")]
+	[DataRow("123.456789012345678901234567891", "#,##0.00000000000000000000000")]
+	[DataRow("-0.123456789012345678901234567891", "C25")]
+	public void ToString_CustomFormat_MoreDigitsThanDecimal_MatchesDecimalRounding(string value, string format)
+	{
+		string expected = decimal.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture).ToString(format, CultureInfo.InvariantCulture);
+		Span<char> destination = stackalloc char[128];
+
+		Assert.AreEqual(expected, Parse(value).ToString(format, CultureInfo.InvariantCulture));
+		Assert.IsTrue(Parse(value).TryFormat(destination, out int charsWritten, format, CultureInfo.InvariantCulture));
+		Assert.AreEqual(expected, destination[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	public void ToString_CustomFormat_TooSmallForDecimalToKeepDoublePrecision_FormatsLikeDouble()
+	{
+		SignificantNumber value = Parse("1.234567890123456789E-20");
+
+		Assert.AreEqual(1.234567890123456789E-20.ToString("0.##############E+0", CultureInfo.InvariantCulture), value.ToString("0.##############E+0", CultureInfo.InvariantCulture));
+	}
+
+	[TestMethod]
 	public void ToString_FormatWithoutProvider_UsesCurrentCulture()
 	{
 		CultureInfo original = CultureInfo.CurrentCulture;
