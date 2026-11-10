@@ -948,7 +948,9 @@ public readonly record struct SignificantNumber
 	/// <returns>The clamped value.</returns>
 	public PreciseNumber Clamp<TNumber>(TNumber min, TNumber max)
 		where TNumber : INumber<TNumber> =>
-		Value.Clamp(min, max);
+		typeof(TNumber) == typeof(SignificantNumber)
+			? Value.Clamp(((SignificantNumber)(object)min).Value, ((SignificantNumber)(object)max).Value)
+			: Value.Clamp(min, max);
 
 	/// <summary>
 	/// Returns the larger of two numbers, compared by value without applying significant figure rules.

@@ -178,6 +178,17 @@ public class SignificantNumberValueTypeTests
 	}
 
 	[TestMethod]
+	public void InstanceClamp_SignificantNumberBounds_ClampsByValue()
+	{
+		SignificantNumber low = Parse("1");
+		SignificantNumber high = Parse("3");
+
+		Assert.AreEqual(Parse("3").Value, Parse("5").Clamp(low, high));
+		Assert.AreEqual(Parse("2").Value, Parse("2").Clamp(low, high));
+		Assert.AreEqual(Parse("1").Value, Parse("-4").Clamp(low, high));
+	}
+
+	[TestMethod]
 	public void TryParse_Invalid_YieldsZero()
 	{
 		bool parsed = SignificantNumber.TryParse("not a number", NumberStyles.Float, CultureInfo.InvariantCulture, out SignificantNumber result);
