@@ -1009,7 +1009,7 @@ public readonly record struct SignificantNumber
 	/// <exception cref="OverflowException">Thrown when the value is outside the range of <typeparamref name="TOutput"/>.</exception>
 	public TOutput To<TOutput>()
 		where TOutput : INumber<TOutput> =>
-		Value.To<TOutput>();
+		TryWrap(this, out TOutput? wrapped) ? wrapped! : Value.To<TOutput>();
 
 	/// <inheritdoc/>
 	public override string ToString() => PreciseNumber.ToString(Value, null, null);
