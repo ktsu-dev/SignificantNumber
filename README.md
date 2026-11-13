@@ -205,6 +205,9 @@ if (SignificantNumber.TryParse("123.45", CultureInfo.InvariantCulture, out Signi
 
 `TryParse` yields zero when parsing fails.
 
+A `null` format provider, and `ToString()` with none, mean the current culture for every format and for
+`Parse`/`TryParse`, as they do for `decimal`. Pass `CultureInfo.InvariantCulture` for culture-independent text.
+
 ### Extension methods
 
 #### `ToSignificantNumber`
