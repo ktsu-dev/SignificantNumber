@@ -149,7 +149,7 @@ public class SignificantNumberJsonTests
 		string json = JsonSerializer.Serialize(map);
 		Dictionary<SignificantNumber, string> back = JsonSerializer.Deserialize<Dictionary<SignificantNumber, string>>(json)!;
 
-		Assert.AreEqual(2, back.Count);
+		Assert.HasCount(2, back);
 		Assert.AreEqual("g", back[Parse("9.81")]);
 		Assert.AreEqual("tiny", back[Parse("1E-400")]);
 	}
