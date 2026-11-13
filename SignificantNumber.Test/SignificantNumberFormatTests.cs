@@ -174,6 +174,40 @@ public class SignificantNumberFormatTests
 	}
 
 	[TestMethod]
+	[DataRow("1.00499999999999999999999999999999", "C2", "¤1.00")]
+	[DataRow("1.00499999999999999999999999999999", "0.00", "1.00")]
+	[DataRow("-1.00499999999999999999999999999999", "C2", "(¤1.00)")]
+	[DataRow("-1.00499999999999999999999999999999", "0.00", "-1.00")]
+	[DataRow("0.00499999999999999999999999999999", "C2", "¤0.00")]
+	[DataRow("0.00499999999999999999999999999999", "0.00", "0.00")]
+	[DataRow("2.4999999999999999999999999999999", "0", "2")]
+	[DataRow("2.4999999999999999999999999999999", "C0", "¤2")]
+	[DataRow("0.0049999999999999999999999999999", "P0", "0 %")]
+	[DataRow("1.00500000000000000000000000000001", "C2", "¤1.01")]
+	[DataRow("1.00500000000000000000000000000001", "0.00", "1.01")]
+	[DataRow("-1.00500000000000000000000000000001", "0.00", "-1.01")]
+	[DataRow("2.5000000000000000000000000000001", "0", "3")]
+	public void ToString_CustomFormat_MoreDigitsThanDecimal_RoundsOnlyOnce(string value, string format, string expected)
+	{
+		Span<char> destination = stackalloc char[128];
+
+		Assert.AreEqual(expected, Parse(value).ToString(format, CultureInfo.InvariantCulture));
+		Assert.IsTrue(Parse(value).TryFormat(destination, out int charsWritten, format, CultureInfo.InvariantCulture));
+		Assert.AreEqual(expected, destination[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	[DataRow("1.00499999999999999999999999999999")]
+	[DataRow("-1.00499999999999999999999999999999")]
+	[DataRow("0.00499999999999999999999999999999")]
+	public void ToString_CustomFormat_MoreDigitsThanDecimal_AgreesWithFixedPoint(string value)
+	{
+		SignificantNumber number = Parse(value);
+
+		Assert.AreEqual(number.ToString("F2", CultureInfo.InvariantCulture), number.ToString("0.00", CultureInfo.InvariantCulture));
+	}
+
+	[TestMethod]
 	public void ToString_CustomFormat_TooSmallForDecimalToKeepDoublePrecision_FormatsLikeDouble()
 	{
 		SignificantNumber value = Parse("1.234567890123456789E-20");

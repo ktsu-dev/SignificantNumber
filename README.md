@@ -187,8 +187,8 @@ Console.WriteLine(formatted);  // Outputs the formatted number
 ```
 
 G, R, F, N and E are written from the exact value, at any magnitude. Other formats, such as C, P or a custom
-pattern like `#,##0.00`, are written the way `decimal` writes the value, rounded to its 28 or 29 significant digits
-when needed, and the way `double` writes it when it is too large or too small for `decimal`. A value outside
+pattern like `#,##0.00`, are written the way `decimal` writes the value, cut to its 28 or 29 significant digits
+when needed (so the value is rounded once, at the digits the format shows), and the way `double` writes it when it is too large or too small for `decimal`. A value outside
 `double`'s finite range, such as `1E400`, throws `FormatException` for those formats rather than printing
 `Infinity` or `0`; use E or G for it.
 
