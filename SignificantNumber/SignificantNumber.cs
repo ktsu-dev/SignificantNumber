@@ -1068,7 +1068,7 @@ public readonly record struct SignificantNumber
 			return asDecimal.ToString(format, formatProvider);
 		}
 
-		return ToFormattingDouble(format).ToString(format, formatProvider);
+		return WithoutSignOfRoundedZero(ToFormattingDouble(format), format, formatProvider).ToString(format, formatProvider);
 	}
 
 	/// <inheritdoc/>
@@ -1086,7 +1086,7 @@ public readonly record struct SignificantNumber
 			return asDecimal.TryFormat(destination, out charsWritten, format, provider);
 		}
 
-		return ToFormattingDouble(format).TryFormat(destination, out charsWritten, format, provider);
+		return WithoutSignOfRoundedZero(ToFormattingDouble(format), format.ToString(), provider).TryFormat(destination, out charsWritten, format, provider);
 	}
 
 	/// <summary>
@@ -1207,6 +1207,24 @@ public readonly record struct SignificantNumber
 
 		return asDouble;
 	}
+
+	/// <summary>
+	/// Replaces a negative <see cref="double"/> that rounds to zero in <paramref name="format"/> with zero, so it is
+	/// written without a minus sign or currency parentheses, as the F and N formats and <see cref="decimal"/> write it.
+	/// </summary>
+	/// <param name="value">The value about to be formatted.</param>
+	/// <param name="format">The format it will be written in.</param>
+	/// <param name="provider">The format provider it will be written with.</param>
+	/// <returns>Zero if <paramref name="value"/> is negative and its magnitude is written the same as zero; otherwise, <paramref name="value"/>.</returns>
+	/// <remarks>
+	/// <see cref="double"/> keeps the sign of a value that rounds to zero: <c>(-1E-30).ToString("0.00")</c> is
+	/// <c>"-0.00"</c> and <c>(-1E-30).ToString("C")</c> is <c>"(¤0.00)"</c>. Comparing the magnitude's text with zero's
+	/// asks the format itself whether the value rounds to zero, whatever its precision. A custom pattern with a zero
+	/// section already writes that section for such a value, so its magnitude doesn't match zero's text and the value
+	/// is left as it is.
+	/// </remarks>
+	private static double WithoutSignOfRoundedZero(double value, string? format, IFormatProvider? provider) =>
+		value < 0 && (-value).ToString(format, provider) == 0d.ToString(format, provider) ? 0d : value;
 
 	/// <summary>
 	/// The largest <see cref="decimal"/>, as a <see cref="PreciseNumber"/>.

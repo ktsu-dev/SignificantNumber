@@ -215,6 +215,46 @@ public class SignificantNumberFormatTests
 		Assert.AreEqual(1.234567890123456789E-20.ToString("0.##############E+0", CultureInfo.InvariantCulture), value.ToString("0.##############E+0", CultureInfo.InvariantCulture));
 	}
 
+	// A negative value that rounds to zero was written with its sign, or in currency parentheses, when it took the
+	// double path (too small for decimal to keep double's digits), but without it on the F/N and decimal paths:
+	// -1E-30 gave "-0.00", "(¤0.00)" and "-0 %", while -0.001 gave "0.00", "¤0.00" and "0 %" (#151).
+	[TestMethod]
+	[DataRow("-0.001", "F2", "0.00")]
+	[DataRow("-0.001", "N2", "0.00")]
+	[DataRow("-0.001", "0.00", "0.00")]
+	[DataRow("-0.001", "C", "¤0.00")]
+	[DataRow("-0.001", "P0", "0 %")]
+	[DataRow("-1E-30", "F2", "0.00")]
+	[DataRow("-1E-30", "N2", "0.00")]
+	[DataRow("-1E-30", "0.00", "0.00")]
+	[DataRow("-1E-30", "#,##0.0", "0.0")]
+	[DataRow("-1E-30", "0.00;(0.00)", "0.00")]
+	[DataRow("-1E-30", "C", "¤0.00")]
+	[DataRow("-1E-30", "C4", "¤0.0000")]
+	[DataRow("-1E-30", "P0", "0 %")]
+	[DataRow("-1E-30", "P", "0.00 %")]
+	public void ToString_NegativeValueThatRoundsToZero_IsWrittenWithoutSign(string value, string format, string expected)
+	{
+		Span<char> destination = stackalloc char[64];
+
+		Assert.AreEqual(expected, Parse(value).ToString(format, CultureInfo.InvariantCulture));
+		Assert.IsTrue(Parse(value).TryFormat(destination, out int charsWritten, format, CultureInfo.InvariantCulture));
+		Assert.AreEqual(expected, destination[..charsWritten].ToString());
+	}
+
+	[TestMethod]
+	[DataRow("-1E-30", "0.00;(0.00);zero", "zero")]
+	[DataRow("-1E-30", "0.##E+0", "-1E-30")]
+	[DataRow("-1E-30", "0.##E+0;(0.##E+0)", "(1E-30)")]
+	public void ToString_NegativeValueThatDoesNotRoundToZeroOrHasAZeroSection_FormatsLikeDouble(string value, string format, string expected)
+	{
+		Span<char> destination = stackalloc char[64];
+
+		Assert.AreEqual(expected, Parse(value).ToString(format, CultureInfo.InvariantCulture));
+		Assert.IsTrue(Parse(value).TryFormat(destination, out int charsWritten, format, CultureInfo.InvariantCulture));
+		Assert.AreEqual(expected, destination[..charsWritten].ToString());
+	}
+
 	[TestMethod]
 	public void ToString_FormatWithoutProvider_UsesCurrentCulture()
 	{
