@@ -195,4 +195,87 @@ public class SignificantNumberFormatTests
 			CultureInfo.CurrentCulture = original;
 		}
 	}
+
+	[TestMethod]
+	[DataRow(null, "1234,5")]
+	[DataRow("G", "1234,5")]
+	[DataRow("F2", "1234,50")]
+	[DataRow("N2", "1.234,50")]
+	[DataRow("E2", "1,23E+003")]
+	[DataRow("0.00", "1234,50")]
+	[DataRow("#,##0.00", "1.234,50")]
+	public void ToString_NullProvider_UsesCurrentCultureForEveryFormat(string? format, string expected)
+	{
+		SignificantNumber value = Parse("1234.5");
+		char[] destination = new char[64];
+
+		WithCurrentCulture(CommaDecimalCulture, () =>
+		{
+			Assert.AreEqual(expected, value.ToString(format, null));
+			Assert.IsTrue(value.TryFormat(destination, out int charsWritten, format, null));
+			Assert.AreEqual(expected, new string(destination, 0, charsWritten));
+		});
+	}
+
+	[TestMethod]
+	public void ToString_NoArguments_UsesCurrentCulture()
+	{
+		SignificantNumber value = Parse("1234.5");
+
+		WithCurrentCulture(CommaDecimalCulture, () =>
+		{
+			Assert.AreEqual("1234,5", value.ToString());
+			Assert.AreEqual("1234,5", value.ToString((IFormatProvider?)null));
+			Assert.AreEqual("1234,50", value.ToString("F2"));
+			Assert.AreEqual("1234,5 / 1234,50", $"{value} / {value:0.00}");
+		});
+	}
+
+	[TestMethod]
+	public void Parse_NullProvider_UsesCurrentCulture()
+	{
+		WithCurrentCulture(CommaDecimalCulture, () =>
+		{
+			Assert.AreEqual(Parse("1.5"), SignificantNumber.Parse("1,5", null));
+			Assert.AreEqual(Parse("1.5"), SignificantNumber.Parse("1,5".AsSpan(), null));
+			Assert.AreEqual(Parse("1.5"), SignificantNumber.Parse("1,5", NumberStyles.Float, null));
+			Assert.AreEqual(Parse("1.5"), SignificantNumber.Parse("1,5".AsSpan(), NumberStyles.Float, null));
+
+			Assert.IsTrue(SignificantNumber.TryParse("1,5", null, out SignificantNumber parsed));
+			Assert.AreEqual(Parse("1.5"), parsed);
+			Assert.IsTrue(SignificantNumber.TryParse("1,5".AsSpan(), null, out parsed));
+			Assert.AreEqual(Parse("1.5"), parsed);
+			Assert.IsTrue(SignificantNumber.TryParse("1,5", NumberStyles.Float, null, out parsed));
+			Assert.AreEqual(Parse("1.5"), parsed);
+			Assert.IsTrue(SignificantNumber.TryParse("1,5".AsSpan(), NumberStyles.Float, null, out parsed));
+			Assert.AreEqual(Parse("1.5"), parsed);
+		});
+	}
+
+	[TestMethod]
+	[DataRow("F1")]
+	[DataRow("F2")]
+	[DataRow("0.00")]
+	[DataRow("0.0#")]
+	public void Parse_NullProvider_ReadsBackWhatToStringWrote(string format)
+	{
+		SignificantNumber value = Parse("1234.5");
+
+		WithCurrentCulture(CommaDecimalCulture, () =>
+			Assert.AreEqual(value, SignificantNumber.Parse(value.ToString(format), null)));
+	}
+
+	private static void WithCurrentCulture(CultureInfo culture, Action action)
+	{
+		CultureInfo original = CultureInfo.CurrentCulture;
+		try
+		{
+			CultureInfo.CurrentCulture = culture;
+			action();
+		}
+		finally
+		{
+			CultureInfo.CurrentCulture = original;
+		}
+	}
 }
