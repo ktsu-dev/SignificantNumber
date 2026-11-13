@@ -2,6 +2,7 @@
 
 Changes since v3.0.0:
 
+- Write a negative value that rounds to zero without its sign in C, P and custom formats [patch] (#152) (matt-edmondson)
 - Round C, P and custom formats once, at the digits the format shows [patch] (#157) (matt-edmondson)
 - Read a null format provider as the current culture everywhere [minor] (#158) (matt-edmondson)
 - Convert to SignificantNumber in To\<TOutput\> without rebuilding the value [patch] (#146) (matt-edmondson)
