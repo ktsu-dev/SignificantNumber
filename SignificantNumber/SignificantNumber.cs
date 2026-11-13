@@ -1017,15 +1017,21 @@ public readonly record struct SignificantNumber
 		where TOutput : INumber<TOutput> =>
 		TryWrap(this, out TOutput? wrapped) ? wrapped! : Value.To<TOutput>();
 
-	/// <inheritdoc/>
-	public override string ToString() => PreciseNumber.ToString(Value, null, null);
+	/// <summary>
+	/// Converts the current instance to a string using the current culture.
+	/// </summary>
+	/// <returns>The string representation of the number.</returns>
+	public override string ToString() => ToString(CultureInfo.CurrentCulture);
 
 	/// <summary>
 	/// Converts the current instance to a string using the specified format provider.
 	/// </summary>
-	/// <param name="formatProvider">An object that provides culture-specific formatting information.</param>
+	/// <param name="formatProvider">
+	/// An object that provides culture-specific formatting information, or <see langword="null"/> for the current culture.
+	/// </param>
 	/// <returns>The string representation of the number.</returns>
-	public string ToString(IFormatProvider? formatProvider) => PreciseNumber.ToString(Value, null, formatProvider);
+	public string ToString(IFormatProvider? formatProvider) =>
+		PreciseNumber.ToString(Value, null, formatProvider ?? CultureInfo.CurrentCulture);
 
 	/// <summary>
 	/// Converts the current instance to a string using the specified format.
@@ -1038,8 +1044,9 @@ public readonly record struct SignificantNumber
 	/// <inheritdoc/>
 	/// <remarks>
 	/// The standard formats G, R, F, N and E are written from the exact value. Any other format, such as C, P or a
-	/// custom pattern like <c>0.00</c>, is written the way <see cref="decimal"/> writes the same value, rounded to
-	/// the 28 or 29 significant digits <see cref="decimal"/> holds when it can't hold it exactly. A value too large
+	/// custom pattern like <c>0.00</c>, is written the way <see cref="decimal"/> writes the same value, cut to
+	/// the 28 or 29 significant digits <see cref="decimal"/> holds when it can't hold it exactly, so it is rounded
+	/// once, at the digits the format shows. A value too large
 	/// for <see cref="decimal"/>, or too small for <see cref="decimal"/> to keep the 15 significant digits
 	/// <see cref="double"/> would, is written the way <see cref="double"/> writes it. A value outside the finite
 	/// range of <see cref="double"/> can't be written that way, so it throws rather than being written as an
@@ -1049,8 +1056,14 @@ public readonly record struct SignificantNumber
 	/// The format is not G, R, F, N or E, and the value is too large or too small for <see cref="double"/> to write.
 	/// Use the E or G format for such a value.
 	/// </exception>
+	/// <param name="format">The format to use, or <see langword="null"/> for the G format.</param>
+	/// <param name="formatProvider">
+	/// An object that provides culture-specific formatting information, or <see langword="null"/> for the current
+	/// culture, whatever the format.
+	/// </param>
 	public string ToString(string? format, IFormatProvider? formatProvider)
 	{
+		formatProvider ??= CultureInfo.CurrentCulture;
 		if (IsExactFormat(format))
 		{
 			return PreciseNumber.ToString(Value, format, formatProvider);
@@ -1068,6 +1081,7 @@ public readonly record struct SignificantNumber
 	/// <remarks><inheritdoc cref="ToString(string?, IFormatProvider?)" path="/remarks"/></remarks>
 	public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
 	{
+		provider ??= CultureInfo.CurrentCulture;
 		if (IsExactFormat(format))
 		{
 			return Value.TryFormat(destination, out charsWritten, format, provider);
@@ -1125,9 +1139,62 @@ public readonly record struct SignificantNumber
 			return false;
 		}
 
-		asDecimal = Value.To<decimal>();
+		asDecimal = TruncateToDecimal(Value);
 		return magnitude >= DecimalFormattingMinMagnitude || asDecimal.ToPreciseNumber() == Value;
 	}
+
+	/// <summary>
+	/// Converts a value no larger in magnitude than <see cref="decimal.MaxValue"/> to <see cref="decimal"/>, dropping
+	/// the digits <see cref="decimal"/> can't hold rather than rounding them.
+	/// </summary>
+	/// <remarks>
+	/// The <see cref="decimal"/> is formatted, and so rounded, a second time. Rounding here as well would round twice:
+	/// <c>1.00499…9</c> with more digits than <see cref="decimal"/> holds would become <c>1.005</c> and then
+	/// <c>1.01</c> under <c>C2</c>. Every halfway point <see cref="decimal"/> can format at is exactly representable,
+	/// so the truncated value rounds the same way the exact value does at any position the format shows.
+	/// </remarks>
+	/// <param name="value">The value to convert.</param>
+	/// <returns>The value, truncated toward zero to the digits <see cref="decimal"/> holds.</returns>
+	private static decimal TruncateToDecimal(PreciseNumber value)
+	{
+		if (value.Exponent >= 0)
+		{
+			return value.To<decimal>();
+		}
+
+		BigInteger significand = BigInteger.Abs(value.Significand);
+		int scale = -value.Exponent;
+		if (scale > DecimalMaxScale)
+		{
+			significand /= BigInteger.Pow(10, scale - DecimalMaxScale);
+			scale = DecimalMaxScale;
+		}
+
+		while (significand > DecimalMaxMantissa)
+		{
+			significand /= 10;
+			scale--;
+		}
+
+		byte[] bytes = new byte[12];
+		significand.TryWriteBytes(bytes, out _, isUnsigned: true, isBigEndian: false);
+		return new decimal(
+			BitConverter.ToInt32(bytes, 0),
+			BitConverter.ToInt32(bytes, 4),
+			BitConverter.ToInt32(bytes, 8),
+			value.Significand.Sign < 0,
+			(byte)scale);
+	}
+
+	/// <summary>
+	/// The most decimal places a <see cref="decimal"/> holds.
+	/// </summary>
+	private const int DecimalMaxScale = 28;
+
+	/// <summary>
+	/// The largest 96-bit integer a <see cref="decimal"/> scales.
+	/// </summary>
+	private static readonly BigInteger DecimalMaxMantissa = (BigInteger.One << 96) - 1;
 
 	/// <summary>
 	/// Converts the current instance to the <see cref="double"/> that formats it.
@@ -1335,52 +1402,52 @@ public readonly record struct SignificantNumber
 	/// </summary>
 	/// <param name="s">The span of characters to parse.</param>
 	/// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of <paramref name="s"/>.</param>
-	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information, or <see langword="null"/> for the current culture.</param>
 	/// <returns>A <see cref="SignificantNumber"/> parsed from the input span.</returns>
 	public static SignificantNumber Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) =>
-		new(PreciseNumber.Parse(s, style, provider));
+		new(PreciseNumber.Parse(s, style, provider ?? CultureInfo.CurrentCulture));
 
 	/// <summary>
 	/// Parses a string into a <see cref="SignificantNumber"/> using the specified style and format provider.
 	/// </summary>
 	/// <param name="s">The string to parse.</param>
 	/// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of <paramref name="s"/>.</param>
-	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information, or <see langword="null"/> for the current culture.</param>
 	/// <returns>A <see cref="SignificantNumber"/> parsed from the input string.</returns>
 	public static SignificantNumber Parse(string s, NumberStyles style, IFormatProvider? provider) =>
-		new(PreciseNumber.Parse(s, style, provider));
+		new(PreciseNumber.Parse(s, style, provider ?? CultureInfo.CurrentCulture));
 
 	/// <summary>
 	/// Parses a span of characters into a <see cref="SignificantNumber"/> using the specified format provider.
 	/// </summary>
 	/// <param name="s">The span of characters to parse.</param>
-	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information, or <see langword="null"/> for the current culture.</param>
 	/// <returns>A <see cref="SignificantNumber"/> parsed from the input span.</returns>
 	/// <exception cref="FormatException">Thrown when the input span is not in a valid format.</exception>
 	public static SignificantNumber Parse(ReadOnlySpan<char> s, IFormatProvider? provider) =>
-		new(PreciseNumber.Parse(s, provider));
+		new(PreciseNumber.Parse(s, provider ?? CultureInfo.CurrentCulture));
 
 	/// <summary>
 	/// Parses a string into a <see cref="SignificantNumber"/> using the specified format provider.
 	/// </summary>
 	/// <param name="s">The string to parse.</param>
-	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information, or <see langword="null"/> for the current culture.</param>
 	/// <returns>A <see cref="SignificantNumber"/> parsed from the input string.</returns>
 	/// <exception cref="FormatException">Thrown when the input string is not in a valid format.</exception>
 	public static SignificantNumber Parse(string s, IFormatProvider? provider) =>
-		new(PreciseNumber.Parse(s, provider));
+		new(PreciseNumber.Parse(s, provider ?? CultureInfo.CurrentCulture));
 
 	/// <summary>
 	/// Attempts to parse a span of characters into a <see cref="SignificantNumber"/> using the specified style and format provider.
 	/// </summary>
 	/// <param name="s">The span of characters to parse.</param>
 	/// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of <paramref name="s"/>.</param>
-	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information, or <see langword="null"/> for the current culture.</param>
 	/// <param name="result">When this method returns, contains the parsed number if parsing succeeded, or zero if it failed.</param>
 	/// <returns><see langword="true"/> if the parsing succeeded; otherwise, <see langword="false"/>.</returns>
 	public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, out SignificantNumber result)
 	{
-		bool parsed = PreciseNumber.TryParse(s, style, provider, out PreciseNumber preciseResult);
+		bool parsed = PreciseNumber.TryParse(s, style, provider ?? CultureInfo.CurrentCulture, out PreciseNumber preciseResult);
 		result = new(preciseResult);
 		return parsed;
 	}
@@ -1390,12 +1457,12 @@ public readonly record struct SignificantNumber
 	/// </summary>
 	/// <param name="s">The string to parse.</param>
 	/// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of <paramref name="s"/>.</param>
-	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information, or <see langword="null"/> for the current culture.</param>
 	/// <param name="result">When this method returns, contains the parsed number if parsing succeeded, or zero if it failed.</param>
 	/// <returns><see langword="true"/> if the parsing succeeded; otherwise, <see langword="false"/>.</returns>
 	public static bool TryParse([NotNullWhen(true)] string? s, NumberStyles style, IFormatProvider? provider, out SignificantNumber result)
 	{
-		bool parsed = PreciseNumber.TryParse(s, style, provider, out PreciseNumber preciseResult);
+		bool parsed = PreciseNumber.TryParse(s, style, provider ?? CultureInfo.CurrentCulture, out PreciseNumber preciseResult);
 		result = new(preciseResult);
 		return parsed;
 	}
@@ -1404,12 +1471,12 @@ public readonly record struct SignificantNumber
 	/// Attempts to parse a span of characters into a <see cref="SignificantNumber"/> using the specified format provider.
 	/// </summary>
 	/// <param name="s">The span of characters to parse.</param>
-	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information, or <see langword="null"/> for the current culture.</param>
 	/// <param name="result">When this method returns, contains the parsed number if parsing succeeded, or zero if it failed.</param>
 	/// <returns><see langword="true"/> if the parsing succeeded; otherwise, <see langword="false"/>.</returns>
 	public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out SignificantNumber result)
 	{
-		bool parsed = PreciseNumber.TryParse(s, provider, out PreciseNumber preciseResult);
+		bool parsed = PreciseNumber.TryParse(s, provider ?? CultureInfo.CurrentCulture, out PreciseNumber preciseResult);
 		result = new(preciseResult);
 		return parsed;
 	}
@@ -1418,12 +1485,12 @@ public readonly record struct SignificantNumber
 	/// Attempts to parse a string into a <see cref="SignificantNumber"/> using the specified format provider.
 	/// </summary>
 	/// <param name="s">The string to parse.</param>
-	/// <param name="provider">An object that provides culture-specific formatting information.</param>
+	/// <param name="provider">An object that provides culture-specific formatting information, or <see langword="null"/> for the current culture.</param>
 	/// <param name="result">When this method returns, contains the parsed number if parsing succeeded, or zero if it failed.</param>
 	/// <returns><see langword="true"/> if the parsing succeeded; otherwise, <see langword="false"/>.</returns>
 	public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out SignificantNumber result)
 	{
-		bool parsed = PreciseNumber.TryParse(s, provider, out PreciseNumber preciseResult);
+		bool parsed = PreciseNumber.TryParse(s, provider ?? CultureInfo.CurrentCulture, out PreciseNumber preciseResult);
 		result = new(preciseResult);
 		return parsed;
 	}
