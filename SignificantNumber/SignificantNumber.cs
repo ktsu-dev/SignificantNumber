@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2026 ktsu-dev contributors
+﻿// Copyright (c) 2023-2026 ktsu-dev contributors
 
 namespace ktsu.SignificantNumber;
 
@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 using ktsu.PreciseNumber;
 
@@ -23,8 +24,13 @@ using ktsu.PreciseNumber;
 /// Multiplication and division round it to the fewest significant digits. An operand of exactly -1, 0, or 1 is treated
 /// as having unlimited precision, so it never limits the result.
 /// </para>
+/// <para>
+/// System.Text.Json reads and writes it through <see cref="SignificantNumberJsonConverter"/>, as a string such as
+/// <c>"9.81"</c>, without any registration.
+/// </para>
 /// </remarks>
 [DebuggerDisplay("{Significand}e{Exponent}")]
+[JsonConverter(typeof(SignificantNumberJsonConverter))]
 public readonly record struct SignificantNumber
 	: INumber<SignificantNumber>
 {
