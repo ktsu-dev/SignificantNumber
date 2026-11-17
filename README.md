@@ -35,6 +35,7 @@ Upgrading from 1.x? See the [2.0 migration guide](docs/migration-guide-2.0.md).
   - [Arithmetic operations](#arithmetic-operations)
   - [Comparison operations](#comparison-operations)
   - [Formatting and parsing](#formatting-and-parsing)
+  - [JSON serialization](#json-serialization)
   - [Extension methods](#extension-methods)
   - [Conversion](#conversion)
 - [Precision](#precision)
@@ -207,6 +208,21 @@ if (SignificantNumber.TryParse("123.45", CultureInfo.InvariantCulture, out Signi
 
 A `null` format provider, and `ToString()` with none, mean the current culture for every format and for
 `Parse`/`TryParse`, as they do for `decimal`. Pass `CultureInfo.InvariantCulture` for culture-independent text.
+
+### JSON serialization
+
+System.Text.Json reads and writes a `SignificantNumber` with no registration. It is written as a string in its
+round-trip (`R`) form in the invariant culture, and read from either a string or a number, as written:
+
+```csharp
+record Reading(string Name, SignificantNumber Value);
+
+string json = JsonSerializer.Serialize(new Reading("g", SignificantNumber.Parse("9.81", CultureInfo.InvariantCulture)));
+// {"Name":"g","Value":"9.81"}
+
+Reading back = JsonSerializer.Deserialize<Reading>(json)!;  // Value is 9.81, with the same significant digits
+SignificantNumber fromNumber = JsonSerializer.Deserialize<SignificantNumber>("1.20");
+```
 
 ### Extension methods
 
